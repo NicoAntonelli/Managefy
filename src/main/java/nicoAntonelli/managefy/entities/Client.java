@@ -81,4 +81,16 @@ public class Client {
     public void setDetelionDate(@Nullable Date detelionDate) {
         this.detelionDate = detelionDate;
     }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", mail='" + mail + '\'' +
+                ", phone='" + phone + '\'' +
+                ", detelionDate=" + detelionDate +
+                '}';
+    }
 }
