@@ -1,9 +1,11 @@
 package nicoAntonelli.managefy.service;
 
 import nicoAntonelli.managefy.entities.Client;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ClientService {
     public List<Client> GetClients() {
         Client client1 = new Client(1L, "Nick", "Food & soda", "nick@mail.com", "123456", null);
