@@ -1,7 +1,7 @@
-package nicoAntonelli.managefy.migration;
+package nicoAntonelli.managefy.migrations;
 
 import nicoAntonelli.managefy.entities.Client;
-import nicoAntonelli.managefy.repository.ClientRepository;
+import nicoAntonelli.managefy.repositories.ClientRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package nicoAntonelli.managefy.repository;
+package nicoAntonelli.managefy.repositories;
 
 import nicoAntonelli.managefy.entities.Client;
 import org.springframework.data.jpa.repository.JpaRepository;

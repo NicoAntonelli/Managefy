@@ -1,7 +1,7 @@
-package nicoAntonelli.managefy.service;
+package nicoAntonelli.managefy.services;
 
 import nicoAntonelli.managefy.entities.Client;
-import nicoAntonelli.managefy.repository.ClientRepository;
+import nicoAntonelli.managefy.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
