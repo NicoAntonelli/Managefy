@@ -1,9 +1,22 @@
 package nicoAntonelli.managefy.entities;
 
+import jakarta.persistence.*;
 import org.springframework.lang.Nullable;
 import java.util.Date;
 
+@Entity
+@Table
 public class Client {
+    @Id
+    @SequenceGenerator(
+            name = "client_sequence",
+            sequenceName = "client_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "client_sequence"
+    )
     private Long id;
     private String name;
     private String description;
