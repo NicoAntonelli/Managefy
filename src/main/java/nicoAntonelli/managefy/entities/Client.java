@@ -23,7 +23,7 @@ public class Client {
     private String mail;
     private String phone;
     @Nullable
-    private Date detelionDate;
+    private Date deletionDate;
 
     public Client() { }
 
@@ -34,7 +34,7 @@ public class Client {
         this.description = description;
         this.mail = mail;
         this.phone = phone;
-        this.detelionDate = detelionDate;
+        this.deletionDate = detelionDate;
     }
 
     public Client(String name, String description, String mail,
@@ -43,7 +43,7 @@ public class Client {
         this.description = description;
         this.mail = mail;
         this.phone = phone;
-        this.detelionDate = detelionDate;
+        this.deletionDate = detelionDate;
     }
 
     public Long getId() {
@@ -87,12 +87,12 @@ public class Client {
     }
 
     @Nullable
-    public Date getDetelionDate() {
-        return detelionDate;
+    public Date getDeletionDate() {
+        return deletionDate;
     }
 
-    public void setDetelionDate(@Nullable Date detelionDate) {
-        this.detelionDate = detelionDate;
+    public void setDeletionDate(@Nullable Date deletionDate) {
+        this.deletionDate = deletionDate;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class Client {
                 ", description='" + description + '\'' +
                 ", mail='" + mail + '\'' +
                 ", phone='" + phone + '\'' +
-                ", detelionDate=" + detelionDate +
+                ", deletionDate=" + deletionDate +
                 '}';
     }
 }
