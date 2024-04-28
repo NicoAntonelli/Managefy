@@ -1,11 +1,10 @@
 package nicoAntonelli.managefy.entities;
 
 import jakarta.persistence.*;
-import org.springframework.lang.Nullable;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "clients")
 public class Client {
     @Id
     @SequenceGenerator(
@@ -17,18 +16,23 @@ public class Client {
             strategy = GenerationType.SEQUENCE,
             generator = "client_sequence"
     )
+    @Column(updatable = false)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private String mail;
+    @Column(nullable = false)
     private String phone;
-    @Nullable
+    @Column(nullable = true)
     private Date deletionDate;
 
     public Client() { }
 
     public Client(Long id, String name, String description, String mail,
-                  String phone, @Nullable Date detelionDate) {
+                  String phone, Date detelionDate) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -38,7 +42,7 @@ public class Client {
     }
 
     public Client(String name, String description, String mail,
-                  String phone, @Nullable Date detelionDate) {
+                  String phone, Date detelionDate) {
         this.name = name;
         this.description = description;
         this.mail = mail;
@@ -86,12 +90,11 @@ public class Client {
         this.phone = phone;
     }
 
-    @Nullable
     public Date getDeletionDate() {
         return deletionDate;
     }
 
-    public void setDeletionDate(@Nullable Date deletionDate) {
+    public void setDeletionDate(Date deletionDate) {
         this.deletionDate = deletionDate;
     }
 
