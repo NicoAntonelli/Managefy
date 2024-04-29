@@ -10,14 +10,14 @@ import java.util.Date;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Client {
     @Id
-    @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence")
+    @SequenceGenerator(name = "clients_sequence", sequenceName = "clients_sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clients_sequence")
     @Column(updatable = false)
     private Long id;
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false)
     private String mail;
