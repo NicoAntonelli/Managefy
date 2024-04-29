@@ -11,7 +11,7 @@ import java.util.List;
 @Configuration
 public class ClientMigrations {
     @Bean
-    CommandLineRunner runner(ClientRepository repository) {
+    CommandLineRunner clientRunner(ClientRepository repository) {
         return args -> {
             Client client1 = new Client("Nick", "Food & soda", "nick@mail.com", "123456", null);
             Client client2 = new Client("Kasp", "Red meat", "kasp@mail.com", "111222", null);

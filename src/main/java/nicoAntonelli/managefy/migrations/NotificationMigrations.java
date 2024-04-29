@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class NotificationMigrations {
     @Bean
-    CommandLineRunner runner(NotificationRepository repository) {
+    CommandLineRunner notificationRunner(NotificationRepository repository) {
         return args -> {
             Date today = new Date();
 
