@@ -20,24 +20,28 @@ with multiple easy-to-understand graphs... in a single free app.
 
 ### Frontend
 
-| Name                      | How it contributes to the project              |
-|:--------------------------|:-----------------------------------------------|
-| :necktie: TypeScript      | Programming language that builds on JavaScript |
-| :rocket: Next.js          | Fullstack framework for React.js               |
-| :art: HTML5 / CSS3 / SASS | The basics for the web!                        |
-| :package: TurboPack       | JavaScript very fast bundler                   |
+| Name                                    | How it contributes to the project              |
+|:----------------------------------------|:-----------------------------------------------|
+| :necktie: TypeScript                    | Programming language that builds on JavaScript |
+| :rocket: Next.js                        | Fullstack framework for React.js               |
+| :framed_picture:	HTML5 / CSS3 / SASS    | The basics for the web!                        |
+| :art: Mantine                           | Really nice component library                  |
+| :package: TurboPack                     | JavaScript very fast bundler                   |
 
 ### Backend
 
-| Name                           | How it contributes to the project                         |
-|:-------------------------------|:----------------------------------------------------------|
-| :coffee: Java                  | General-purpose object-oriented programming language      |
-| :briefcase: Maven              | Automation tool for build and manage Java projects        |
-| :desktop_computer: Spring Boot | Java framework used to create services and applications   |
-| :card_file_box: PostgreSQL     | Open-source relational database management system (RDBMS) |
+| Name                            | How it contributes to the project                                   |
+|:--------------------------------|:--------------------------------------------------------------------|
+| :coffee: Java                   | General-purpose object-oriented programming language                |
+| :feather: Maven                 | Automation tool for build and manage Java projects                  |
+| :fallen_leaf: Spring Boot       | Java framework used to create services and applications             |
+| :bookmark_tabs: Spring Data JPA | Extra layer of data-access abstraction. Easy JPA-based repositories |
+| :world_map: Hibernate           | Object-relational mapping (ORM) tool for Java, JPA implementation   |
+| :card_file_box: PostgreSQL      | Open-source relational database management system (RDBMS)           |
+| :hot_pepper: Lombok             | Minimizes boilerplate such as constructors, getters and setters     |
 
 ## Author
 
-| Name               | GitHub Account                             |
-| :----------------- | :----------------------------------------- |
-| Antonelli, Nicolás | :octocat: https://github.com/NicoAntonelli |
+| Name                        | GitHub Account                            |
+|:----------------------------|:------------------------------------------|
+| :octocat: Nicolás Antonelli | :link: https://github.com/NicoAntonelli   |
