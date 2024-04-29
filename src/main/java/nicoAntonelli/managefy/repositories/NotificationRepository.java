@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    @Query("SELECT n FROM Notification WHERE n.user.id = ?1")
+    @Query("SELECT n FROM Notification n INNER JOIN n.user u WHERE u.id = ?1")
     List<Notification> findByUser(Long userID);
 }
