@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -29,6 +30,9 @@ public class NotificationController {
 
     @PostMapping
     public Notification CreateNotification(@RequestBody Notification notification) {
+        notification.setState(Notification.NotificationState.Unread);
+        notification.setDate(new Date());
+
         return notificationService.CreateNotification(notification);
     }
 
