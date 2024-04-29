@@ -15,7 +15,7 @@ public class Notification {
     public enum NotificationType { Normal, Important, Priority }
 
     // State enum
-    public enum NotificationState { Unread, read, closed }
+    public enum NotificationState { Unread, Read, Closed }
 
     @Id
     @SequenceGenerator(name = "notifications_sequence", sequenceName = "notifications_sequence")
