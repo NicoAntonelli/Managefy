@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users",
        uniqueConstraints = {
@@ -27,6 +30,11 @@ public class User {
     private Boolean validated;
     @Column(nullable = false)
     private Boolean mailNotifications;
+
+    @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL },
+               orphanRemoval = true, fetch = FetchType.LAZY
+    )
+    private List<Notification> notifications = new ArrayList<>();
 
     public User(String mail, String password, String name, Boolean validated, Boolean mailNotifications) {
         this.mail = mail;
