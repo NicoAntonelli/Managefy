@@ -1,5 +1,6 @@
 package nicoAntonelli.managefy.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class User {
     @Column(nullable = false)
     private Boolean mailNotifications;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL },
                orphanRemoval = true, fetch = FetchType.LAZY
     )
