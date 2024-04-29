@@ -30,6 +30,7 @@ public class NotificationController {
 
     @PostMapping
     public Notification CreateNotification(@RequestBody Notification notification) {
+        notification.setId(null);
         notification.setState(Notification.NotificationState.Unread);
         notification.setDate(new Date());
 

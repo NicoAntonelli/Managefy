@@ -29,6 +29,7 @@ public class UserController {
 
     @PostMapping(path = "/Register")
     public User Register(@RequestBody User user) {
+        user.setId(null);
         return userService.CreateUser(user);
     }
 
