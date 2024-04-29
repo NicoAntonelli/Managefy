@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class ClientMigration {
+public class ClientMigrations {
     @Bean
     CommandLineRunner runner(ClientRepository repository) {
         return args -> {
