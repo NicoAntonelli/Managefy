@@ -23,8 +23,7 @@ public class Client {
     private String mail;
     @Column(nullable = false)
     private String phone;
-    @Column(nullable = true)
-    private Date deletionDate;
+    private Date deletionDate; // Nullable
 
     public Client(String name, String description, String mail,
                   String phone, Date detelionDate) {
