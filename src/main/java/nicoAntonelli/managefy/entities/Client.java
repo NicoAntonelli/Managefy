@@ -10,17 +10,11 @@ import java.util.Date;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Client {
     @Id
-    @SequenceGenerator(
-            name = "client_sequence",
-            sequenceName = "client_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "client_sequence"
-    )
+    @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence")
     @Column(updatable = false)
     private Long id;
+
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)

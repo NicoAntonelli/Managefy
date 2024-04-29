@@ -1,5 +1,6 @@
 package nicoAntonelli.managefy.services;
 
+import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Client;
 import nicoAntonelli.managefy.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ClientService {
     private final ClientRepository clientRepository;
 
