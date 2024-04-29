@@ -41,11 +41,15 @@ public class Notification {
     )
     private User user;
 
-    public Notification(String description, NotificationType type, NotificationState state, Date date) {
+    public Notification(String description, NotificationType type, NotificationState state,
+                        Date date, Long userID) {
         this.description = description;
         this.type = type;
         this.state = state;
         this.date = date;
+
+        // Load nested entity with ID-only
+        this.user = new User();
+        user.setId(userID);
     }
 }
-
