@@ -27,13 +27,13 @@ public class UserController {
         return userService.GetOneUser(userID);
     }
 
-    @PostMapping(path = "/Register")
+    @PostMapping(path = "/register")
     public User Register(@RequestBody User user) {
         user.setId(null);
         return userService.CreateUser(user);
     }
 
-    @PostMapping(path = "/Login")
+    @PostMapping(path = "/login")
     public User Login(@RequestBody User user) {
         return userService.ValidateUser(user.getMail(), user.getPassword());
     }

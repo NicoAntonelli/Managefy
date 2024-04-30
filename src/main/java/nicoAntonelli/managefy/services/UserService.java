@@ -83,7 +83,10 @@ public class UserService {
         // Mail unique validation
         Optional<User> possibleUser = userRepository.findByMail(user.getMail());
         if (possibleUser.isPresent()) {
-            throw new IllegalStateException("Mail '" + user.getMail() + "' already taken");
+            // Don't fail validation if it's the same user
+            if (!Objects.equals(possibleUser.get().getId(), user.getId())) {
+                throw new IllegalStateException("Mail '" + user.getMail() + "' already taken");
+            }
         }
 
         return userRepository.save(user);
