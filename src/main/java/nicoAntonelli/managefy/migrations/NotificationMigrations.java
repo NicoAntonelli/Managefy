@@ -5,11 +5,13 @@ import nicoAntonelli.managefy.repositories.NotificationRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import java.util.Date;
 import java.util.List;
 
 @Configuration
+@DependsOn("userRunner")
 public class NotificationMigrations {
     @Bean
     CommandLineRunner notificationRunner(NotificationRepository repository) {
