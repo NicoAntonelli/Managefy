@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users",
@@ -37,6 +39,13 @@ public class User {
                orphanRemoval = true, fetch = FetchType.LAZY
     )
     private List<Notification> notifications = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name="userRoles",
+               joinColumns = @JoinColumn(name = "userID"),
+               inverseJoinColumns = @JoinColumn(name = "businessID"))
+    private Set<Business> userRoles = new HashSet<>();
 
     public User(String mail, String password, String name, Boolean validated, Boolean mailNotifications) {
         this.mail = mail;

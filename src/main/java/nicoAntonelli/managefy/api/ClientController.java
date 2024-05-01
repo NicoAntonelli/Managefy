@@ -41,8 +41,7 @@ public class ClientController {
     }
 
     @DeleteMapping(path = "{clientID}")
-    public Client DeleteClient(@PathVariable("clientID") Long clientID)
-    {
+    public Client DeleteClient(@PathVariable("clientID") Long clientID) {
         return clientService.DeleteClient(clientID);
     }
 }
