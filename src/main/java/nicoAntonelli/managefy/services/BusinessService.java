@@ -51,16 +51,6 @@ public class BusinessService {
         return businessRepository.save(business);
     }
 
-    public Boolean AddUserRole(Long businessID, Long userID) {
-        Business business = GetOneBusiness(businessID);
-        User user = userService.GetOneUser(userID);
-
-        business.addUser(user);
-        businessRepository.save(business);
-
-        return true;
-    }
-
     public Long DeleteBusiness(Long businessID) {
         businessRepository.deleteById(businessID);
         return businessID;

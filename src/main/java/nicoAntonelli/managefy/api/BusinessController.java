@@ -38,12 +38,6 @@ public class BusinessController {
         return businessService.UpdateBusiness(business);
     }
 
-    @PutMapping(path = "{businessID}/userRole/{userID}")
-    public Boolean AddUserRole(@PathVariable("businessID") Long businessID,
-                               @PathVariable("userID") Long userID) {
-        return businessService.AddUserRole(businessID, userID);
-    }
-
     @DeleteMapping(path = "{businessID}")
     public Long BusinessIDUser(@PathVariable("businessID") Long businessID) {
         return businessService.DeleteBusiness(businessID);
