@@ -36,16 +36,12 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL },
-               orphanRemoval = true, fetch = FetchType.LAZY
-    )
+               orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Notification> notifications = new ArrayList<>();
 
     @JsonIgnore
-    @ManyToMany
-    @JoinTable(name="userRoles",
-               joinColumns = @JoinColumn(name = "userID"),
-               inverseJoinColumns = @JoinColumn(name = "businessID"))
-    private Set<Business> userRoles = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL })
+    private Set<UserRole> userRoles = new HashSet<>();
 
     public User(String mail, String password, String name, Boolean validated, Boolean mailNotifications) {
         this.mail = mail;

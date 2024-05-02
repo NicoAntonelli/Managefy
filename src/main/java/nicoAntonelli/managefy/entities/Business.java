@@ -42,11 +42,12 @@ public class Business {
         put("Sunday", false);
     }};
 
-    @ManyToMany(mappedBy = "userRoles")
-    private Set<User> users = new HashSet<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL })
+    private Set<UserRole> userRoles = new HashSet<>();
 
-    public void addUser(User user) {
-        users.add(user);
+    public void addUser(UserRole userRole) {
+        userRoles.add(userRole);
     }
 
     public Business(String name, String description, String link, SortedMap<String, Boolean> businessDays) {
