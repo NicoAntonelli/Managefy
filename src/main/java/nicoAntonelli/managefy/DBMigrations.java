@@ -15,7 +15,8 @@ public class DBMigrations {
     CommandLineRunner runner(BusinessRepository businessRepository,
                              ClientRepository clientRepository,
                              NotificationRepository notificationRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             UserRoleRepository userRoleRepository) {
         return args -> {
             // Business
             List<Business> businesses = generateBusinesses();
@@ -28,6 +29,10 @@ public class DBMigrations {
             // User
             List<User> users = generateUsers();
             userRepository.saveAll(users);
+
+            // User roles
+            List<UserRole> userRoles = generateUserRoles();
+            userRoleRepository.saveAll(userRoles);
 
             // Notification
             List<Notification> notifications = generateNotifications();
@@ -73,5 +78,22 @@ public class DBMigrations {
         User user2 = new User("janedoe@mail.com", "12345678", "Jane Doe", false, false);
 
         return List.of(user1, user2);
+    }
+
+    private static List<UserRole> generateUserRoles() {
+        User user1 = new User();
+        user1.setId(1L);
+        User user2 = new User();
+        user2.setId(2L);
+
+        Business business1 = new Business();
+        business1.setId(1L);
+        Business business2 = new Business();
+        business2.setId(2L);
+
+        UserRole userRole1 = new UserRole(user1, business1, true, false, false);
+        UserRole userRole2 = new UserRole(user2, business2, true, false, false);
+
+        return List.of(userRole1, userRole2);
     }
 }
