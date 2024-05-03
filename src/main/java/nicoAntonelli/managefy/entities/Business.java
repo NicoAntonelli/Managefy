@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 @Entity
 @Table(name = "businesses")
@@ -45,6 +42,16 @@ public class Business {
     @JsonIgnore
     @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL })
     private Set<UserRole> userRoles = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL },
+               orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Product> products = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL },
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Sale> sales = new ArrayList<>();
 
     public void addUser(UserRole userRole) {
         userRoles.add(userRole);

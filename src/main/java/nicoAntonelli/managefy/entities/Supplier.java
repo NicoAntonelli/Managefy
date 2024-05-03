@@ -2,19 +2,21 @@ package nicoAntonelli.managefy.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "suppliers")
 @Data @NoArgsConstructor @AllArgsConstructor
-public class Client {
+public class Supplier {
     @Id
-    @SequenceGenerator(name = "clients_sequence", sequenceName = "clients_sequence")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clients_sequence")
+    @SequenceGenerator(name = "suppliers_sequence", sequenceName = "suppliers_sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "suppliers_sequence")
     @Column(updatable = false)
     private Long id;
 
@@ -29,12 +31,12 @@ public class Client {
     private Date deletionDate; // Nullable
 
     @JsonIgnore
-    @OneToMany(mappedBy = "client", cascade = { CascadeType.ALL },
-            orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Sale> sales = new HashSet<>();
+    @OneToMany(mappedBy = "supplier", cascade = { CascadeType.ALL },
+               orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Product> products = new HashSet<>();
 
-    public Client(String name, String description, String mail,
-                  String phone, Date detelionDate) {
+    public Supplier(String name, String description, String mail,
+                    String phone, Date detelionDate) {
         this.name = name;
         this.description = description;
         this.mail = mail;
