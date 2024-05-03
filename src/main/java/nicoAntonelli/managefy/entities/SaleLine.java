@@ -27,7 +27,7 @@ public class SaleLine {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(
-            name = "saleID",
+            name = "sale",
             nullable = false,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "sales_saleLines_fk")
@@ -36,7 +36,7 @@ public class SaleLine {
 
     @ManyToOne
     @JoinColumn(
-            name = "productID",
+            name = "product",
             nullable = false,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "sales_products_fk")
