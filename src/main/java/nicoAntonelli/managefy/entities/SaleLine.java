@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "saleLines")
 @Data @NoArgsConstructor @AllArgsConstructor
@@ -18,11 +15,12 @@ public class SaleLine {
     SaleLineKey id;
 
     @Column(nullable = false)
-    private Float amount;
+    private Integer amount;
     @Column(nullable = false)
     private Float price;
-    @Column(nullable = false)
-    private Boolean discountSurcharge;
+    @Transient
+    private Float subtotal;
+    private Float discountSurcharge; // Nullable
 
     @JsonIgnore
     @ManyToOne
@@ -43,10 +41,25 @@ public class SaleLine {
     )
     private Product product;
 
-    public SaleLine(Float amount, Float price, Boolean discountSurcharge) {
+    public SaleLine(SaleLineKey id, Integer amount, Float price, Float discountSurcharge) {
+        this.id = id;
         this.amount = amount;
         this.price = price;
+
+        if (discountSurcharge == null) discountSurcharge = 1f;
         this.discountSurcharge = discountSurcharge;
+
+        calculateAndSetSubtotal();
+    }
+
+    public SaleLine(Integer amount, Float price, Float discountSurcharge) {
+        this.amount = amount;
+        this.price = price;
+
+        if (discountSurcharge == null) discountSurcharge = 1f;
+        this.discountSurcharge = discountSurcharge;
+
+        calculateAndSetSubtotal();
     }
 
     public void setSaleByID(Long saleID) {
@@ -57,5 +70,10 @@ public class SaleLine {
     public void setProductByID(Long productID) {
         product = new Product();
         product.setId(productID);
+    }
+
+    public void calculateAndSetSubtotal() {
+        if (discountSurcharge == null) discountSurcharge = 1f;
+        subtotal = amount * price * discountSurcharge;
     }
 }
