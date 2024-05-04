@@ -26,7 +26,7 @@ public class Sale {
     private Date date;
     @Column(nullable = false)
     private Float totalPrice;
-    private float partialPayment; // Nullable
+    private Float partialPayment; // Nullable
     @Column(nullable = false)
     private SaleState saleState;
 
@@ -52,18 +52,21 @@ public class Sale {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SaleLine> saleLines = new ArrayList<>();
 
-    public Sale(Date date, Float totalPrice, float partialPayment, SaleState saleState) {
-        this.date = date;
-        this.totalPrice = totalPrice;
+    public Sale(Long id, Float partialPayment, SaleState saleState) {
+        this.id = id;
+        this.date = new Date();
         this.partialPayment = partialPayment;
+
+        if (saleState == null) saleState = SaleState.PendingPayment;
         this.saleState = saleState;
     }
 
-    public Sale(Date date, Float totalPrice, float partialPayment) {
-        this.date = date;
-        this.totalPrice = totalPrice;
+    public Sale(Float partialPayment, SaleState saleState) {
+        this.date = new Date();
         this.partialPayment = partialPayment;
-        this.saleState = SaleState.PendingPayment;
+
+        if (saleState == null) saleState = SaleState.PendingPayment;
+        this.saleState = saleState;
     }
 
     public void setBusinessByID(Long businessID) {
@@ -76,8 +79,19 @@ public class Sale {
         client.setId(clientID);
     }
 
-    public void addSaleLine(SaleLine saleLine)
-    {
+    public void addSaleLine(SaleLine saleLine) {
         saleLines.add(saleLine);
+    }
+
+    public float calculateTotalPrice() {
+        List<SaleLine> lines = getSaleLines();
+        if (lines.isEmpty()) return 0;
+
+        float total = 0;
+        for (SaleLine line : lines) {
+            total += line.getSubtotal();
+        }
+
+        return total;
     }
 }
