@@ -2,14 +2,10 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
-import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.repositories.BusinessRepository;
-import nicoAntonelli.managefy.repositories.UserRepository;
-import nicoAntonelli.managefy.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +13,10 @@ import java.util.Optional;
 @Transactional
 public class BusinessService {
     private final BusinessRepository businessRepository;
-    private final UserService userService; // Dependency
 
     @Autowired
-    public BusinessService(BusinessRepository businessRepository, UserService userService) {
+    public BusinessService(BusinessRepository businessRepository) {
         this.businessRepository = businessRepository;
-        this.userService = userService;
     }
 
     public List<Business> GetBusinesses() {
