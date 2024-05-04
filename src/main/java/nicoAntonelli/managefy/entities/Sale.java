@@ -83,15 +83,15 @@ public class Sale {
         saleLines.add(saleLine);
     }
 
-    public float calculateTotalPrice() {
+    public void calculateAndSetTotalPrice() {
         List<SaleLine> lines = getSaleLines();
-        if (lines.isEmpty()) return 0;
+        if (lines.isEmpty()) this.setTotalPrice(0f);
 
         float total = 0;
         for (SaleLine line : lines) {
             total += line.getSubtotal();
         }
 
-        return total;
+        this.setTotalPrice(total);
     }
 }
