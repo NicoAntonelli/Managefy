@@ -53,10 +53,6 @@ public class Business {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Sale> sales = new ArrayList<>();
 
-    public void addUser(UserRole userRole) {
-        userRoles.add(userRole);
-    }
-
     public Business(String name, String description, String link, SortedMap<String, Boolean> businessDays) {
         this.name = name;
         this.description = description;
@@ -68,5 +64,9 @@ public class Business {
         this.name = name;
         this.description = description;
         this.link = link;
+    }
+
+    public void addUserRole(UserRole userRole) {
+        userRoles.add(userRole);
     }
 }

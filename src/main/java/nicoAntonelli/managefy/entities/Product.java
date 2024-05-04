@@ -84,4 +84,14 @@ public class Product {
         this.saleMinAmount = saleMinAmount;
         this.deletionDate = deletionDate;
     }
+
+    public void setBusinessByID(Long businessID) {
+        business = new Business();
+        business.setId(businessID);
+    }
+
+    public void setSupplierByID(Long supplierID) {
+        supplier = new Supplier();
+        supplier.setId(supplierID);
+    }
 }

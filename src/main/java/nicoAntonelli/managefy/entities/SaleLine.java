@@ -48,4 +48,14 @@ public class SaleLine {
         this.price = price;
         this.discountSurcharge = discountSurcharge;
     }
+
+    public void setSaleByID(Long saleID) {
+        sale = new Sale();
+        sale.setId(saleID);
+    }
+
+    public void setProductByID(Long productID) {
+        product = new Product();
+        product.setId(productID);
+    }
 }

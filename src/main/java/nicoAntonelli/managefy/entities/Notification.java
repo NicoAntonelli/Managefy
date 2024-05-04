@@ -49,7 +49,12 @@ public class Notification {
         this.date = date;
 
         // Load nested entity with ID-only
-        this.user = new User();
+        user = new User();
+        user.setId(userID);
+    }
+
+    public void setUserByID(Long userID) {
+        user = new User();
         user.setId(userID);
     }
 }
