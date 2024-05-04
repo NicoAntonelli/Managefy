@@ -6,6 +6,7 @@ import nicoAntonelli.managefy.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,24 +21,31 @@ public class NotificationService {
     }
 
     public List<Notification> GetNotificationsByUser(Long userID) {
-        if (userID == null || userID == 0)
-        {
-            throw new IllegalStateException("Error retrieving notifications. User with ID: " + userID + " doesn't exists");
+        if (userID == null || userID == 0) {
+            throw new IllegalStateException("Error at 'GetNotificationsByUser'. User with ID: " + userID + " doesn't exists");
         }
 
         return notificationRepository.findByUser(userID);
     }
 
+    public Boolean ExistsNotification(Long notificationID) {
+        return notificationRepository.existsById(notificationID);
+    }
+
     public Notification GetOneNotification(Long notificationID) {
         Optional<Notification> notification = notificationRepository.findById(notificationID);
         if (notification.isEmpty()) {
-            throw new IllegalStateException("Notification with ID: " + notificationID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneNotification' - Notification with ID: " + notificationID + " doesn't exists");
         }
 
         return notification.get();
     }
 
     public Notification CreateNotification(Notification notification) {
+        notification.setId(null);
+        notification.setState(Notification.NotificationState.Unread);
+        notification.setDate(new Date());
+
         return notificationRepository.save(notification);
     }
 
@@ -54,6 +62,11 @@ public class NotificationService {
     }
 
     public Long DeleteNotification(Long notificationID) {
+        boolean exists = ExistsNotification(notificationID);
+        if (!exists) {
+            throw new IllegalStateException("Error at 'DeleteNotification' - Notification with ID: " + notificationID + " doesn't exists");
+        }
+
         notificationRepository.deleteById(notificationID);
         return notificationID;
     }

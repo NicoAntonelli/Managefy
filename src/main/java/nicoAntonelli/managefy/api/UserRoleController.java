@@ -31,11 +31,6 @@ public class UserRoleController {
 
     @PostMapping
     public UserRole CreateUserRole(@RequestBody UserRole userRole) {
-        Long userID = userRole.getUser().getId();
-        Long businessID = userRole.getBusiness().getId();
-        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
-        userRole.setId(userRoleKey);
-
         return userRoleService.CreateUserRole(userRole);
     }
 
@@ -46,7 +41,7 @@ public class UserRoleController {
 
     @DeleteMapping(path = "{userID}/{businessID}")
     public UserRoleKey UserRoleIDUser(@PathVariable("userID") Long userID,
-                               @PathVariable("businessID") Long businessID) {
+                                      @PathVariable("businessID") Long businessID) {
         return userRoleService.DeleteUserRole(userID, businessID);
     }
 }

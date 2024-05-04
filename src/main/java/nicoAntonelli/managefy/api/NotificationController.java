@@ -5,7 +5,6 @@ import nicoAntonelli.managefy.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,16 +29,12 @@ public class NotificationController {
 
     @PostMapping
     public Notification CreateNotification(@RequestBody Notification notification) {
-        notification.setId(null);
-        notification.setState(Notification.NotificationState.Unread);
-        notification.setDate(new Date());
-
         return notificationService.CreateNotification(notification);
     }
 
     @PutMapping(path = "{notificationID}")
-    public Notification UpdateNotification(@PathVariable("notificationID") Long notificationID,
-                                           @RequestParam String state) {
+    public Notification UpdateNotificationState(@PathVariable("notificationID") Long notificationID,
+                                                @RequestParam String state) {
         return notificationService.UpdateNotificationState(notificationID, state);
     }
 

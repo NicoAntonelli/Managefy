@@ -29,7 +29,6 @@ public class BusinessController {
 
     @PostMapping
     public Business CreateBusiness(@RequestBody Business business) {
-        business.setId(null);
         return businessService.CreateBusiness(business);
     }
 

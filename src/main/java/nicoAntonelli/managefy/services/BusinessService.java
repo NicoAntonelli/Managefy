@@ -23,29 +23,39 @@ public class BusinessService {
         return businessRepository.findAll();
     }
 
+    public Boolean ExistsBusiness(Long businessID) {
+        return businessRepository.existsById(businessID);
+    }
+
     public Business GetOneBusiness(Long businessID) {
         Optional<Business> business = businessRepository.findById(businessID);
         if (business.isEmpty()) {
-            throw new IllegalStateException("Business with ID: " + businessID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exists");
         }
 
         return business.get();
     }
 
     public Business CreateBusiness(Business business) {
+        business.setId(null);
         return businessRepository.save(business);
     }
 
     public Business UpdateBusiness(Business business) {
-        boolean exists = businessRepository.existsById(business.getId());
+        boolean exists = ExistsBusiness(business.getId());
         if (!exists) {
-            throw new IllegalStateException("Business with ID: " + business.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exists");
         }
 
         return businessRepository.save(business);
     }
 
     public Long DeleteBusiness(Long businessID) {
+        boolean exists = ExistsBusiness(businessID);
+        if (!exists) {
+            throw new IllegalStateException("Error at 'DeleteBusiness' - Business with ID: " + businessID + " doesn't exists");
+        }
+
         businessRepository.deleteById(businessID);
         return businessID;
     }

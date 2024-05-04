@@ -29,9 +29,6 @@ public class ClientController {
 
     @PostMapping
     public Client CreateClient(@RequestBody Client client) {
-        client.setId(null);
-        client.setDeletionDate(null);
-
         return clientService.CreateClient(client);
     }
 
