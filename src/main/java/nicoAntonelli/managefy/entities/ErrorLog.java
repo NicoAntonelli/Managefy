@@ -11,6 +11,9 @@ import java.util.Date;
 @Table(name = "errorLogs")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class ErrorLog {
+    // Backend-originated Error Log
+    public static final String SERVER = "Managefy-server";
+
     @Id
     @SequenceGenerator(name = "errorLogs_sequence", sequenceName = "errorLogs_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "errorLogs_sequence")
@@ -25,6 +28,12 @@ public class ErrorLog {
     private String origin;
     private String browser; // Nullable
     private Date userIPAddress; // Nullable
+
+    public ErrorLog(String description) {
+        this.date = new Date();
+        this.description = description;
+        this.origin = SERVER;
+    }
 
     public ErrorLog(Date date, String description, String origin) {
         this.date = date;
