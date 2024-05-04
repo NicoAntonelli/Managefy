@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Business;
+import nicoAntonelli.managefy.entities.dto.BusinessWithUser;
 import nicoAntonelli.managefy.services.BusinessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,8 @@ public class BusinessController {
     }
 
     @PostMapping
-    public Business CreateBusiness(@RequestBody Business business) {
-        return businessService.CreateBusiness(business);
+    public Business CreateBusiness(@RequestBody BusinessWithUser businessWithUser) {
+        return businessService.CreateBusiness(businessWithUser);
     }
 
     @PutMapping
