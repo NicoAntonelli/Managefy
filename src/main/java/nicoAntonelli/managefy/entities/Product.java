@@ -60,6 +60,19 @@ public class Product {
     private Set<SaleLine> saleLines = new HashSet<>();
 
     public Product(String code, String name, String description, Float unitCost, Float unitPrice,
+                   Integer stock, Integer stockMin, Integer saleMinAmount) {
+        this.code = code;
+        this.name = name;
+        this.description = description;
+        this.unitCost = unitCost;
+        this.unitPrice = unitPrice;
+        this.stock = stock;
+        this.stockMin = stockMin;
+        this.saleMinAmount = saleMinAmount;
+        this.deletionDate = null;
+    }
+
+    public Product(String code, String name, String description, Float unitCost, Float unitPrice,
                    Integer stock, Integer stockMin, Integer saleMinAmount, Date deletionDate) {
         this.code = code;
         this.name = name;
