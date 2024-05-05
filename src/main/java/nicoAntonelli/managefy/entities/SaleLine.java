@@ -1,6 +1,5 @@
 package nicoAntonelli.managefy.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -62,6 +61,10 @@ public class SaleLine {
         this.discountSurcharge = discountSurcharge;
 
         calculateAndSetSubtotal();
+    }
+
+    public SaleLineKey getId() {
+        return new SaleLineKey(getSale().getId(), getPosition());
     }
 
     public void setSaleByID(Long saleID) {
