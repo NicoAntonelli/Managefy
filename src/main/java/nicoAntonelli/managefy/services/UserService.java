@@ -31,7 +31,7 @@ public class UserService {
     public User GetOneUser(Long userID) {
         Optional<User> user = userRepository.findById(userID);
         if (user.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUser' - User with ID: " + userID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneUser' - User with ID: " + userID + " doesn't exist");
         }
 
         return user.get();
@@ -45,7 +45,7 @@ public class UserService {
 
         Optional<User> user = userRepository.findByMail(mail);
         if (user.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUserByMail' - User with mail: " + mail + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneUserByMail' - User with mail: " + mail + " doesn't exist");
         }
 
         return user.get();
@@ -85,7 +85,7 @@ public class UserService {
     public User UpdateUser(User user) {
         boolean exists = ExistsUser(user.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
         }
         // Mail unique validation
         Optional<User> possibleUser = userRepository.findByMail(user.getMail());
@@ -102,7 +102,7 @@ public class UserService {
     public Long DeleteUser(Long userID) {
         boolean exists = ExistsUser(userID);
         if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exists");
+            throw new IllegalStateException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exist");
         }
 
         userRepository.deleteById(userID);

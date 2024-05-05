@@ -35,7 +35,7 @@ public class ProductService {
     public Product GetOneProduct(Long productID) {
         Optional<Product> product = productRepository.findById(productID);
         if (product.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
         }
 
         return product.get();
@@ -48,7 +48,7 @@ public class ProductService {
             throw new IllegalStateException("Error at 'CreateProduct' - Business not supplied");
         }
         if (!businessService.ExistsBusiness(business.getId())) {
-            throw new IllegalStateException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist");
         }
 
         product.setId(null);
@@ -60,7 +60,7 @@ public class ProductService {
     public Product UpdateProduct(Product product) {
         boolean exists = ExistsProduct(product.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist");
         }
 
         return productRepository.save(product);

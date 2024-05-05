@@ -25,7 +25,7 @@ public class NotificationService {
 
     public List<Notification> GetNotificationsByUser(Long userID) {
         if (userID == null || userID == 0) {
-            throw new IllegalStateException("Error at 'GetNotificationsByUser'. User with ID: " + userID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetNotificationsByUser'. User with ID: " + userID + " doesn't exist");
         }
 
         return notificationRepository.findByUser(userID);
@@ -38,7 +38,7 @@ public class NotificationService {
     public Notification GetOneNotification(Long notificationID) {
         Optional<Notification> notification = notificationRepository.findById(notificationID);
         if (notification.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneNotification' - Notification with ID: " + notificationID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneNotification' - Notification with ID: " + notificationID + " doesn't exist");
         }
 
         return notification.get();
@@ -51,7 +51,7 @@ public class NotificationService {
             throw new IllegalStateException("Error at 'CreateNotification' - User not supplied");
         }
         if (!userService.ExistsUser(user.getId())) {
-            throw new IllegalStateException("Error at 'CreateNotification' - User with ID: " + user.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'CreateNotification' - User with ID: " + user.getId() + " doesn't exist");
         }
 
         notification.setId(null);
@@ -76,7 +76,7 @@ public class NotificationService {
     public Long DeleteNotification(Long notificationID) {
         boolean exists = ExistsNotification(notificationID);
         if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteNotification' - Notification with ID: " + notificationID + " doesn't exists");
+            throw new IllegalStateException("Error at 'DeleteNotification' - Notification with ID: " + notificationID + " doesn't exist");
         }
 
         notificationRepository.deleteById(notificationID);

@@ -31,7 +31,7 @@ public class ClientService {
     public Client GetOneClient(Long clientID) {
         Optional<Client> client = clientRepository.findById(clientID);
         if (client.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exist");
         }
 
         return client.get();
@@ -47,7 +47,7 @@ public class ClientService {
     public Client UpdateClient(Client client) {
         boolean exists = ExistsClient(client.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exist");
         }
 
         return clientRepository.save(client);

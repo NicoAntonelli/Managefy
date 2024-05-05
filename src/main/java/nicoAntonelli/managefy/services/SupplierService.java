@@ -31,7 +31,7 @@ public class SupplierService {
     public Supplier GetOneSupplier(Long supplierID) {
         Optional<Supplier> supplier = supplierRepository.findById(supplierID);
         if (supplier.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exists");
+            throw new IllegalStateException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exist");
         }
 
         return supplier.get();
@@ -47,7 +47,7 @@ public class SupplierService {
     public Supplier UpdateSupplier(Supplier supplier) {
         boolean exists = ExistsSupplier(supplier.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exists");
+            throw new IllegalStateException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist");
         }
 
         return supplierRepository.save(supplier);
