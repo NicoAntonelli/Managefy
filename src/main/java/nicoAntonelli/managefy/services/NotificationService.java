@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Notification;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,12 @@ import java.util.Optional;
 @Transactional
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final UserService userService;
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, UserService userService) {
         this.notificationRepository = notificationRepository;
+        this.userService = userService;
     }
 
     public List<Notification> GetNotificationsByUser(Long userID) {
@@ -42,6 +45,15 @@ public class NotificationService {
     }
 
     public Notification CreateNotification(Notification notification) {
+        // Validate associated user
+        User user = notification.getUser();
+        if (user == null || user.getId() == null) {
+            throw new IllegalStateException("Error at 'CreateNotification' - User not supplied");
+        }
+        if (!userService.ExistsUser(user.getId())) {
+            throw new IllegalStateException("Error at 'CreateNotification' - User with ID: " + user.getId() + " doesn't exists");
+        }
+
         notification.setId(null);
         notification.setState(Notification.NotificationState.Unread);
         notification.setDate(new Date());
