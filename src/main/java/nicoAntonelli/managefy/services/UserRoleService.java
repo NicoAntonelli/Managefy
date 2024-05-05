@@ -3,6 +3,8 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
+import nicoAntonelli.managefy.repositories.BusinessRepository;
+import nicoAntonelli.managefy.repositories.UserRepository;
 import nicoAntonelli.managefy.repositories.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,16 +16,16 @@ import java.util.Optional;
 @Transactional
 public class UserRoleService {
     private final UserRoleRepository userRoleRepository;
-    private final UserService userService; // Dependency
-    private final BusinessService businessService; // Dependency
+    private final UserRepository userRepository; // Dependency
+    private final BusinessRepository businessRepository; // Dependency
 
     @Autowired
     public UserRoleService(UserRoleRepository userRoleRepository,
-                           UserService userService,
-                           BusinessService businessService) {
+                           UserRepository userRepository,
+                           BusinessRepository businessRepository) {
         this.userRoleRepository = userRoleRepository;
-        this.userService = userService;
-        this.businessService = businessService;
+        this.userRepository = userRepository;
+        this.businessRepository = businessRepository;
     }
 
     public List<UserRole> GetUserRoles() {
@@ -48,13 +50,13 @@ public class UserRoleService {
     public UserRole CreateUserRole(UserRole userRole) {
         // Validate user
         Long userID = userRole.getUser().getId();
-        if (!userService.ExistsUser(userID)) {
+        if (!userRepository.existsById(userID)) {
             throw new IllegalStateException("Error at 'CreateUserRole' - User with ID: " + userID + " doesn't exists");
         }
 
         // Validate business
         Long businessID = userRole.getBusiness().getId();
-        if (!businessService.ExistsBusiness(businessID)) {
+        if (!businessRepository.existsById(businessID)) {
             throw new IllegalStateException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exists");
         }
 
