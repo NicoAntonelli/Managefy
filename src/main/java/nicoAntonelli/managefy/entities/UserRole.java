@@ -6,21 +6,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@IdClass(UserRoleKey.class)
 @Table(name = "userRoles")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class UserRole {
-    @EmbeddedId
-    @Column(updatable = false)
-    UserRoleKey id;
-
+    @Id
     @ManyToOne
-    @MapsId("userID")
-    @JoinColumn(name = "userID")
+    @JoinColumn(
+            name = "userID",
+            nullable = false,
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "users_userRoles_fk")
+    )
     User user;
 
+    @Id
     @ManyToOne
-    @MapsId("businessID")
-    @JoinColumn(name = "businessID")
+    @JoinColumn(
+            name = "businessID",
+            nullable = false,
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "business_userRoles_fk")
+    )
     Business business;
 
     @Column(nullable = false)
@@ -30,12 +37,23 @@ public class UserRole {
     @Column(nullable = false)
     private Boolean isCollaborator;
 
-    public UserRole(User user, Business business, Boolean isManager, Boolean isAdmin, Boolean isCollaborator) {
-        this.id = new UserRoleKey(user.getId(), business.getId());
-        this.user = user;
-        this.business = business;
+    public UserRole(Boolean isManager, Boolean isAdmin, Boolean isCollaborator) {
         this.isManager = isManager;
         this.isAdmin = isAdmin;
         this.isCollaborator = isCollaborator;
+    }
+
+    public UserRoleKey getId() {
+        return new UserRoleKey(getUser().getId(), getBusiness().getId());
+    }
+
+    public void setBusinessByID(Long businessByID) {
+        business = new Business();
+        business.setId(businessByID);
+    }
+
+    public void setUserByID(Long userID) {
+        user = new User();
+        user.setId(userID);
     }
 }

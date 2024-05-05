@@ -32,11 +32,13 @@ public class UserRoleService {
         return userRoleRepository.findAll();
     }
 
-    public Boolean ExistsUserRole(UserRoleKey userRoleID) {
-        return userRoleRepository.existsById(userRoleID);
+    public Boolean ExistsUserRole(Long userID, Long businessID) {
+        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
+
+        return userRoleRepository.existsById(userRoleKey);
     }
 
-    public UserRole GetOneUserRole(Long userID, long businessID) {
+    public UserRole GetOneUserRole(Long userID, Long businessID) {
         UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
 
         Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
@@ -60,10 +62,6 @@ public class UserRoleService {
             throw new IllegalStateException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exists");
         }
 
-        // Pre-loaded key
-        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
-        userRole.setId(userRoleKey);
-
         return userRoleRepository.save(userRole);
     }
 
@@ -78,7 +76,7 @@ public class UserRoleService {
 
     public UserRoleKey DeleteUserRole(Long userRoleID, long businessID) {
         UserRoleKey userRoleKey = new UserRoleKey(userRoleID, businessID);
-        boolean exists = ExistsUserRole(userRoleKey);
+        boolean exists = ExistsUserRole(userRoleID, businessID);
         if (!exists) {
             throw new IllegalStateException("Error at 'DeleteUserRole' - User with ID: " + userRoleKey + " doesn't exists");
         }
