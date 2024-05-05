@@ -7,12 +7,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@IdClass(SaleLineKey.class)
 @Table(name = "saleLines")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class SaleLine {
-    @EmbeddedId
+    @Id
+    @ManyToOne
+    @JoinColumn(
+            name = "saleID",
+            nullable = false,
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "sales_saleLines_fk")
+    )
+    private Sale sale;
+
+    @Id
     @Column(updatable = false)
-    SaleLineKey id;
+    Integer position;
 
     @Column(nullable = false)
     private Integer amount;
@@ -22,27 +33,18 @@ public class SaleLine {
     private Float subtotal;
     private Float discountSurcharge; // Nullable
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(
-            name = "sale",
-            nullable = false,
-            referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "sales_saleLines_fk")
-    )
-    private Sale sale;
-
-    @ManyToOne
-    @JoinColumn(
-            name = "product",
+            name = "productID",
             nullable = false,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "sales_products_fk")
     )
     private Product product;
 
-    public SaleLine(SaleLineKey id, Integer amount, Float price, Float discountSurcharge) {
-        this.id = id;
+    public SaleLine(Sale sale, Integer position, Integer amount, Float price, Float discountSurcharge) {
+        this.sale = sale;
+        this.position = position;
         this.amount = amount;
         this.price = price;
 

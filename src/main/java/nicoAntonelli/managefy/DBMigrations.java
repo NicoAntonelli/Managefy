@@ -148,45 +148,41 @@ public class DBMigrations {
     private static List<Sale> generateSalesWithLines(List<Product> products) {
         // Sale 1 - Soda & Doritos
         long sale1ID = 1L;
-        SaleLineKey saleLineKeyS1L1 = new SaleLineKey(sale1ID, 1);
-        Product productSoda = products.getFirst();
-        SaleLine saleLineS1L1 = new SaleLine(saleLineKeyS1L1, 1, productSoda.getUnitPrice(), null);
-        saleLineS1L1.setSaleByID(sale1ID);
-        saleLineS1L1.setProductByID(productSoda.getId());
-
-        SaleLineKey saleLineKeyS1L2 = new SaleLineKey(sale1ID, 2);
-        Product productDoritos = products.get(3);
-        SaleLine saleLineS1L2 = new SaleLine(saleLineKeyS1L2, 1,  productDoritos.getUnitPrice(), null);
-        saleLineS1L2.setSaleByID(sale1ID);
-        saleLineS1L2.setProductByID(productDoritos.getId());
-
         Sale sale1 = new Sale(sale1ID, 0f, null);
         sale1.setBusinessByID(1L);
         sale1.setClientByID(1L);
+
+        Product productSoda = products.getFirst();
+        SaleLine saleLineS1L1 = new SaleLine(sale1, 1, 1, productSoda.getUnitPrice(), null);
+        saleLineS1L1.setProductByID(productSoda.getId());
+
+        Product productDoritos = products.get(3);
+        SaleLine saleLineS1L2 = new SaleLine(sale1, 2, 1, productDoritos.getUnitPrice(), null);
+        saleLineS1L2.setProductByID(productDoritos.getId());
+
         sale1.addSaleLine(saleLineS1L1);
         sale1.addSaleLine(saleLineS1L2);
         sale1.calculateAndSetTotalPrice();
 
         // Sale 2 - Chicken & Eggs with 10% off
         long sale2ID = 2L;
-        float discount = 10f;
-        float discountCoefficient = 1 - (discount/100);
-
-        SaleLineKey saleLineKeyS2L1 = new SaleLineKey(sale2ID, 1);
-        Product productChicken = products.get(8);
-        SaleLine saleLineS2L1 = new SaleLine(saleLineKeyS2L1, 1, productChicken.getUnitPrice(), discountCoefficient);
-        saleLineS2L1.setSaleByID(sale2ID);
-        saleLineS2L1.setProductByID(productChicken.getId());
-
-        SaleLineKey saleLineKeyS2L2 = new SaleLineKey(sale2ID, 2);
-        Product productEgg = products.get(6);
-        SaleLine saleLineS2L2 = new SaleLine(saleLineKeyS2L2, 6,  productEgg.getUnitPrice(), discountCoefficient);
-        saleLineS2L2.setSaleByID(sale2ID);
-        saleLineS2L2.setProductByID(productEgg.getId());
-
         Sale sale2 = new Sale(sale2ID, 0f, null);
         sale2.setBusinessByID(1L);
         sale2.setClientByID(1L);
+
+        float discount = 10f;
+        float discountCoefficient = 1 - (discount/100);
+
+        Product productChicken = products.get(8);
+        SaleLine saleLineS2L1 = new SaleLine(sale2, 1, 1, productChicken.getUnitPrice(), discountCoefficient);
+        saleLineS2L1.setSaleByID(sale2ID);
+        saleLineS2L1.setProductByID(productChicken.getId());
+
+        Product productEgg = products.get(6);
+        SaleLine saleLineS2L2 = new SaleLine(sale2, 2, 6, productEgg.getUnitPrice(), discountCoefficient);
+        saleLineS2L2.setSaleByID(sale2ID);
+        saleLineS2L2.setProductByID(productEgg.getId());
+
         sale2.addSaleLine(saleLineS2L1);
         sale2.addSaleLine(saleLineS2L2);
         sale2.calculateAndSetTotalPrice();
