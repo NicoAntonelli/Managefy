@@ -5,7 +5,6 @@ import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.repositories.SaleLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.core.support.FragmentNotImplementedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -65,7 +64,78 @@ public class SaleService {
 
     public Sale CreateSale(Sale sale) {
         try {
-            throw new Exception("Not implemented");
+            // Validate associated business
+            Business business = sale.getBusiness();
+            if (business == null || business.getId() == null) {
+                throw new IllegalStateException("Error at 'CreateSale' - Business not supplied");
+            }
+            if (!businessService.ExistsBusiness(business.getId())) {
+                throw new IllegalStateException("Error at 'CreateSale' - Business with ID: " + business.getId() + " doesn't exist");
+            }
+
+            // Validate associated client
+            Client client = sale.getClient();
+            if (client == null || client.getId() == null) {
+                throw new IllegalStateException("Error at 'CreateSale' - Client not supplied");
+            }
+            if (!clientService.ExistsClient(client.getId())) {
+                throw new IllegalStateException("Error at 'CreateSale' - Client with ID: " + client.getId() + " doesn't exist");
+            }
+
+            // At least one saleLine
+            List<SaleLine> lines = sale.getSaleLines();
+            if (lines == null || lines.isEmpty()) {
+                throw new IllegalStateException("Error at 'CreateSale' - No SaleLines supplied, business: " + business.getId());
+            }
+
+            // All saleLines must have positive subtotal and a valid product
+            for (int i = 0; i < lines.size(); i++) {
+                SaleLine line = lines.get(i);
+                if (line.getSubtotal() <= 0) {
+                    throw new IllegalStateException("Error at 'CreateSale' - The SaleLine in position: " + (i+1) + " had an invalid subtotal of $" + line.getPrice() + ", business: " + business.getId());
+                }
+
+                // Validate associated product for current line
+                Product product = line.getProduct();
+                if (product == null || product.getId() == null) {
+                    throw new IllegalStateException("Error at 'CreateSale' - Product not supplied for the saleLine in position: " + (i+1) + ", business: " + business.getId());
+                }
+                if (!productService.ExistsProduct(product.getId())) {
+                    throw new IllegalStateException("Error at 'CreateSale' - Product with ID: " + product.getId() + " doesn't exist, business: " + business.getId());
+                }
+
+                line.setSale(null);
+                line.setPosition(i+1);
+            }
+
+            // Set state if a valid value was provided
+            Boolean result = sale.setStateByText(sale.getState().toString());
+            if (!result) {
+                throw new IllegalStateException("Error at 'CreateSale' - Unexpected value for state: " + sale.getState() + ", business: " + business.getId());
+            }
+            if (sale.getState() == Sale.SaleState.Cancelled) {
+                throw new IllegalStateException("Error at 'CreateSale' - The sale can't have Cancelled state, business: " + business.getId());
+            }
+
+            // Partial payment (if it was given)
+            Float partialPayment = sale.getPartialPayment();
+            if (partialPayment != null && partialPayment <= 0) {
+                throw new IllegalStateException("Error at 'CreateSale' - Can't make a partial payment of $" + partialPayment + ", business: " + business.getId());
+            }
+
+            sale.setId(null);
+            sale.setDate(new Date());
+
+            // Calculate total price and save the sale before saleLines
+            sale.calculateAndSetTotalPrice(lines);
+            sale = saleRepository.save(sale);
+
+            // Now save the saleLines with the now-loaded sale
+            lines = saleLineRepository.saveAll(lines);
+
+            // Set saved lines in the sale and return it
+            sale.setSaleLines(lines);
+            return sale;
         }
         catch(Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
