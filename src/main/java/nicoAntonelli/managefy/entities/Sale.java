@@ -87,8 +87,32 @@ public class Sale {
         saleLines.add(saleLine);
     }
 
+    public Boolean setStateByText(String state) {
+        switch (state.toLowerCase()) {
+            case "cancelled" -> setState(Sale.SaleState.Cancelled);
+            case "pendingpayment" -> setState(Sale.SaleState.PendingPayment);
+            case "partialpayment" -> setState(Sale.SaleState.PartialPayment);
+            case "payed" -> setState(Sale.SaleState.Payed);
+            case "payedandbilled" -> setState(Sale.SaleState.PayedAndBilled);
+            default -> { return false; }
+        }
+
+        return true;
+    }
+
     public void calculateAndSetTotalPrice() {
         List<SaleLine> lines = getSaleLines();
+        if (lines.isEmpty()) this.setTotalPrice(0f);
+
+        float total = 0;
+        for (SaleLine line : lines) {
+            total += line.getSubtotal();
+        }
+
+        this.setTotalPrice(total);
+    }
+
+    public void calculateAndSetTotalPrice(List<SaleLine> lines) {
         if (lines.isEmpty()) this.setTotalPrice(0f);
 
         float total = 0;
