@@ -17,8 +17,8 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping()
-    public List<Notification> GetNotifications(@RequestParam Long userID) {
+    @GetMapping(path = "/user/{userID}")
+    public List<Notification> GetNotificationsByUser(@PathVariable("userID") Long userID) {
         return notificationService.GetNotificationsByUser(userID);
     }
 
@@ -32,9 +32,9 @@ public class NotificationController {
         return notificationService.CreateNotification(notification);
     }
 
-    @PutMapping(path = "{notificationID}")
+    @PutMapping(path = "{notificationID}/state/{state}")
     public Notification UpdateNotificationState(@PathVariable("notificationID") Long notificationID,
-                                                @RequestParam String state) {
+                                                @PathVariable("state") String state) {
         return notificationService.UpdateNotificationState(notificationID, state);
     }
 

@@ -82,7 +82,7 @@ public class NotificationService {
                 case "unread" -> notification.setState(Notification.NotificationState.Unread);
                 case "read" -> notification.setState(Notification.NotificationState.Read);
                 case "closed" -> notification.setState(Notification.NotificationState.Closed);
-                default -> throw new IllegalStateException("Unexpected value: " + state);
+                default -> throw new IllegalStateException("Error at 'UpdateNotificationState' - Unexpected value: " + state);
             }
 
             return notification;
