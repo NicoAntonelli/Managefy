@@ -16,11 +16,15 @@ import java.util.Optional;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserService userService;
+    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository, UserService userService) {
+    public NotificationService(NotificationRepository notificationRepository,
+                               UserService userService,
+                               ErrorLogService errorLogService) {
         this.notificationRepository = notificationRepository;
         this.userService = userService;
+        this.errorLogService = errorLogService;
     }
 
     public List<Notification> GetNotificationsByUser(Long userID) {
@@ -36,50 +40,70 @@ public class NotificationService {
     }
 
     public Notification GetOneNotification(Long notificationID) {
-        Optional<Notification> notification = notificationRepository.findById(notificationID);
-        if (notification.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneNotification' - Notification with ID: " + notificationID + " doesn't exist");
-        }
+        try {
+            Optional<Notification> notification = notificationRepository.findById(notificationID);
+            if (notification.isEmpty()) {
+                throw new IllegalStateException("Error at 'GetOneNotification' - Notification with ID: " + notificationID + " doesn't exist");
+            }
 
-        return notification.get();
+            return notification.get();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Notification CreateNotification(Notification notification) {
-        // Validate associated user
-        User user = notification.getUser();
-        if (user == null || user.getId() == null) {
-            throw new IllegalStateException("Error at 'CreateNotification' - User not supplied");
-        }
-        if (!userService.ExistsUser(user.getId())) {
-            throw new IllegalStateException("Error at 'CreateNotification' - User with ID: " + user.getId() + " doesn't exist");
-        }
+        try {
+            // Validate associated user
+            User user = notification.getUser();
+            if (user == null || user.getId() == null) {
+                throw new IllegalStateException("Error at 'CreateNotification' - User not supplied");
+            }
+            if (!userService.ExistsUser(user.getId())) {
+                throw new IllegalStateException("Error at 'CreateNotification' - User with ID: " + user.getId() + " doesn't exist");
+            }
 
-        notification.setId(null);
-        notification.setState(Notification.NotificationState.Unread);
-        notification.setDate(new Date());
+            notification.setId(null);
+            notification.setState(Notification.NotificationState.Unread);
+            notification.setDate(new Date());
 
-        return notificationRepository.save(notification);
+            return notificationRepository.save(notification);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Notification UpdateNotificationState(Long notificationID, String state) {
-        Notification notification = GetOneNotification(notificationID);
-        switch (state.toLowerCase()) {
-            case "unread" -> notification.setState(Notification.NotificationState.Unread);
-            case "read" -> notification.setState(Notification.NotificationState.Read);
-            case "closed" -> notification.setState(Notification.NotificationState.Closed);
-            default -> throw new IllegalStateException("Unexpected value: " + state);
-        }
+        try {
+            Notification notification = GetOneNotification(notificationID);
+            switch (state.toLowerCase()) {
+                case "unread" -> notification.setState(Notification.NotificationState.Unread);
+                case "read" -> notification.setState(Notification.NotificationState.Read);
+                case "closed" -> notification.setState(Notification.NotificationState.Closed);
+                default -> throw new IllegalStateException("Unexpected value: " + state);
+            }
 
-        return notification;
+            return notification;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Long DeleteNotification(Long notificationID) {
-        boolean exists = ExistsNotification(notificationID);
-        if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteNotification' - Notification with ID: " + notificationID + " doesn't exist");
-        }
+        try {
+            boolean exists = ExistsNotification(notificationID);
+            if (!exists) {
+                throw new IllegalStateException("Error at 'DeleteNotification' - Notification with ID: " + notificationID + " doesn't exist");
+            }
 
-        notificationRepository.deleteById(notificationID);
-        return notificationID;
+            notificationRepository.deleteById(notificationID);
+            return notificationID;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 }

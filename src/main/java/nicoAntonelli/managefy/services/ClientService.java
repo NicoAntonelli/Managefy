@@ -14,10 +14,12 @@ import java.util.Optional;
 @Transactional
 public class ClientService {
     private final ClientRepository clientRepository;
+    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, ErrorLogService errorLogService) {
         this.clientRepository = clientRepository;
+        this.errorLogService = errorLogService;
     }
 
     public List<Client> GetClients() {
@@ -29,36 +31,57 @@ public class ClientService {
     }
 
     public Client GetOneClient(Long clientID) {
-        Optional<Client> client = clientRepository.findById(clientID);
-        if (client.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exist");
-        }
+        try {
+            Optional<Client> client = clientRepository.findById(clientID);
+            if (client.isEmpty()) {
+                throw new IllegalStateException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exist");
+            }
 
-        return client.get();
+            return client.get();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Client CreateClient(Client client) {
-        client.setId(null);
-        client.setDeletionDate(null);
+        try {
+            client.setId(null);
+            client.setDeletionDate(null);
 
-        return clientRepository.save(client);
+            return clientRepository.save(client);
+        }
+        catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Client UpdateClient(Client client) {
-        boolean exists = ExistsClient(client.getId());
-        if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exist");
-        }
+        try {
+            boolean exists = ExistsClient(client.getId());
+            if (!exists) {
+                throw new IllegalStateException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exist");
+            }
 
-        return clientRepository.save(client);
+            return clientRepository.save(client);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     // Logic deletion (field: deletion date)
     public Client DeleteClient(Long clientID) {
-        Client client = GetOneClient(clientID);
-        client.setDeletionDate(new Date());
-        clientRepository.save(client);
+        try {
+            Client client = GetOneClient(clientID);
+            client.setDeletionDate(new Date());
+            clientRepository.save(client);
 
-        return client;
+            return client;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 }

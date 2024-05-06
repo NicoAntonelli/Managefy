@@ -17,11 +17,15 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final BusinessService businessService;
+    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public ProductService(ProductRepository productRepository, BusinessService businessService) {
+    public ProductService(ProductRepository productRepository,
+                          BusinessService businessService,
+                          ErrorLogService errorLogService) {
         this.productRepository = productRepository;
         this.businessService = businessService;
+        this.errorLogService = errorLogService;
     }
 
     public List<Product> GetProducts() {
@@ -33,45 +37,65 @@ public class ProductService {
     }
 
     public Product GetOneProduct(Long productID) {
-        Optional<Product> product = productRepository.findById(productID);
-        if (product.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
-        }
+        try {
+            Optional<Product> product = productRepository.findById(productID);
+            if (product.isEmpty()) {
+                throw new IllegalStateException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
+            }
 
-        return product.get();
+            return product.get();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Product CreateProduct(Product product) {
-        // Validate associated business
-        Business business = product.getBusiness();
-        if (business == null || business.getId() == null) {
-            throw new IllegalStateException("Error at 'CreateProduct' - Business not supplied");
-        }
-        if (!businessService.ExistsBusiness(business.getId())) {
-            throw new IllegalStateException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist");
-        }
+        try {
+            // Validate associated business
+            Business business = product.getBusiness();
+            if (business == null || business.getId() == null) {
+                throw new IllegalStateException("Error at 'CreateProduct' - Business not supplied");
+            }
+            if (!businessService.ExistsBusiness(business.getId())) {
+                throw new IllegalStateException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist");
+            }
 
-        product.setId(null);
-        product.setDeletionDate(null);
+            product.setId(null);
+            product.setDeletionDate(null);
 
-        return productRepository.save(product);
+            return productRepository.save(product);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Product UpdateProduct(Product product) {
-        boolean exists = ExistsProduct(product.getId());
-        if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist");
-        }
+        try {
+            boolean exists = ExistsProduct(product.getId());
+            if (!exists) {
+                throw new IllegalStateException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist");
+            }
 
-        return productRepository.save(product);
+            return productRepository.save(product);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     // Logic deletion (field: deletion date)
     public Product DeleteProduct(Long productID) {
-        Product product = GetOneProduct(productID);
-        product.setDeletionDate(new Date());
-        productRepository.save(product);
+        try {
+            Product product = GetOneProduct(productID);
+            product.setDeletionDate(new Date());
+            productRepository.save(product);
 
-        return product;
+            return product;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 }

@@ -18,14 +18,17 @@ public class BusinessService {
     private final BusinessRepository businessRepository;
     private final UserService userService; // Dependency
     private final UserRoleService userRoleService; // Dependency
+    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
     public BusinessService(BusinessRepository businessRepository,
                            UserService userService,
-                           UserRoleService userRoleService) {
+                           UserRoleService userRoleService,
+                           ErrorLogService errorLogService) {
         this.businessRepository = businessRepository;
         this.userService = userService;
         this.userRoleService = userRoleService;
+        this.errorLogService = errorLogService;
     }
 
     public List<Business> GetBusinesses() {
@@ -37,52 +40,72 @@ public class BusinessService {
     }
 
     public Business GetOneBusiness(Long businessID) {
-        Optional<Business> business = businessRepository.findById(businessID);
-        if (business.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist");
-        }
+        try {
+            Optional<Business> business = businessRepository.findById(businessID);
+            if (business.isEmpty()) {
+                throw new IllegalStateException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist");
+            }
 
-        return business.get();
+            return business.get();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Business CreateBusiness(BusinessWithUser businessWithUser) {
-        // Validate associated user ID
-        boolean exists = userService.ExistsUser(businessWithUser.getUserID());
-        if (!exists) {
-            throw new IllegalStateException("Error at 'CreateBusiness' - User with ID: " + businessWithUser.getUserID() + " doesn't exist");
+        try {
+            // Validate associated user ID
+            boolean exists = userService.ExistsUser(businessWithUser.getUserID());
+            if (!exists) {
+                throw new IllegalStateException("Error at 'CreateBusiness' - User with ID: " + businessWithUser.getUserID() + " doesn't exist");
+            }
+
+            // Create business
+            Business business = businessWithUser.getBusiness();
+            business.setId(null);
+            business = businessRepository.save(business);
+
+            // Set associated user
+            User user = new User(businessWithUser.getUserID());
+
+            // Create user role
+            UserRole userRole = new UserRole(user, business, true, false, false);
+            userRoleService.CreateUserRole(userRole);
+
+            return business;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
         }
-
-        // Create business
-        Business business = businessWithUser.getBusiness();
-        business.setId(null);
-        business = businessRepository.save(business);
-
-        // Set associated user
-        User user = new User(businessWithUser.getUserID());
-
-        // Create user role
-        UserRole userRole = new UserRole(user, business, true, false, false);
-        userRoleService.CreateUserRole(userRole);
-
-        return business;
     }
 
     public Business UpdateBusiness(Business business) {
-        boolean exists = ExistsBusiness(business.getId());
-        if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exist");
-        }
+        try {
+            boolean exists = ExistsBusiness(business.getId());
+            if (!exists) {
+                throw new IllegalStateException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exist");
+            }
 
-        return businessRepository.save(business);
+            return businessRepository.save(business);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Long DeleteBusiness(Long businessID) {
-        boolean exists = ExistsBusiness(businessID);
-        if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteBusiness' - Business with ID: " + businessID + " doesn't exist");
-        }
+        try {
+            boolean exists = ExistsBusiness(businessID);
+            if (!exists) {
+                throw new IllegalStateException("Error at 'DeleteBusiness' - Business with ID: " + businessID + " doesn't exist");
+            }
 
-        businessRepository.deleteById(businessID);
-        return businessID;
+            businessRepository.deleteById(businessID);
+            return businessID;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 }

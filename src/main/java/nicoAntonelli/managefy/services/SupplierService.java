@@ -14,10 +14,12 @@ import java.util.Optional;
 @Transactional
 public class SupplierService {
     private final SupplierRepository supplierRepository;
+    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public SupplierService(SupplierRepository supplierRepository) {
+    public SupplierService(SupplierRepository supplierRepository, ErrorLogService errorLogService) {
         this.supplierRepository = supplierRepository;
+        this.errorLogService = errorLogService;
     }
 
     public List<Supplier> GetSuppliers() {
@@ -29,36 +31,56 @@ public class SupplierService {
     }
 
     public Supplier GetOneSupplier(Long supplierID) {
-        Optional<Supplier> supplier = supplierRepository.findById(supplierID);
-        if (supplier.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exist");
-        }
+        try {
+            Optional<Supplier> supplier = supplierRepository.findById(supplierID);
+            if (supplier.isEmpty()) {
+                throw new IllegalStateException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exist");
+            }
 
-        return supplier.get();
+            return supplier.get();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Supplier CreateSupplier(Supplier supplier) {
-        supplier.setId(null);
-        supplier.setDeletionDate(null);
+        try {
+            supplier.setId(null);
+            supplier.setDeletionDate(null);
 
-        return supplierRepository.save(supplier);
+            return supplierRepository.save(supplier);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Supplier UpdateSupplier(Supplier supplier) {
-        boolean exists = ExistsSupplier(supplier.getId());
-        if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist");
-        }
+        try {
+            boolean exists = ExistsSupplier(supplier.getId());
+            if (!exists) {
+                throw new IllegalStateException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist");
+            }
 
-        return supplierRepository.save(supplier);
+            return supplierRepository.save(supplier);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     // Logic deletion (field: deletion date)
     public Supplier DeleteSupplier(Long supplierID) {
-        Supplier supplier = GetOneSupplier(supplierID);
-        supplier.setDeletionDate(new Date());
-        supplierRepository.save(supplier);
+        try {
+            Supplier supplier = GetOneSupplier(supplierID);
+            supplier.setDeletionDate(new Date());
+            supplierRepository.save(supplier);
 
-        return supplier;
+            return supplier;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 }

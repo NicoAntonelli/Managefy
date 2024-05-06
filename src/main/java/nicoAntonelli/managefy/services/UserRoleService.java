@@ -18,14 +18,17 @@ public class UserRoleService {
     private final UserRoleRepository userRoleRepository;
     private final UserRepository userRepository; // Dependency
     private final BusinessRepository businessRepository; // Dependency
+    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
     public UserRoleService(UserRoleRepository userRoleRepository,
                            UserRepository userRepository,
-                           BusinessRepository businessRepository) {
+                           BusinessRepository businessRepository,
+                           ErrorLogService errorLogService) {
         this.userRoleRepository = userRoleRepository;
         this.userRepository = userRepository;
         this.businessRepository = businessRepository;
+        this.errorLogService = errorLogService;
     }
 
     public List<UserRole> GetUserRoles() {
@@ -39,49 +42,69 @@ public class UserRoleService {
     }
 
     public UserRole GetOneUserRole(Long userID, Long businessID) {
-        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
+        try {
+            UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
 
-        Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
-        if (userRole.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUserRole' - UserRole with ID: " + userRoleKey + " doesn't exist");
+            Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
+            if (userRole.isEmpty()) {
+                throw new IllegalStateException("Error at 'GetOneUserRole' - UserRole with ID: " + userRoleKey + " doesn't exist");
+            }
+
+            return userRole.get();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
         }
-
-        return userRole.get();
     }
 
     public UserRole CreateUserRole(UserRole userRole) {
-        // Validate user
-        Long userID = userRole.getUser().getId();
-        if (!userRepository.existsById(userID)) {
-            throw new IllegalStateException("Error at 'CreateUserRole' - User with ID: " + userID + " doesn't exist");
-        }
+        try {
+            // Validate user
+            Long userID = userRole.getUser().getId();
+            if (!userRepository.existsById(userID)) {
+                throw new IllegalStateException("Error at 'CreateUserRole' - User with ID: " + userID + " doesn't exist");
+            }
 
-        // Validate business
-        Long businessID = userRole.getBusiness().getId();
-        if (!businessRepository.existsById(businessID)) {
-            throw new IllegalStateException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exist");
-        }
+            // Validate business
+            Long businessID = userRole.getBusiness().getId();
+            if (!businessRepository.existsById(businessID)) {
+                throw new IllegalStateException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exist");
+            }
 
-        return userRoleRepository.save(userRole);
+            return userRoleRepository.save(userRole);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public UserRole UpdateUserRole(UserRole userRole) {
-        boolean exists = userRoleRepository.existsById(userRole.getId());
-        if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateUserRole' - UserRole with ID: " + userRole.getId() + " doesn't exist");
-        }
+        try {
+            boolean exists = userRoleRepository.existsById(userRole.getId());
+            if (!exists) {
+                throw new IllegalStateException("Error at 'UpdateUserRole' - UserRole with ID: " + userRole.getId() + " doesn't exist");
+            }
 
-        return userRoleRepository.save(userRole);
+            return userRoleRepository.save(userRole);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public UserRoleKey DeleteUserRole(Long userRoleID, long businessID) {
-        UserRoleKey userRoleKey = new UserRoleKey(userRoleID, businessID);
-        boolean exists = ExistsUserRole(userRoleID, businessID);
-        if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteUserRole' - User with ID: " + userRoleKey + " doesn't exist");
-        }
+        try {
+            UserRoleKey userRoleKey = new UserRoleKey(userRoleID, businessID);
+            boolean exists = ExistsUserRole(userRoleID, businessID);
+            if (!exists) {
+                throw new IllegalStateException("Error at 'DeleteUserRole' - User with ID: " + userRoleKey + " doesn't exist");
+            }
 
-        userRoleRepository.deleteById(userRoleKey);
-        return userRoleKey;
+            userRoleRepository.deleteById(userRoleKey);
+            return userRoleKey;
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 }
