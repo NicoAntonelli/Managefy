@@ -33,6 +33,10 @@ public class Client {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Sale> sales = new HashSet<>();
 
+    public Client(Long id) {
+        this.id = id;
+    }
+
     public Client(String name, String description, String mail, String phone) {
         this.name = name;
         this.description = description;

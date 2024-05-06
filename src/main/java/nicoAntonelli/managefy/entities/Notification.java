@@ -41,6 +41,10 @@ public class Notification {
     )
     private User user;
 
+    public Notification(Long id) {
+        this.id = id;
+    }
+
     public Notification(String description, NotificationType type, NotificationState state,
                         Date date, Long userID) {
         this.description = description;

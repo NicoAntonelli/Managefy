@@ -22,7 +22,7 @@ public class SaleLine {
 
     @Id
     @Column(updatable = false)
-    Integer position;
+    private Integer position;
 
     @Column(nullable = false)
     private Integer amount;
@@ -40,6 +40,11 @@ public class SaleLine {
             foreignKey = @ForeignKey(name = "sales_products_fk")
     )
     private Product product;
+
+    public SaleLine(Sale sale, Integer position) {
+        this.sale = sale;
+        this.position = position;
+    }
 
     public SaleLine(Sale sale, Integer position, Integer amount, Float price, Float discountSurcharge) {
         this.sale = sale;

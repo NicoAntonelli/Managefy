@@ -18,7 +18,7 @@ public class UserRole {
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "users_userRoles_fk")
     )
-    User user;
+    private User user;
 
     @Id
     @ManyToOne
@@ -28,7 +28,7 @@ public class UserRole {
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "business_userRoles_fk")
     )
-    Business business;
+    private Business business;
 
     @Column(nullable = false)
     private Boolean isManager;
@@ -36,6 +36,11 @@ public class UserRole {
     private Boolean isAdmin;
     @Column(nullable = false)
     private Boolean isCollaborator;
+
+    public UserRole(User user, Business business) {
+        this.user = user;
+        this.business = business;
+    }
 
     public UserRole(Boolean isManager, Boolean isAdmin, Boolean isCollaborator) {
         this.isManager = isManager;

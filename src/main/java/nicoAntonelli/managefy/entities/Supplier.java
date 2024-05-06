@@ -35,6 +35,10 @@ public class Supplier {
                orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Product> products = new HashSet<>();
 
+    public Supplier(Long id) {
+        this.id = id;
+    }
+
     public Supplier(String name, String description, String mail, String phone) {
         this.name = name;
         this.description = description;

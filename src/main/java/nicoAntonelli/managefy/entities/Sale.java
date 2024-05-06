@@ -52,6 +52,10 @@ public class Sale {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SaleLine> saleLines = new ArrayList<>();
 
+    public Sale(Long id) {
+        this.id = id;
+    }
+
     public Sale(Long id, Float partialPayment, SaleState saleState) {
         this.id = id;
         this.date = new Date();

@@ -59,6 +59,10 @@ public class Product {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<SaleLine> saleLines = new HashSet<>();
 
+    public Product(Long id) {
+        this.id = id;
+    }
+
     public Product(String code, String name, String description, Float unitCost, Float unitPrice,
                    Integer stock, Integer stockMin, Integer saleMinAmount) {
         this.code = code;

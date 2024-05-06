@@ -53,6 +53,10 @@ public class Business {
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Sale> sales = new ArrayList<>();
 
+    public Business(Long id) {
+        this.id = id;
+    }
+
     public Business(String name, String description, String link, SortedMap<String, Boolean> businessDays) {
         this.name = name;
         this.description = description;

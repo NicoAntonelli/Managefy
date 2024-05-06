@@ -29,6 +29,10 @@ public class ErrorLog {
     private String browser; // Nullable
     private Date userIPAddress; // Nullable
 
+    public ErrorLog(Long id) {
+        this.id = id;
+    }
+
     public ErrorLog(String description) {
         this.date = new Date();
         this.description = description;

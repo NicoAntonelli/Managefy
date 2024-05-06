@@ -43,6 +43,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL })
     private Set<UserRole> userRoles = new HashSet<>();
 
+    public User(Long id) {
+        this.id = id;
+    }
+
     public User(String mail, String password, String name, Boolean validated, Boolean mailNotifications) {
         this.mail = mail;
         this.password = password;
