@@ -61,4 +61,15 @@ public class Notification {
         user = new User();
         user.setId(userID);
     }
+
+    public Boolean setStateByText(String state) {
+        switch (state.toLowerCase()) {
+            case "unread" -> setState(Notification.NotificationState.Unread);
+            case "read" -> setState(Notification.NotificationState.Read);
+            case "closed" -> setState(Notification.NotificationState.Closed);
+            default -> { return false; }
+        }
+
+        return true;
+    }
 }

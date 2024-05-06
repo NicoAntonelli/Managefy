@@ -78,11 +78,9 @@ public class NotificationService {
     public Notification UpdateNotificationState(Long notificationID, String state) {
         try {
             Notification notification = GetOneNotification(notificationID);
-            switch (state.toLowerCase()) {
-                case "unread" -> notification.setState(Notification.NotificationState.Unread);
-                case "read" -> notification.setState(Notification.NotificationState.Read);
-                case "closed" -> notification.setState(Notification.NotificationState.Closed);
-                default -> throw new IllegalStateException("Error at 'UpdateNotificationState' - Unexpected value: " + state);
+            Boolean result = notification.setStateByText(state);
+            if (!result) {
+                throw new IllegalStateException("Error at 'UpdateNotificationState' - Unexpected value: " + state);
             }
 
             return notification;
