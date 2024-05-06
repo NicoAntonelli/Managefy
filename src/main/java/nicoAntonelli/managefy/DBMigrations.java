@@ -84,8 +84,8 @@ public class DBMigrations {
     }
 
     private static List<ErrorLog> generateErrors() {
-        ErrorLog error1 = new ErrorLog("Dummy error 1: It took you 3 years to start & deliver the Java TP!");
-        ErrorLog error2 = new ErrorLog("Dummy error 2: Yep, the previous error was an easter egg");
+        ErrorLog error1 = new ErrorLog("Dummy error 1: It took you 3 years to start & deliver the Java TP!", ErrorLog.SERVER);
+        ErrorLog error2 = new ErrorLog("Dummy error 2: Yep, the previous error was an easter egg", ErrorLog.SERVER);
 
         return List.of(error1, error2);
     }
