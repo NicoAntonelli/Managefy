@@ -206,15 +206,11 @@ public class DBMigrations {
     }
 
     private static List<UserRole> generateUserRoles() {
-        User user1 = new User();
-        user1.setId(1L);
-        User user2 = new User();
-        user2.setId(2L);
+        User user1 = new User(1L);
+        User user2 = new User(2L);
 
-        Business business1 = new Business();
-        business1.setId(1L);
-        Business business2 = new Business();
-        business2.setId(2L);
+        Business business1 = new Business(1L);
+        Business business2 = new Business(2L);
 
         UserRole userRole1 = new UserRole(user1, business1, true, false, false);
         UserRole userRole2 = new UserRole(user2, business2, true, false, false);

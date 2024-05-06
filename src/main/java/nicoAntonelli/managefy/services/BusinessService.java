@@ -58,8 +58,7 @@ public class BusinessService {
         business = businessRepository.save(business);
 
         // Set associated user
-        User user = new User();
-        user.setId(businessWithUser.getUserID());
+        User user = new User(businessWithUser.getUserID());
 
         // Create user role
         UserRole userRole = new UserRole(user, business, true, false, false);
