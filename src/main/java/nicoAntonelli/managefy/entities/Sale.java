@@ -14,7 +14,7 @@ import java.util.List;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Sale {
     // State enum
-    public enum SaleState { Canceled, PendingPayment, PartialPayment, Payed, PayedAndBilled }
+    public enum SaleState { Cancelled, PendingPayment, PartialPayment, Payed, PayedAndBilled }
 
     @Id
     @SequenceGenerator(name = "sales_sequence", sequenceName = "sales_sequence")
@@ -28,7 +28,7 @@ public class Sale {
     private Float totalPrice;
     private Float partialPayment; // Nullable
     @Column(nullable = false)
-    private SaleState saleState;
+    private SaleState state;
 
     @ManyToOne
     @JoinColumn(
@@ -56,21 +56,21 @@ public class Sale {
         this.id = id;
     }
 
-    public Sale(Long id, Float partialPayment, SaleState saleState) {
+    public Sale(Long id, Float partialPayment, SaleState state) {
         this.id = id;
         this.date = new Date();
         this.partialPayment = partialPayment;
 
-        if (saleState == null) saleState = SaleState.PendingPayment;
-        this.saleState = saleState;
+        if (state == null) state = SaleState.PendingPayment;
+        this.state = state;
     }
 
-    public Sale(Float partialPayment, SaleState saleState) {
+    public Sale(Float partialPayment, SaleState state) {
         this.date = new Date();
         this.partialPayment = partialPayment;
 
-        if (saleState == null) saleState = SaleState.PendingPayment;
-        this.saleState = saleState;
+        if (state == null) state = SaleState.PendingPayment;
+        this.state = state;
     }
 
     public void setBusinessByID(Long businessID) {
