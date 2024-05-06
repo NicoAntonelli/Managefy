@@ -26,7 +26,7 @@ public class UserRole {
             name = "businessID",
             nullable = false,
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "business_userRoles_fk")
+            foreignKey = @ForeignKey(name = "businesses_userRoles_fk")
     )
     private Business business;
 

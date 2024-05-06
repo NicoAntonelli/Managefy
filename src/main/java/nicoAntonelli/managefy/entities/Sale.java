@@ -35,7 +35,7 @@ public class Sale {
             name = "businessID",
             nullable = false,
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "business_sales_fk")
+            foreignKey = @ForeignKey(name = "businesses_sales_fk")
     )
     private Business business;
 

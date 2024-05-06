@@ -40,7 +40,7 @@ public class Product {
             name = "businessID",
             nullable = false,
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "business_products_fk")
+            foreignKey = @ForeignKey(name = "businesses_products_fk")
     )
     private Business business;
 
