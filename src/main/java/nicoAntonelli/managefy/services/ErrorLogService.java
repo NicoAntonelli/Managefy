@@ -24,11 +24,11 @@ public class ErrorLogService {
     }
 
     public List<ErrorLog> GetBackendErrorsByInterval(Date initialDate, Date finalDate) {
-        return errorLogRepository.findByOrigin(ErrorLog.SERVER, initialDate, finalDate);
+        return errorLogRepository.findByOriginAndInterval(ErrorLog.SERVER, initialDate, finalDate);
     }
 
     public List<ErrorLog> GetFrontendErrorsByInterval(Date initialDate, Date finalDate) {
-        return errorLogRepository.findByOrigin(ErrorLog.CLIENT, initialDate, finalDate);
+        return errorLogRepository.findByOriginAndInterval(ErrorLog.CLIENT, initialDate, finalDate);
     }
 
     public void SetBackendError(String description) {

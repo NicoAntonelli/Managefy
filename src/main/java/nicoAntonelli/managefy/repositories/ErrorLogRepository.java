@@ -13,5 +13,5 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
     @Query("SELECT e " +
            "FROM ErrorLog e " +
            "WHERE e.origin = ?1 AND e.date >= ?2 AND e.date <= ?3")
-    List<ErrorLog> findByOrigin(String origin, Date initialDate, Date finalDate);
+    List<ErrorLog> findByOriginAndInterval(String origin, Date initialDate, Date finalDate);
 }
