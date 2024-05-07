@@ -29,7 +29,7 @@ public class SaleLine {
     @Column(nullable = false)
     private Float price;
     @Transient
-    private Float subtotal;
+    private Float subtotal; // Calculated
     private Float discountSurcharge; // Nullable
 
     @ManyToOne
@@ -84,6 +84,7 @@ public class SaleLine {
 
     public void calculateAndSetSubtotal() {
         if (discountSurcharge == null) discountSurcharge = 1f;
+        if (price == null) price = getProduct().getUnitPrice();
         subtotal = amount * price * discountSurcharge;
     }
 }
