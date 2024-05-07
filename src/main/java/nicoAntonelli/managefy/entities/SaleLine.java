@@ -28,9 +28,9 @@ public class SaleLine {
     private Integer amount;
     @Column(nullable = false)
     private Float price;
+    private Float discountSurcharge; // Nullable
     @Transient
     private Float subtotal; // Calculated
-    private Float discountSurcharge; // Nullable
 
     @ManyToOne
     @JoinColumn(

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notifications")
@@ -29,8 +29,8 @@ public class Notification {
     private NotificationType type;
     @Column(nullable = false)
     private NotificationState state;
-    @Column(nullable = false)
-    private Date date;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(
@@ -46,7 +46,7 @@ public class Notification {
     }
 
     public Notification(String description, NotificationType type, NotificationState state,
-                        Date date, Long userID) {
+                        LocalDateTime date, Long userID) {
         this.description = description;
         this.type = type;
         this.state = state;

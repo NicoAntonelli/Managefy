@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +26,8 @@ public class Client {
     private String mail;
     @Column(nullable = false)
     private String phone;
-    private Date deletionDate; // Nullable
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private LocalDateTime deletionDate; // Nullable
 
     @JsonIgnore
     @OneToMany(mappedBy = "client", cascade = { CascadeType.ALL },
@@ -46,7 +47,7 @@ public class Client {
     }
 
     public Client(String name, String description, String mail,
-                  String phone, Date detelionDate) {
+                  String phone, LocalDateTime detelionDate) {
         this.name = name;
         this.description = description;
         this.mail = mail;

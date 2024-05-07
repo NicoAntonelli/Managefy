@@ -7,7 +7,7 @@ import nicoAntonelli.managefy.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +68,7 @@ public class ProductService {
     // Logic deletion (field: deletion date)
     public Product DeleteProduct(Long productID) {
         Product product = GetOneProduct(productID);
-        product.setDeletionDate(new Date());
+        product.setDeletionDate(LocalDateTime.now());
         productRepository.save(product);
 
         return product;

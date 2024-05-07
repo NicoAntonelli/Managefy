@@ -6,8 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Configuration
@@ -92,20 +92,18 @@ public class DBMigrations {
     }
 
     private static List<Notification> generateNotifications() {
-        Date today = new Date();
-
         Notification not1 = new Notification("You made 10 sales this week, 2 more than the previous",
                 Notification.NotificationType.Normal, Notification.NotificationState.Read,
-                today, 1L);
+                LocalDateTime.now(), 1L);
         Notification not2 = new Notification("The sale has been completed successfully",
                 Notification.NotificationType.Normal, Notification.NotificationState.Closed,
-                today, 1L);
+                LocalDateTime.now(), 1L);
         Notification not3 = new Notification("An admin has removed you from the 'MinShop' business",
                 Notification.NotificationType.Priority, Notification.NotificationState.Unread,
-                today, 1L);
+                LocalDateTime.now(), 1L);
         Notification not4 = new Notification("Minimum storage for Soda reached at 'MyShop': 3 units left",
                 Notification.NotificationType.Important, Notification.NotificationState.Unread,
-                today, 1L);
+                LocalDateTime.now(), 1L);
 
         return List.of(not1, not2, not3, not4);
     }

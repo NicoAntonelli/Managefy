@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +28,8 @@ public class Supplier {
     private String mail;
     @Column(nullable = false)
     private String phone;
-    private Date deletionDate; // Nullable
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private LocalDateTime deletionDate; // Nullable
 
     @JsonIgnore
     @OneToMany(mappedBy = "supplier", cascade = { CascadeType.ALL },
@@ -48,7 +49,7 @@ public class Supplier {
     }
 
     public Supplier(String name, String description, String mail,
-                    String phone, Date detelionDate) {
+                    String phone, LocalDateTime detelionDate) {
         this.name = name;
         this.description = description;
         this.mail = mail;

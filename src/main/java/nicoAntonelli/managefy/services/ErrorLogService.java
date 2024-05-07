@@ -6,7 +6,7 @@ import nicoAntonelli.managefy.repositories.ErrorLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,11 +23,11 @@ public class ErrorLogService {
         return errorLogRepository.findAll();
     }
 
-    public List<ErrorLog> GetBackendErrorsByInterval(Date initialDate, Date finalDate) {
+    public List<ErrorLog> GetBackendErrorsByInterval(LocalDateTime initialDate, LocalDateTime finalDate) {
         return errorLogRepository.findByOriginAndInterval(ErrorLog.SERVER, initialDate, finalDate);
     }
 
-    public List<ErrorLog> GetFrontendErrorsByInterval(Date initialDate, Date finalDate) {
+    public List<ErrorLog> GetFrontendErrorsByInterval(LocalDateTime initialDate, LocalDateTime finalDate) {
         return errorLogRepository.findByOriginAndInterval(ErrorLog.CLIENT, initialDate, finalDate);
     }
 
@@ -46,7 +46,7 @@ public class ErrorLogService {
 
             errorLog.setId(null);
             errorLog.setOrigin(ErrorLog.CLIENT);
-            if (errorLog.getDate() == null) errorLog.setDate(new Date());
+            if (errorLog.getDate() == null) errorLog.setDate(LocalDateTime.now());
 
             errorLogRepository.save(errorLog);
 

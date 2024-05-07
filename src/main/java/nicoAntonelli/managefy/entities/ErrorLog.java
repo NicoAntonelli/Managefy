@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "errorLogs")
@@ -23,8 +23,8 @@ public class ErrorLog {
     @Column(updatable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private Date date;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private LocalDateTime date;
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false)
@@ -37,18 +37,18 @@ public class ErrorLog {
     }
 
     public ErrorLog(String description, String origin) {
-        this.date = new Date();
+        this.date = LocalDateTime.now();
         this.description = description;
         this.origin = origin;
     }
 
-    public ErrorLog(Date date, String description, String origin) {
+    public ErrorLog(LocalDateTime date, String description, String origin) {
         this.date = date;
         this.description = description;
         this.origin = origin;
     }
 
-    public ErrorLog(Date date, String description, String origin, String browser, String userIPAddress) {
+    public ErrorLog(LocalDateTime date, String description, String origin, String browser, String userIPAddress) {
         this.date = date;
         this.description = description;
         this.origin = origin;

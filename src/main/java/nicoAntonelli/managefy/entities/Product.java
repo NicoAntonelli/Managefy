@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Entity
 @Table(name = "products")
@@ -32,7 +35,8 @@ public class Product {
     private Integer stock;
     private Integer stockMin; // Nullable
     private Integer saleMinAmount; // Nullable
-    private Date deletionDate; // Nullable
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private LocalDateTime deletionDate; // Nullable
 
     @JsonIgnore
     @ManyToOne
@@ -77,7 +81,7 @@ public class Product {
     }
 
     public Product(String code, String name, String description, Float unitCost, Float unitPrice,
-                   Integer stock, Integer stockMin, Integer saleMinAmount, Date deletionDate) {
+                   Integer stock, Integer stockMin, Integer saleMinAmount, LocalDateTime deletionDate) {
         this.code = code;
         this.name = name;
         this.description = description;

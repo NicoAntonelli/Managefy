@@ -6,7 +6,7 @@ import nicoAntonelli.managefy.repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +56,7 @@ public class SupplierService {
     // Logic deletion (field: deletion date)
     public Supplier DeleteSupplier(Long supplierID) {
         Supplier supplier = GetOneSupplier(supplierID);
-        supplier.setDeletionDate(new Date());
+        supplier.setDeletionDate(LocalDateTime.now());
         supplierRepository.save(supplier);
 
         return supplier;

@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,8 +22,8 @@ public class Sale {
     @Column(updatable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private Date date;
+    @Column(nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private LocalDateTime date;
     @Column(nullable = false)
     private Float totalPrice;
     private Float partialPayment; // Nullable
@@ -58,7 +58,7 @@ public class Sale {
 
     public Sale(Long id, Float partialPayment, SaleState state) {
         this.id = id;
-        this.date = new Date();
+        this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
 
         if (state == null) state = SaleState.PendingPayment;
@@ -66,7 +66,7 @@ public class Sale {
     }
 
     public Sale(Float partialPayment, SaleState state) {
-        this.date = new Date();
+        this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
 
         if (state == null) state = SaleState.PendingPayment;

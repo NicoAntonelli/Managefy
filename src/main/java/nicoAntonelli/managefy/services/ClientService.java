@@ -6,7 +6,7 @@ import nicoAntonelli.managefy.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +56,7 @@ public class ClientService {
     // Logic deletion (field: deletion date)
     public Client DeleteClient(Long clientID) {
         Client client = GetOneClient(clientID);
-        client.setDeletionDate(new Date());
+        client.setDeletionDate(LocalDateTime.now());
         clientRepository.save(client);
 
         return client;

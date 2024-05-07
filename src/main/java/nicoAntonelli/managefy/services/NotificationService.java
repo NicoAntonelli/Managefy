@@ -7,7 +7,7 @@ import nicoAntonelli.managefy.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +56,7 @@ public class NotificationService {
 
         notification.setId(null);
         notification.setState(Notification.NotificationState.Unread);
-        notification.setDate(new Date());
+        notification.setDate(LocalDateTime.now());
 
         return notificationRepository.save(notification);
     }

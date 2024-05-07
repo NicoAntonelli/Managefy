@@ -7,7 +7,7 @@ import nicoAntonelli.managefy.repositories.SaleLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ public class SaleService {
         return saleRepository.findAll();
     }
 
-    public List<Sale> GetSalesByInterval(Date initialDate, Date finalDate) {
+    public List<Sale> GetSalesByInterval(LocalDateTime initialDate, LocalDateTime finalDate) {
         return saleRepository.findByInterval(initialDate, finalDate);
     }
 
@@ -117,7 +117,7 @@ public class SaleService {
         }
 
         sale.setId(null);
-        sale.setDate(new Date());
+        sale.setDate(LocalDateTime.now());
 
         // Calculate total price and save the sale before saleLines
         sale.calculateAndSetTotalPrice(lines);

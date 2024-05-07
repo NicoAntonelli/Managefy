@@ -6,7 +6,7 @@ import nicoAntonelli.managefy.services.ErrorLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -32,8 +32,8 @@ public class ErrorLogController {
     }
 
     @GetMapping(path = "front")
-    public Result<List<ErrorLog>> GetFrontendErrors(@RequestParam Date from,
-                                                    @RequestParam Date to) {
+    public Result<List<ErrorLog>> GetFrontendErrors(@RequestParam LocalDateTime from,
+                                                    @RequestParam LocalDateTime to) {
         try {
             List<ErrorLog> errors = errorLogService.GetFrontendErrorsByInterval(from, to);
             return new Result<>(errors);
@@ -44,8 +44,8 @@ public class ErrorLogController {
     }
 
     @GetMapping(path = "back")
-    public Result<List<ErrorLog>> GetBackendErrorsByInterval(@RequestParam Date from,
-                                                             @RequestParam Date to) {
+    public Result<List<ErrorLog>> GetBackendErrorsByInterval(@RequestParam LocalDateTime from,
+                                                             @RequestParam LocalDateTime to) {
         try {
             List<ErrorLog> errors = errorLogService.GetBackendErrorsByInterval(from, to);
             return new Result<>(errors);

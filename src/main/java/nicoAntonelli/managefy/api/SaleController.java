@@ -7,7 +7,7 @@ import nicoAntonelli.managefy.services.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -41,8 +41,8 @@ public class SaleController {
     }
 
     @GetMapping(path = "interval")
-    public Result<List<Sale>> GetSalesByInterval(@RequestParam Date from,
-                                                 @RequestParam Date to) {
+    public Result<List<Sale>> GetSalesByInterval(@RequestParam LocalDateTime from,
+                                                 @RequestParam LocalDateTime to) {
         try {
             List<Sale> sales = saleService.GetSalesByInterval(from, to);
             return new Result<>(sales);
