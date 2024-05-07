@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 @RequestMapping(path = "api/sales")
 public class SaleController {
     private final SaleService saleService;

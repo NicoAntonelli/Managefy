@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Configuration
+@SuppressWarnings("unused")
 public class DBMigrations {
     @Bean
     CommandLineRunner runner(BusinessRepository businessRepository,

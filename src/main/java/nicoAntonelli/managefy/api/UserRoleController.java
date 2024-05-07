@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 @RequestMapping(path = "api/userRoles")
 public class UserRoleController {
     private final UserRoleService userRoleService;

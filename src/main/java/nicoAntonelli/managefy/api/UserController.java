@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 @RequestMapping(path = "api/users")
 public class UserController {
     private final UserService userService;

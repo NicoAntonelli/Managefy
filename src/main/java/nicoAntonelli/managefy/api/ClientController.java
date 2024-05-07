@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 @RequestMapping(path = "api/clients")
 public class ClientController {
     private final ClientService clientService;

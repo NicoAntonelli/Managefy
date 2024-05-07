@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
+@SuppressWarnings("unused")
 @RequestMapping(path = "api/errorLogs")
 public class ErrorLogController {
     private final ErrorLogService errorLogService;
