@@ -14,140 +14,98 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
-    private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public UserService(UserRepository userRepository, ErrorLogService errorLogService) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.errorLogService = errorLogService;
     }
 
     public List<User> GetUsers() {
-        try {
-            return userRepository.findAll();
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
-        }
+        return userRepository.findAll();
     }
 
     public Boolean ExistsUser(Long userID) {
-        try {
-            return userRepository.existsById(userID);
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
-        }
+        return userRepository.existsById(userID);
     }
 
     public User GetOneUser(Long userID) {
-        try {
-            Optional<User> user = userRepository.findById(userID);
-            if (user.isEmpty()) {
-                throw new IllegalStateException("Error at 'GetOneUser' - User with ID: " + userID + " doesn't exist");
-            }
-
-            return user.get();
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
+        Optional<User> user = userRepository.findById(userID);
+        if (user.isEmpty()) {
+            throw new IllegalStateException("Error at 'GetOneUser' - User with ID: " + userID + " doesn't exist");
         }
+
+        return user.get();
     }
 
     public User GetOneUserByMail(String mail) {
-        try {
-            // Mail format validation (TO-DO: add regex)
-            if (mail == null || mail.isBlank()) {
-                throw new IllegalStateException("Error at 'GetOneUserByMail' - Mail bad formatted: " + mail);
-            }
-
-            Optional<User> user = userRepository.findByMail(mail);
-            if (user.isEmpty()) {
-                throw new IllegalStateException("Error at 'GetOneUserByMail' - User with mail: " + mail + " doesn't exist");
-            }
-
-            return user.get();
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
+        // Mail format validation (TO-DO: add regex)
+        if (mail == null || mail.isBlank()) {
+            throw new IllegalStateException("Error at 'GetOneUserByMail' - Mail bad formatted: " + mail);
         }
+
+        Optional<User> user = userRepository.findByMail(mail);
+        if (user.isEmpty()) {
+            throw new IllegalStateException("Error at 'GetOneUserByMail' - User with mail: " + mail + " doesn't exist");
+        }
+
+        return user.get();
     }
 
     public User CreateUser(User user) {
-        try {
-            // Mail unique validation
-            Optional<User> possibleUser = userRepository.findByMail(user.getMail());
-            if (possibleUser.isPresent()) {
-                throw new IllegalStateException("Error at 'CreateUser' - Mail '" + user.getMail() + "' already taken");
-            }
-
-            user.setId(null);
-            return userRepository.save(user);
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
+        // Mail unique validation
+        Optional<User> possibleUser = userRepository.findByMail(user.getMail());
+        if (possibleUser.isPresent()) {
+            throw new IllegalStateException("Error at 'CreateUser' - Mail '" + user.getMail() + "' already taken");
         }
+
+        user.setId(null);
+        return userRepository.save(user);
     }
 
     public User ValidateUser(String mail, String password) {
-        try {
-            // Mail format validation (TO-DO: add regex)
-            if (mail == null || mail.isBlank()) {
-                throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
-            }
-
-            // Password format validation (TO-DO: add regex)
-            if (password == null || password.isBlank()) {
-                throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
-            }
-
-            // Correct mail & password validation (TO-DO: add encryption for password)
-            User user = GetOneUserByMail(mail);
-            if (!Objects.equals(mail, user.getMail()) || !Objects.equals(password, user.getPassword())) {
-                throw new SecurityException("Error at 'ValidateUser' - Mail or password mismatch, attempted mail: " + mail);
-            }
-
-            return user;
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
+        // Mail format validation (TO-DO: add regex)
+        if (mail == null || mail.isBlank()) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
         }
+
+        // Password format validation (TO-DO: add regex)
+        if (password == null || password.isBlank()) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
+        }
+
+        // Correct mail & password validation (TO-DO: add encryption for password)
+        User user = GetOneUserByMail(mail);
+        if (!Objects.equals(mail, user.getMail()) || !Objects.equals(password, user.getPassword())) {
+            throw new SecurityException("Error at 'ValidateUser' - Mail or password mismatch, attempted mail: " + mail);
+        }
+
+        return user;
     }
 
     public User UpdateUser(User user) {
-        try {
-            boolean exists = ExistsUser(user.getId());
-            if (!exists) {
-                throw new IllegalStateException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
-            }
-            // Mail unique validation
-            Optional<User> possibleUser = userRepository.findByMail(user.getMail());
-            if (possibleUser.isPresent()) {
-                // Only fail validation if it's not the same user
-                if (!Objects.equals(possibleUser.get().getId(), user.getId())) {
-                    throw new IllegalStateException("Error at 'UpdateUser' - Mail '" + user.getMail() + "' already taken");
-                }
-            }
-
-            return userRepository.save(user);
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
+        boolean exists = ExistsUser(user.getId());
+        if (!exists) {
+            throw new IllegalStateException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
         }
+        // Mail unique validation
+        Optional<User> possibleUser = userRepository.findByMail(user.getMail());
+        if (possibleUser.isPresent()) {
+            // Only fail validation if it's not the same user
+            if (!Objects.equals(possibleUser.get().getId(), user.getId())) {
+                throw new IllegalStateException("Error at 'UpdateUser' - Mail '" + user.getMail() + "' already taken");
+            }
+        }
+
+        return userRepository.save(user);
     }
 
     public Long DeleteUser(Long userID) {
-        try {
-            boolean exists = ExistsUser(userID);
-            if (!exists) {
-                throw new IllegalStateException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exist");
-            }
-
-            userRepository.deleteById(userID);
-            return userID;
-        } catch(Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
-            return null;
+        boolean exists = ExistsUser(userID);
+        if (!exists) {
+            throw new IllegalStateException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exist");
         }
+
+        userRepository.deleteById(userID);
+        return userID;
     }
 }

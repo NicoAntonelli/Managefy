@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.ErrorLog;
+import nicoAntonelli.managefy.entities.dto.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,24 +20,48 @@ public class ErrorLogController {
     }
 
     @GetMapping
-    public List<ErrorLog> GetErrorLogs() {
-        return errorLogService.GetErrors();
+    public Result<List<ErrorLog>> GetErrorLogs() {
+        try {
+            List<ErrorLog> errors = errorLogService.GetErrors();
+            return new Result<>(errors);
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return new Result<>(null, 500);
+        }
     }
 
     @GetMapping(path = "front")
-    public List<ErrorLog> GetFrontendErrors(@RequestParam Date from,
-                                            @RequestParam Date to) {
-        return errorLogService.GetFrontendErrorsByInterval(from, to);
+    public Result<List<ErrorLog>> GetFrontendErrors(@RequestParam Date from,
+                                                    @RequestParam Date to) {
+        try {
+            List<ErrorLog> errors = errorLogService.GetFrontendErrorsByInterval(from, to);
+            return new Result<>(errors);
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return new Result<>(null, 500);
+        }
     }
 
     @GetMapping(path = "back")
-    public List<ErrorLog> GetBackendErrorsByInterval(@RequestParam Date from,
-                                                     @RequestParam Date to) {
-        return errorLogService.GetBackendErrorsByInterval(from, to);
+    public Result<List<ErrorLog>> GetBackendErrorsByInterval(@RequestParam Date from,
+                                                             @RequestParam Date to) {
+        try {
+            List<ErrorLog> errors = errorLogService.GetBackendErrorsByInterval(from, to);
+            return new Result<>(errors);
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return new Result<>(null, 500);
+        }
     }
 
     @PostMapping
-    public Boolean SetFrontendError(@RequestBody ErrorLog errorLog) {
-        return errorLogService.SetFrontendError(errorLog);
+    public Result<Boolean> SetFrontendError(@RequestBody ErrorLog errorLog) {
+        try {
+            Boolean operationResult = errorLogService.SetFrontendError(errorLog);
+            return new Result<>(operationResult);
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return new Result<>(null, 500);
+        }
     }
 }
