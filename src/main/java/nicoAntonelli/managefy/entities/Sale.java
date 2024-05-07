@@ -42,7 +42,7 @@ public class Sale {
     @ManyToOne
     @JoinColumn(
             name = "clientID",
-            nullable = false,
+            nullable = true,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "clients_sales_fk")
     )

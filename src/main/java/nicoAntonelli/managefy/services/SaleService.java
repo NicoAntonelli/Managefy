@@ -73,13 +73,15 @@ public class SaleService {
                 throw new IllegalStateException("Error at 'CreateSale' - Business with ID: " + business.getId() + " doesn't exist");
             }
 
-            // Validate associated client
+            // Optional associated client: validate if it was supplied
             Client client = sale.getClient();
-            if (client == null || client.getId() == null) {
-                throw new IllegalStateException("Error at 'CreateSale' - Client not supplied");
-            }
-            if (!clientService.ExistsClient(client.getId())) {
-                throw new IllegalStateException("Error at 'CreateSale' - Client with ID: " + client.getId() + " doesn't exist");
+            if (client != null) {
+                if (client.getId() == null) {
+                    throw new IllegalStateException("Error at 'CreateSale' - Optional client was supplied but without an ID, business: " + business.getId());
+                }
+                if (!clientService.ExistsClient(client.getId())) {
+                    throw new IllegalStateException("Error at 'CreateSale' - Client with ID: " + client.getId() + " doesn't exist, business: " + business.getId());
+                }
             }
 
             // At least one saleLine
