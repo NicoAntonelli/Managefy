@@ -118,7 +118,7 @@ public class DBMigrations {
         Product product6 = new Product("D02", "Diet Yogurt", "Yogurt with less sugar", 30f, 40f, 20, null, null);
         Product product7 = new Product("M01", "Egg", "Just an egg", 200f, 260f, 10, null, 6);
         Product product8 = new Product("M02", "Meat 1KG", "Roast beef", 200f, 260f, 20, 4, 2);
-        Product product9 = new Product("M03", "Chicken 1KG", "Roast beef", 150f, 200f, 20, 4, 2);
+        Product product9 = new Product("M03", "Chicken 1KG", "Chicken leg & thigh", 150f, 200f, 20, 4, 2);
 
         // Set supplier
         product1.setSupplierByID(1L);
