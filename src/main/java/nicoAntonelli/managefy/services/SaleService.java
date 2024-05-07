@@ -37,15 +37,30 @@ public class SaleService {
     }
 
     public List<Sale> GetSales() {
-        return saleRepository.findAll();
+        try {
+            return saleRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public List<Sale> GetSalesByInterval(Date initialDate, Date finalDate) {
-        return saleRepository.findByInterval(initialDate, finalDate);
+        try {
+            return saleRepository.findByInterval(initialDate, finalDate);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsSale(Long saleID) {
-        return saleRepository.existsById(saleID);
+        try {
+            return saleRepository.existsById(saleID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Sale GetOneSale(Long saleID) {

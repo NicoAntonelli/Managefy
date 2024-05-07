@@ -28,15 +28,25 @@ public class NotificationService {
     }
 
     public List<Notification> GetNotificationsByUser(Long userID) {
-        if (userID == null || userID == 0) {
-            throw new IllegalStateException("Error at 'GetNotificationsByUser'. User with ID: " + userID + " doesn't exist");
-        }
+        try {
+            if (userID == null || userID == 0) {
+                throw new IllegalStateException("Error at 'GetNotificationsByUser'. User with ID: " + userID + " doesn't exist");
+            }
 
-        return notificationRepository.findByUser(userID);
+            return notificationRepository.findByUser(userID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsNotification(Long notificationID) {
-        return notificationRepository.existsById(notificationID);
+        try {
+            return notificationRepository.existsById(notificationID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Notification GetOneNotification(Long notificationID) {

@@ -23,11 +23,21 @@ public class ClientService {
     }
 
     public List<Client> GetClients() {
-        return clientRepository.findAll();
+        try {
+            return clientRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsClient(Long clientID) {
-        return clientRepository.existsById(clientID);
+        try {
+            return clientRepository.existsById(clientID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Client GetOneClient(Long clientID) {

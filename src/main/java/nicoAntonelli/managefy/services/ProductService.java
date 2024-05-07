@@ -29,11 +29,21 @@ public class ProductService {
     }
 
     public List<Product> GetProducts() {
-        return productRepository.findAll();
+        try {
+            return productRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsProduct(Long productID) {
-        return productRepository.existsById(productID);
+        try {
+            return productRepository.existsById(productID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Product GetOneProduct(Long productID) {

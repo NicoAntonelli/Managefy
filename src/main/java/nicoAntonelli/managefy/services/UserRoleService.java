@@ -32,13 +32,23 @@ public class UserRoleService {
     }
 
     public List<UserRole> GetUserRoles() {
-        return userRoleRepository.findAll();
+        try {
+            return userRoleRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsUserRole(Long userID, Long businessID) {
-        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
+        try {
+            UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
 
-        return userRoleRepository.existsById(userRoleKey);
+            return userRoleRepository.existsById(userRoleKey);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public UserRole GetOneUserRole(Long userID, Long businessID) {

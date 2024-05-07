@@ -32,11 +32,21 @@ public class BusinessService {
     }
 
     public List<Business> GetBusinesses() {
-        return businessRepository.findAll();
+        try {
+            return businessRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsBusiness(Long businessID) {
-        return businessRepository.existsById(businessID);
+        try {
+            return businessRepository.existsById(businessID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Business GetOneBusiness(Long businessID) {

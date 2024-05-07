@@ -23,11 +23,21 @@ public class UserService {
     }
 
     public List<User> GetUsers() {
-        return userRepository.findAll();
+        try {
+            return userRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsUser(Long userID) {
-        return userRepository.existsById(userID);
+        try {
+            return userRepository.existsById(userID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public User GetOneUser(Long userID) {

@@ -23,11 +23,21 @@ public class SupplierService {
     }
 
     public List<Supplier> GetSuppliers() {
-        return supplierRepository.findAll();
+        try {
+            return supplierRepository.findAll();
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Boolean ExistsSupplier(Long supplierID) {
-        return supplierRepository.existsById(supplierID);
+        try {
+            return supplierRepository.existsById(supplierID);
+        } catch(Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage());
+            return null;
+        }
     }
 
     public Supplier GetOneSupplier(Long supplierID) {
