@@ -52,11 +52,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(
             name = "supplierID",
-            nullable = true,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "suppliers_products_fk")
     )
-    private Supplier supplier;
+    private Supplier supplier; // Nullable
 
     @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = { CascadeType.ALL },

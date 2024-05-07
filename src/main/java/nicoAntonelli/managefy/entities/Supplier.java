@@ -49,11 +49,11 @@ public class Supplier {
     }
 
     public Supplier(String name, String description, String mail,
-                    String phone, LocalDateTime detelionDate) {
+                    String phone, LocalDateTime deletionDate) {
         this.name = name;
         this.description = description;
         this.mail = mail;
         this.phone = phone;
-        this.deletionDate = detelionDate;
+        this.deletionDate = deletionDate;
     }
 }

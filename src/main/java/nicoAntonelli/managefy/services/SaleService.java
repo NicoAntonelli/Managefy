@@ -41,10 +41,6 @@ public class SaleService {
         return saleRepository.findByInterval(initialDate, finalDate);
     }
 
-    public Boolean ExistsSale(Long saleID) {
-        return saleRepository.existsById(saleID);
-    }
-
     public Sale GetOneSale(Long saleID) {
         Optional<Sale> sale = saleRepository.findById(saleID);
         if (sale.isEmpty()) {

@@ -69,8 +69,4 @@ public class Business {
         this.description = description;
         this.link = link;
     }
-
-    public void addUserRole(UserRole userRole) {
-        userRoles.add(userRole);
-    }
 }

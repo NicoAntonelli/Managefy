@@ -42,11 +42,10 @@ public class Sale {
     @ManyToOne
     @JoinColumn(
             name = "clientID",
-            nullable = true,
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "clients_sales_fk")
     )
-    private Client client;
+    private Client client; // Nullable
 
     @OneToMany(mappedBy = "sale", cascade = { CascadeType.ALL },
             orphanRemoval = true, fetch = FetchType.LAZY)
@@ -87,6 +86,7 @@ public class Sale {
         saleLines.add(saleLine);
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     public Boolean setStateByText(String state) {
         switch (state.toLowerCase()) {
             case "cancelled" -> setState(Sale.SaleState.Cancelled);
