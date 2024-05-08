@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,12 +63,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User ValidateUser(String mail, String password) {
+    public User ValidateUser(Login login) {
+        String mail = login.getMail();
         // Mail format validation (TO-DO: add regex)
         if (mail == null || mail.isBlank()) {
             throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
         }
 
+        String password = login.getPassword();
         // Password format validation (TO-DO: add regex)
         if (password == null || password.isBlank()) {
             throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);

@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.helpTypes.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
@@ -74,9 +75,9 @@ public class UserController {
     }
 
     @PostMapping(path = "/login")
-    public Result<User> Login(@RequestBody User user) {
+    public Result<User> Login(@RequestBody Login login) {
         try {
-            user = userService.ValidateUser(user.getMail(), user.getPassword());
+            User user = userService.ValidateUser(login);
             return new Result<>(user);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
