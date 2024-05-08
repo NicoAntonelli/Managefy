@@ -1,5 +1,6 @@
 package nicoAntonelli.managefy.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class SaleLine {
     @Id
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "saleID",
