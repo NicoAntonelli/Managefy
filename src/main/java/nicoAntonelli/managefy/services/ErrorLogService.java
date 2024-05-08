@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.ErrorLog;
+import nicoAntonelli.managefy.entities.helpTypes.DateFormatterSingleton;
 import nicoAntonelli.managefy.repositories.ErrorLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,22 +14,52 @@ import java.util.List;
 @Transactional
 public class ErrorLogService {
     private final ErrorLogRepository errorLogRepository;
+    private final DateFormatterSingleton dateFormatterSingleton;
 
     @Autowired
     public ErrorLogService(ErrorLogRepository errorLogRepository) {
         this.errorLogRepository = errorLogRepository;
+        this.dateFormatterSingleton = DateFormatterSingleton.getInstance();
     }
 
     public List<ErrorLog> GetErrors() {
         return errorLogRepository.findAll();
     }
 
-    public List<ErrorLog> GetBackendErrorsByInterval(LocalDateTime initialDate, LocalDateTime finalDate) {
-        return errorLogRepository.findByOriginAndInterval(ErrorLog.SERVER, initialDate, finalDate);
+    public List<ErrorLog> GetBackendErrorsByInterval(String initialDate, String finalDate) {
+        if (initialDate == null || finalDate == null
+            || initialDate.isBlank() || finalDate.isBlank()) {
+            throw new IllegalStateException("Error at 'GetBackendErrorsByInterval' - Both start and end dates must be supplied");
+        }
+
+        LocalDateTime startDate, endDate;
+        try {
+            startDate = LocalDateTime.parse(initialDate, dateFormatterSingleton.value);
+            endDate = LocalDateTime.parse(finalDate, dateFormatterSingleton.value);
+        }
+        catch(Exception ex) {
+            throw new IllegalStateException("Error at 'GetBackendErrorsByInterval' - Both start and end dates must be a valid date form", ex);
+        }
+
+        return errorLogRepository.findByOriginAndInterval(ErrorLog.SERVER, startDate, endDate);
     }
 
-    public List<ErrorLog> GetFrontendErrorsByInterval(LocalDateTime initialDate, LocalDateTime finalDate) {
-        return errorLogRepository.findByOriginAndInterval(ErrorLog.CLIENT, initialDate, finalDate);
+    public List<ErrorLog> GetFrontendErrorsByInterval(String initialDate, String finalDate) {
+        if (initialDate == null || finalDate == null
+                || initialDate.isBlank() || finalDate.isBlank()) {
+            throw new IllegalStateException("Error at 'GetFrontendErrorsByInterval' - Both start and end dates must be supplied");
+        }
+
+        LocalDateTime startDate, endDate;
+        try {
+            startDate = LocalDateTime.parse(initialDate, dateFormatterSingleton.value);
+            endDate = LocalDateTime.parse(finalDate, dateFormatterSingleton.value);
+        }
+        catch(Exception ex) {
+            throw new IllegalStateException("Error at 'GetFrontendErrorsByInterval' - Both start and end dates must be a valid date form", ex);
+        }
+
+        return errorLogRepository.findByOriginAndInterval(ErrorLog.CLIENT, startDate, endDate);
     }
 
     public void SetBackendError(String description) {
