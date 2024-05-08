@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
+import nicoAntonelli.managefy.entities.helpTypes.DateFormatterSingleton;
 import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.repositories.SaleLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class SaleService {
     private final BusinessService businessService; // Dependency
     private final ClientService clientService; // Dependency
     private final ProductService productService; // Dependency
+    private final DateFormatterSingleton dateFormatterSingleton;
 
     @Autowired
     public SaleService(SaleRepository saleRepository,
@@ -31,14 +33,29 @@ public class SaleService {
         this.businessService = businessService;
         this.clientService = clientService;
         this.productService = productService;
+        this.dateFormatterSingleton = DateFormatterSingleton.getInstance();
     }
 
     public List<Sale> GetSales() {
         return saleRepository.findAll();
     }
 
-    public List<Sale> GetSalesByInterval(LocalDateTime initialDate, LocalDateTime finalDate) {
-        return saleRepository.findByInterval(initialDate, finalDate);
+    public List<Sale> GetSalesByInterval(String initialDate, String finalDate) {
+        if (initialDate == null || finalDate == null
+                || initialDate.isBlank() || finalDate.isBlank()) {
+            throw new IllegalStateException("Error at 'GetSalesByInterval' - Both start and end dates must be supplied");
+        }
+
+        LocalDateTime startDate, endDate;
+        try {
+            startDate = LocalDateTime.parse(initialDate, dateFormatterSingleton.value);
+            endDate = LocalDateTime.parse(finalDate, dateFormatterSingleton.value);
+        }
+        catch(Exception ex) {
+            throw new IllegalStateException("Error at 'GetSalesByInterval' - Both start and end dates must be a valid date form", ex);
+        }
+
+        return saleRepository.findByInterval(startDate, endDate);
     }
 
     public Sale GetOneSale(Long saleID) {
