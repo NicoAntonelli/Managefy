@@ -1,4 +1,4 @@
-package nicoAntonelli.managefy.entities.dto;
+package nicoAntonelli.managefy.entities.helpTypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

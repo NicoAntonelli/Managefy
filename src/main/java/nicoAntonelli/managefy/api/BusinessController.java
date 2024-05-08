@@ -2,7 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.dto.BusinessWithUser;
-import nicoAntonelli.managefy.entities.dto.Result;
+import nicoAntonelli.managefy.entities.helpTypes.Result;
 import nicoAntonelli.managefy.services.BusinessService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import org.springframework.beans.factory.annotation.Autowired;

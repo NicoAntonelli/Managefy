@@ -2,7 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
-import nicoAntonelli.managefy.entities.dto.Result;
+import nicoAntonelli.managefy.entities.helpTypes.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
