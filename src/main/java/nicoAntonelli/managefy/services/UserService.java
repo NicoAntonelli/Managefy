@@ -3,6 +3,8 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
+import nicoAntonelli.managefy.entities.dto.Registration;
+import nicoAntonelli.managefy.entities.helpTypes.PasswordEncoder;
 import nicoAntonelli.managefy.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,12 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = PasswordEncoder.getInstance();
     }
 
     public List<User> GetUsers() {
@@ -40,7 +44,7 @@ public class UserService {
 
     public User GetOneUserByMail(String mail) {
         // Mail format validation (TO-DO: add regex)
-        if (mail == null || mail.isBlank()) {
+        if (!ValidateMail(mail)) {
             throw new IllegalStateException("Error at 'GetOneUserByMail' - Mail bad formatted: " + mail);
         }
 
@@ -52,31 +56,51 @@ public class UserService {
         return user.get();
     }
 
-    public User CreateUser(User user) {
-        // Mail unique validation
-        Optional<User> possibleUser = userRepository.findByMail(user.getMail());
-        if (possibleUser.isPresent()) {
-            throw new IllegalStateException("Error at 'CreateUser' - Mail '" + user.getMail() + "' already taken");
+    public User CreateUser(Registration registration) {
+        // Validate fields
+        String mail = registration.getMail();
+        if (!ValidateMail(mail)) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
         }
 
-        user.setId(null);
+        String password = registration.getPassword();
+        if (!ValidatePassword(password)) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
+        }
+
+        String name = registration.getName();
+        if (name == null || name.isBlank()) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Name not supplied for the attempted mail: " + mail);
+        }
+
+        // Mail unique validation
+        Optional<User> possibleUser = userRepository.findByMail(mail);
+        if (possibleUser.isPresent()) {
+            throw new IllegalStateException("Error at 'CreateUser' - Mail '" + mail + "' already taken");
+        }
+
+        // Encode password
+        password = passwordEncoder.Encode(password);
+
+        User user = new User(mail, password, name);
         return userRepository.save(user);
     }
 
-    public User ValidateUser(Login login) {
+    public User Login(Login login) {
         String mail = login.getMail();
-        // Mail format validation (TO-DO: add regex)
-        if (mail == null || mail.isBlank()) {
+        if (!ValidateMail(mail)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
         }
 
         String password = login.getPassword();
-        // Password format validation (TO-DO: add regex)
-        if (password == null || password.isBlank()) {
+        if (!ValidatePassword(password)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
         }
 
-        // Correct mail & password validation (TO-DO: add encryption for password)
+        // Encode password
+        password = passwordEncoder.Encode(password);
+
+        // Mail & password comparison against DB
         User user = GetOneUserByMail(mail);
         if (!Objects.equals(mail, user.getMail()) || !Objects.equals(password, user.getPassword())) {
             throw new SecurityException("Error at 'ValidateUser' - Mail or password mismatch, attempted mail: " + mail);
@@ -110,5 +134,15 @@ public class UserService {
 
         userRepository.deleteById(userID);
         return userID;
+    }
+
+    private boolean ValidateMail(String mail) {
+        // Mail format validation (TO-DO: add regex)
+        return mail != null && !mail.isBlank();
+    }
+
+    private boolean ValidatePassword(String password) {
+        // Password format validation (TO-DO: add regex)
+        return password != null && !password.isBlank();
     }
 }

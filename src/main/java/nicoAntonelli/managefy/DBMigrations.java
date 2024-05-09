@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy;
 
 import nicoAntonelli.managefy.entities.*;
+import nicoAntonelli.managefy.entities.helpTypes.PasswordEncoder;
 import nicoAntonelli.managefy.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -198,8 +199,11 @@ public class DBMigrations {
     }
 
     private static List<User> generateUsers() {
-        User user1 = new User("johndoe@mail.com", "12345678", "John Doe", true, true);
-        User user2 = new User("janedoe@mail.com", "11001100", "Jane Doe", false, false);
+        PasswordEncoder passwordEncoder = PasswordEncoder.getInstance();
+        if (passwordEncoder == null) return new ArrayList<>();
+
+        User user1 = new User("johndoe@mail.com", passwordEncoder.Encode("12345678"), "John Doe", true, true);
+        User user2 = new User("janedoe@mail.com", passwordEncoder.Encode("11001100"), "Jane Doe", false, false);
 
         return List.of(user1, user2);
     }
