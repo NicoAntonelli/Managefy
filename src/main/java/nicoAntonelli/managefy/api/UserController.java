@@ -59,10 +59,10 @@ public class UserController {
     }
 
     @PostMapping(path = "/register")
-    public Result<User> Register(@RequestBody Registration registration) {
+    public Result<String> Register(@RequestBody Registration registration) {
         try {
-            User user = userService.CreateUser(registration);
-            return new Result<>(user);
+            String token = userService.CreateUser(registration);
+            return new Result<>(token);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
@@ -76,10 +76,10 @@ public class UserController {
     }
 
     @PostMapping(path = "/login")
-    public Result<User> Login(@RequestBody Login login) {
+    public Result<String> Login(@RequestBody Login login) {
         try {
-            User user = userService.Login(login);
-            return new Result<>(user);
+            String token = userService.Login(login);
+            return new Result<>(token);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());

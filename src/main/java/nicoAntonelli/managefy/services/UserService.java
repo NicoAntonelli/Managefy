@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
 import nicoAntonelli.managefy.repositories.UserRepository;
+import nicoAntonelli.managefy.utils.JWTHelper;
 import nicoAntonelli.managefy.utils.PasswordEncoder;
 import nicoAntonelli.managefy.utils.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class UserService {
         return user.get();
     }
 
-    public User CreateUser(Registration registration) {
+    public String CreateUser(Registration registration) {
         // Validate fields
         String email = registration.getEmail();
         if (!Validation.email(email)) {
@@ -78,11 +79,15 @@ public class UserService {
         // Encode password
         password = passwordEncoder.encode(password);
 
+        // Save new user
         User user = new User(email, password, registration.getName());
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        // Generate JWT Token
+        return JWTHelper.generateToken(user.toStringSafe());
     }
 
-    public User Login(Login login) {
+    public String Login(Login login) {
         String email = login.getEmail();
         if (!Validation.email(email)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
@@ -101,8 +106,8 @@ public class UserService {
         if (!Objects.equals(email, user.getEmail()) || !Objects.equals(password, user.getPassword())) {
             throw new SecurityException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
         }
-
-        return user;
+        // Generate JWT Token
+        return JWTHelper.generateToken(user.toStringSafe());
     }
 
     public User UpdateUser(User user) {
