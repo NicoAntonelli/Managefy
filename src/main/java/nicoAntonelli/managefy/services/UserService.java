@@ -84,7 +84,7 @@ public class UserService {
 
     public User Login(Login login) {
         String email = login.getEmail();
-        if (!Validation.password(email)) {
+        if (!Validation.email(email)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
