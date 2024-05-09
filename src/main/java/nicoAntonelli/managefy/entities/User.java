@@ -26,6 +26,7 @@ public class User {
 
     @Column(nullable = false)
     private String mail; // Unique
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
     private String name; // Nullable
