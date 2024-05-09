@@ -3,10 +3,12 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
+import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +18,15 @@ import java.util.List;
 @RequestMapping(path = "api/users")
 public class UserController {
     private final UserService userService;
+    private final AuthService authService; // Dependency
     private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public UserController(UserService userService, ErrorLogService errorLogService) {
+    public UserController(UserService userService,
+                          AuthService authService,
+                          ErrorLogService errorLogService) {
         this.userService = userService;
+        this.authService = authService;
         this.errorLogService = errorLogService;
     }
 
@@ -42,8 +48,11 @@ public class UserController {
     }
 
     @GetMapping(path = "{userID}")
-    public Result<User> GetOneUser(@PathVariable("userID") Long userID) {
+    public Result<User> GetOneUser(@PathVariable("userID") Long userID,
+                                   @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetOneUser");
+
             User user = userService.GetOneUser(userID);
             return new Result<>(user);
         } catch (IllegalStateException ex) {
