@@ -54,4 +54,12 @@ public class User {
         this.validated = validated;
         this.mailNotifications = mailNotifications;
     }
+
+    public User(String mail, String password, String name) {
+        this.mail = mail;
+        this.password = password;
+        this.name = name;
+        this.validated = false;
+        this.mailNotifications = true;
+    }
 }
