@@ -29,13 +29,13 @@ public class NotificationController {
             return new Result<>(notifications);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 400);
+            return new Result<>(null, 400, ex.getMessage());
         } catch (SecurityException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 401);
+            return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -46,13 +46,13 @@ public class NotificationController {
             return new Result<>(notification);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 400);
+            return new Result<>(null, 400, ex.getMessage());
         } catch (SecurityException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 401);
+            return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -63,13 +63,13 @@ public class NotificationController {
             return new Result<>(notification);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 400);
+            return new Result<>(null, 400, ex.getMessage());
         } catch (SecurityException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 401);
+            return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -81,13 +81,13 @@ public class NotificationController {
             return new Result<>(notification);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 400);
+            return new Result<>(null, 400, ex.getMessage());
         } catch (SecurityException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 401);
+            return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -98,13 +98,13 @@ public class NotificationController {
             return new Result<>(operationResult);
         } catch (IllegalStateException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 400);
+            return new Result<>(null, 400, ex.getMessage());
         } catch (SecurityException ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 401);
+            return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 }

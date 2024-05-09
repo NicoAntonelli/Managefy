@@ -9,12 +9,14 @@ public class Result<T> {
     private Boolean ok;
     private Integer statusCode;
     private String status;
+    private String errorMessage;
     private T body;
 
-    public Result(T body, Integer statusCode) {
+    public Result(T body, Integer statusCode, String errorMessage) {
         this.ok = statusCode == 200;
         this.statusCode = statusCode;
         this.status = setStatusByCode(statusCode);
+        this.errorMessage = errorMessage;
         this.body = body;
     }
 
@@ -22,6 +24,7 @@ public class Result<T> {
         this.ok = true;
         this.statusCode = 200;
         this.status = "200 (OK)";
+        this.errorMessage = null;
         this.body = body;
     }
 

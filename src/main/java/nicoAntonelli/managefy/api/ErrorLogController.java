@@ -26,7 +26,7 @@ public class ErrorLogController {
             return new Result<>(errors);
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -38,7 +38,7 @@ public class ErrorLogController {
             return new Result<>(errors);
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ public class ErrorLogController {
             return new Result<>(errors);
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ public class ErrorLogController {
             return new Result<>(operationResult);
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage());
-            return new Result<>(null, 500);
+            return new Result<>(null, 500, ex.getMessage());
         }
     }
 }
