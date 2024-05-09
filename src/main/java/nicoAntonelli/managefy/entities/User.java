@@ -63,4 +63,15 @@ public class User {
         this.validated = false;
         this.emailNotifications = true;
     }
+
+    // Without password and ID
+    public String toStringSafe() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + "'" +
+                ", name='" + name + "'" +
+                ", validated=" + validated +
+                ", emailNotifications=" + emailNotifications +
+                '}';
+    }
 }
