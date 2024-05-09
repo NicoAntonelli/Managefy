@@ -14,7 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users",
        uniqueConstraints = {
-               @UniqueConstraint(name = "users_mail_unique", columnNames = "mail")
+               @UniqueConstraint(name = "users_email_unique", columnNames = "email")
        })
 @Data @NoArgsConstructor @AllArgsConstructor
 public class User {
@@ -25,7 +25,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
-    private String mail; // Unique
+    private String email; // Unique
     @JsonIgnore
     @Column(nullable = false)
     private String password;
@@ -33,7 +33,7 @@ public class User {
     @Column(nullable = false)
     private Boolean validated;
     @Column(nullable = false)
-    private Boolean mailNotifications;
+    private Boolean emailNotifications;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL },
@@ -48,19 +48,19 @@ public class User {
         this.id = id;
     }
 
-    public User(String mail, String password, String name, Boolean validated, Boolean mailNotifications) {
-        this.mail = mail;
+    public User(String email, String password, String name, Boolean validated, Boolean emailNotifications) {
+        this.email = email;
         this.password = password;
         this.name = name;
         this.validated = validated;
-        this.mailNotifications = mailNotifications;
+        this.emailNotifications = emailNotifications;
     }
 
-    public User(String mail, String password, String name) {
-        this.mail = mail;
+    public User(String email, String password, String name) {
+        this.email = email;
         this.password = password;
         this.name = name;
         this.validated = false;
-        this.mailNotifications = true;
+        this.emailNotifications = true;
     }
 }

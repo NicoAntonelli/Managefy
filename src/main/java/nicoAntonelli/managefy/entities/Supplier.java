@@ -25,7 +25,7 @@ public class Supplier {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false)
-    private String mail;
+    private String email;
     @Column(nullable = false)
     private String phone;
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
@@ -40,19 +40,19 @@ public class Supplier {
         this.id = id;
     }
 
-    public Supplier(String name, String description, String mail, String phone) {
+    public Supplier(String name, String description, String email, String phone) {
         this.name = name;
         this.description = description;
-        this.mail = mail;
+        this.email = email;
         this.phone = phone;
         this.deletionDate = null;
     }
 
-    public Supplier(String name, String description, String mail,
+    public Supplier(String name, String description, String email,
                     String phone, LocalDateTime deletionDate) {
         this.name = name;
         this.description = description;
-        this.mail = mail;
+        this.email = email;
         this.phone = phone;
         this.deletionDate = deletionDate;
     }

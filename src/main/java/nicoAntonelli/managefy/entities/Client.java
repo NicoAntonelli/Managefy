@@ -23,7 +23,7 @@ public class Client {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false)
-    private String mail;
+    private String email;
     @Column(nullable = false)
     private String phone;
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
@@ -38,19 +38,19 @@ public class Client {
         this.id = id;
     }
 
-    public Client(String name, String description, String mail, String phone) {
+    public Client(String name, String description, String email, String phone) {
         this.name = name;
         this.description = description;
-        this.mail = mail;
+        this.email = email;
         this.phone = phone;
         this.deletionDate = null;
     }
 
-    public Client(String name, String description, String mail,
+    public Client(String name, String description, String email,
                   String phone, LocalDateTime deletionDate) {
         this.name = name;
         this.description = description;
-        this.mail = mail;
+        this.email = email;
         this.phone = phone;
         this.deletionDate = deletionDate;
     }

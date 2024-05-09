@@ -42,15 +42,15 @@ public class UserService {
         return user.get();
     }
 
-    public User GetOneUserByMail(String mail) {
-        // Mail format validation (TO-DO: add regex)
-        if (!ValidateMail(mail)) {
-            throw new IllegalStateException("Error at 'GetOneUserByMail' - Mail bad formatted: " + mail);
+    public User GetOneUserByEmail(String email) {
+        // Email format validation (TO-DO: add regex)
+        if (!ValidateEmail(email)) {
+            throw new IllegalStateException("Error at 'GetOneUserByEmail' - Email bad formatted: " + email);
         }
 
-        Optional<User> user = userRepository.findByMail(mail);
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUserByMail' - User with mail: " + mail + " doesn't exist");
+            throw new IllegalStateException("Error at 'GetOneUserByEmail' - User with email: " + email + " doesn't exist");
         }
 
         return user.get();
@@ -58,47 +58,47 @@ public class UserService {
 
     public User CreateUser(Registration registration) {
         // Validate fields
-        String mail = registration.getMail();
-        if (!ValidateMail(mail)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
+        String email = registration.getEmail();
+        if (!ValidateEmail(email)) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
         String password = registration.getPassword();
         if (!ValidatePassword(password)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
+            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
-        // Mail unique validation
-        Optional<User> possibleUser = userRepository.findByMail(mail);
+        // Email unique validation
+        Optional<User> possibleUser = userRepository.findByEmail(email);
         if (possibleUser.isPresent()) {
-            throw new IllegalStateException("Error at 'CreateUser' - Mail '" + mail + "' already taken");
+            throw new IllegalStateException("Error at 'CreateUser' - Email '" + email + "' already taken");
         }
 
         // Encode password
         password = passwordEncoder.encode(password);
 
-        User user = new User(mail, password, registration.getName());
+        User user = new User(email, password, registration.getName());
         return userRepository.save(user);
     }
 
     public User Login(Login login) {
-        String mail = login.getMail();
-        if (!ValidateMail(mail)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Mail bad formatted: " + mail);
+        String email = login.getEmail();
+        if (!ValidateEmail(email)) {
+            throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
         String password = login.getPassword();
         if (!ValidatePassword(password)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
+            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
         // Encode password
         password = passwordEncoder.encode(password);
 
-        // Mail & password comparison against DB
-        User user = GetOneUserByMail(mail);
-        if (!Objects.equals(mail, user.getMail()) || !Objects.equals(password, user.getPassword())) {
-            throw new SecurityException("Error at 'ValidateUser' - Mail or password mismatch, attempted mail: " + mail);
+        // Email & password comparison against DB
+        User user = GetOneUserByEmail(email);
+        if (!Objects.equals(email, user.getEmail()) || !Objects.equals(password, user.getPassword())) {
+            throw new SecurityException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
         }
 
         return user;
@@ -109,12 +109,12 @@ public class UserService {
         if (!exists) {
             throw new IllegalStateException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
         }
-        // Mail unique validation
-        Optional<User> possibleUser = userRepository.findByMail(user.getMail());
+        // Email unique validation
+        Optional<User> possibleUser = userRepository.findByEmail(user.getEmail());
         if (possibleUser.isPresent()) {
             // Only fail validation if it's not the same user
             if (!Objects.equals(possibleUser.get().getId(), user.getId())) {
-                throw new IllegalStateException("Error at 'UpdateUser' - Mail '" + user.getMail() + "' already taken");
+                throw new IllegalStateException("Error at 'UpdateUser' - Email '" + user.getEmail() + "' already taken");
             }
         }
 
@@ -131,9 +131,9 @@ public class UserService {
         return userID;
     }
 
-    private boolean ValidateMail(String mail) {
-        // Mail format validation (TO-DO: add regex)
-        return mail != null && !mail.isBlank();
+    private boolean ValidateEmail(String email) {
+        // Email format validation (TO-DO: add regex)
+        return email != null && !email.isBlank();
     }
 
     private boolean ValidatePassword(String password) {
