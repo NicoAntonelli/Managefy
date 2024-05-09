@@ -68,11 +68,6 @@ public class UserService {
             throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted mail: " + mail);
         }
 
-        String name = registration.getName();
-        if (name == null || name.isBlank()) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Name not supplied for the attempted mail: " + mail);
-        }
-
         // Mail unique validation
         Optional<User> possibleUser = userRepository.findByMail(mail);
         if (possibleUser.isPresent()) {
@@ -82,7 +77,7 @@ public class UserService {
         // Encode password
         password = passwordEncoder.Encode(password);
 
-        User user = new User(mail, password, name);
+        User user = new User(mail, password, registration.getName());
         return userRepository.save(user);
     }
 
