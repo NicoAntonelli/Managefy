@@ -4,8 +4,9 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
-import nicoAntonelli.managefy.utils.PasswordEncoder;
 import nicoAntonelli.managefy.repositories.UserRepository;
+import nicoAntonelli.managefy.utils.PasswordEncoder;
+import nicoAntonelli.managefy.utils.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +44,8 @@ public class UserService {
     }
 
     public User GetOneUserByEmail(String email) {
-        // Email format validation (TO-DO: add regex)
-        if (!ValidateEmail(email)) {
+        // Email format validation
+        if (!Validation.email(email)) {
             throw new IllegalStateException("Error at 'GetOneUserByEmail' - Email bad formatted: " + email);
         }
 
@@ -59,12 +60,12 @@ public class UserService {
     public User CreateUser(Registration registration) {
         // Validate fields
         String email = registration.getEmail();
-        if (!ValidateEmail(email)) {
+        if (!Validation.email(email)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
         String password = registration.getPassword();
-        if (!ValidatePassword(password)) {
+        if (!Validation.password(password)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
@@ -83,12 +84,12 @@ public class UserService {
 
     public User Login(Login login) {
         String email = login.getEmail();
-        if (!ValidateEmail(email)) {
+        if (!Validation.password(email)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
         String password = login.getPassword();
-        if (!ValidatePassword(password)) {
+        if (!Validation.password(password)) {
             throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
@@ -129,15 +130,5 @@ public class UserService {
 
         userRepository.deleteById(userID);
         return userID;
-    }
-
-    private boolean ValidateEmail(String email) {
-        // Email format validation (TO-DO: add regex)
-        return email != null && !email.isBlank();
-    }
-
-    private boolean ValidatePassword(String password) {
-        // Password format validation (TO-DO: add regex)
-        return password != null && !password.isBlank();
     }
 }

@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class Validation {
     // At least one uppercase and lowercase letters, one digit and min 8 total length
     private static final Pattern passwordRegex = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", Pattern.CASE_INSENSITIVE);
