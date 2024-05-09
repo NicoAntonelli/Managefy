@@ -85,13 +85,14 @@ public class User {
                 "}";
     }
 
-    public static User UserFromJWT(String userStringify) {
-        long id = Long.parseLong(userStringify.substring(userStringify.indexOf("id=") + 1, userStringify.indexOf(", email=")));
-        String email = userStringify.substring(userStringify.indexOf("email=") + 1, userStringify.indexOf(", name="));
-        String name = userStringify.substring(userStringify.indexOf("name=") + 1, userStringify.indexOf(", validated="));
-        Boolean validated = Boolean.parseBoolean(userStringify.substring(userStringify.indexOf("validated=") + 1, userStringify.indexOf(", emailNotifications=")));
-        Boolean emailNotifications = Boolean.parseBoolean(userStringify.substring(userStringify.indexOf("emailNotifications=") + 1, userStringify.indexOf("}")));
+    public static User UserFromJWT(String payload) {
+        List<String> filters = List.of("id=", "email=", "name=", "validated=", "emailNotifications=");
+        String id = payload.substring(payload.indexOf(filters.get(0)) + filters.get(0).length(), payload.indexOf(filters.get(1)) - 2);
+        String email = payload.substring(payload.indexOf(filters.get(1)) + filters.get(1).length(), payload.indexOf(filters.get(2)) - 2);
+        String name = payload.substring(payload.indexOf(filters.get(2)) + filters.get(2).length(), payload.indexOf(filters.get(3)) - 2);
+        String validated = payload.substring(payload.indexOf(filters.get(3)) + filters.get(3).length(), payload.indexOf(filters.get(4)) - 2);
+        String emailNotifications = payload.substring(payload.indexOf(filters.get(4)) + filters.get(4).length(), payload.indexOf("}"));
 
-        return new User(id, email, "null", name, validated, emailNotifications);
+        return new User(Long.parseLong(id), email, "null", name, Boolean.parseBoolean(validated), Boolean.parseBoolean(emailNotifications));
     }
 }
