@@ -1,7 +1,7 @@
 package nicoAntonelli.managefy;
 
 import nicoAntonelli.managefy.entities.*;
-import nicoAntonelli.managefy.entities.helpTypes.PasswordEncoder;
+import nicoAntonelli.managefy.utils.PasswordEncoder;
 import nicoAntonelli.managefy.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

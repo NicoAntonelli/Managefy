@@ -1,7 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.ErrorLog;
-import nicoAntonelli.managefy.entities.helpTypes.Result;
+import nicoAntonelli.managefy.utils.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
-import nicoAntonelli.managefy.entities.helpTypes.PasswordEncoder;
+import nicoAntonelli.managefy.utils.PasswordEncoder;
 import nicoAntonelli.managefy.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.ErrorLog;
-import nicoAntonelli.managefy.entities.helpTypes.DateFormatterSingleton;
+import nicoAntonelli.managefy.utils.DateFormatterSingleton;
 import nicoAntonelli.managefy.repositories.ErrorLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

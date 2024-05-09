@@ -2,7 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
-import nicoAntonelli.managefy.entities.helpTypes.DateFormatterSingleton;
+import nicoAntonelli.managefy.utils.DateFormatterSingleton;
 import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.repositories.SaleLineRepository;
 import org.springframework.beans.factory.annotation.Autowired;

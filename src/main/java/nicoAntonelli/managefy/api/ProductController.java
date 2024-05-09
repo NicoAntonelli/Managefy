@@ -1,7 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Product;
-import nicoAntonelli.managefy.entities.helpTypes.Result;
+import nicoAntonelli.managefy.utils.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;

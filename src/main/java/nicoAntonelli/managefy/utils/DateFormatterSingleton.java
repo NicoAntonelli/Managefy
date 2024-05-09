@@ -1,4 +1,4 @@
-package nicoAntonelli.managefy.entities.helpTypes;
+package nicoAntonelli.managefy.utils;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;

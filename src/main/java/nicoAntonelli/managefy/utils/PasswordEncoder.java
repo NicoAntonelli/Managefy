@@ -1,4 +1,4 @@
-package nicoAntonelli.managefy.entities.helpTypes;
+package nicoAntonelli.managefy.utils;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

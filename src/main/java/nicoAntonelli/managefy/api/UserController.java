@@ -3,7 +3,7 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
-import nicoAntonelli.managefy.entities.helpTypes.Result;
+import nicoAntonelli.managefy.utils.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
