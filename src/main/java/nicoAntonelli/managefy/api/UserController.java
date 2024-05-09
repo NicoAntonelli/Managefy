@@ -3,9 +3,9 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
-import nicoAntonelli.managefy.utils.Result;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
+import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
