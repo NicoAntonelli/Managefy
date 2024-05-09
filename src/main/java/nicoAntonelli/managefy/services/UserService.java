@@ -75,7 +75,7 @@ public class UserService {
         }
 
         // Encode password
-        password = passwordEncoder.Encode(password);
+        password = passwordEncoder.encode(password);
 
         User user = new User(mail, password, registration.getName());
         return userRepository.save(user);
@@ -93,7 +93,7 @@ public class UserService {
         }
 
         // Encode password
-        password = passwordEncoder.Encode(password);
+        password = passwordEncoder.encode(password);
 
         // Mail & password comparison against DB
         User user = GetOneUserByMail(mail);

@@ -34,7 +34,7 @@ public class PasswordEncoder {
         }
     }
 
-    public String Encode(String password) {
+    public String encode(String password) {
         try {
             password = secretPassword + password;
             int iterationCount = 65536; // 2^16
@@ -45,7 +45,7 @@ public class PasswordEncoder {
             return new String(encodedPassword, StandardCharsets.UTF_8);
         }
         catch (Exception ex) {
-            return  null;
+            return null;
         }
     }
 }
