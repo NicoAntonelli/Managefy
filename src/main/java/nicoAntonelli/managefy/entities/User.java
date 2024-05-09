@@ -48,6 +48,16 @@ public class User {
         this.id = id;
     }
 
+
+    public User(Long id, String email, String password, String name, Boolean validated, Boolean emailNotifications) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.validated = validated;
+        this.emailNotifications = emailNotifications;
+    }
+
     public User(String email, String password, String name, Boolean validated, Boolean emailNotifications) {
         this.email = email;
         this.password = password;
@@ -64,14 +74,24 @@ public class User {
         this.emailNotifications = true;
     }
 
-    // Without password and ID
+    // Without password & relations
     public String toStringSafe() {
         return "User{" +
                 "id=" + id +
-                ", email='" + email + "'" +
-                ", name='" + name + "'" +
+                ", email=" + email +
+                ", name=" + name +
                 ", validated=" + validated +
                 ", emailNotifications=" + emailNotifications +
-                '}';
+                "}";
+    }
+
+    public static User UserFromJWT(String userStringify) {
+        long id = Long.parseLong(userStringify.substring(userStringify.indexOf("id=") + 1, userStringify.indexOf(", email=")));
+        String email = userStringify.substring(userStringify.indexOf("email=") + 1, userStringify.indexOf(", name="));
+        String name = userStringify.substring(userStringify.indexOf("name=") + 1, userStringify.indexOf(", validated="));
+        Boolean validated = Boolean.parseBoolean(userStringify.substring(userStringify.indexOf("validated=") + 1, userStringify.indexOf(", emailNotifications=")));
+        Boolean emailNotifications = Boolean.parseBoolean(userStringify.substring(userStringify.indexOf("emailNotifications=") + 1, userStringify.indexOf("}")));
+
+        return new User(id, email, "null", name, validated, emailNotifications);
     }
 }
