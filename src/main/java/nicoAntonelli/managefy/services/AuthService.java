@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.services;
 
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.JWTHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,13 @@ public class AuthService {
     // Fails with exceptions
     public User validateTokenFromHeaders(HttpHeaders headers, String methodName) {
         if (headers == null) {
-            throw new SecurityException(methodName + " - Invalid access token");
+            throw new Exceptions.UnauthorizedException(methodName + " - Invalid access token");
         }
 
         String token = headers.getFirst("Authorization");
         User user = validateToken(token);
         if (user == null) {
-            throw new SecurityException(methodName + " - Invalid access token");
+            throw new Exceptions.UnauthorizedException(methodName + " - Invalid access token");
         }
 
         return user;
