@@ -2,11 +2,13 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
+import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserRoleService;
 import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,17 +18,23 @@ import java.util.List;
 @RequestMapping(path = "api/userRoles")
 public class UserRoleController {
     private final UserRoleService userRoleService;
+    private final AuthService authService; // Dependency
     private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public UserRoleController(UserRoleService userRoleService, ErrorLogService errorLogService) {
+    public UserRoleController(UserRoleService userRoleService,
+                              AuthService authService,
+                              ErrorLogService errorLogService) {
         this.userRoleService = userRoleService;
+        this.authService = authService;
         this.errorLogService = errorLogService;
     }
 
     @GetMapping
-    public Result<List<UserRole>> GetUserRoles() {
+    public Result<List<UserRole>> GetUserRoles(@RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetUserRoles");
+
             List<UserRole> userRoles = userRoleService.GetUserRoles();
             return new Result<>(userRoles);
         } catch (Exceptions.BadRequestException ex) {
@@ -43,8 +51,11 @@ public class UserRoleController {
 
     @GetMapping(path = "{userID}/{businessID}")
     public Result<UserRole> GetOneUserRole(@PathVariable("userID") Long userID,
-                                           @PathVariable("businessID") Long businessID) {
+                                           @PathVariable("businessID") Long businessID,
+                                           @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetOneUserRole");
+
             UserRole userRole = userRoleService.GetOneUserRole(userID, businessID);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
@@ -60,8 +71,11 @@ public class UserRoleController {
     }
 
     @PostMapping
-    public Result<UserRole> CreateUserRole(@RequestBody UserRole userRole) {
+    public Result<UserRole> CreateUserRole(@RequestBody UserRole userRole,
+                                           @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "CreateUserRole");
+
             userRole = userRoleService.CreateUserRole(userRole);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
@@ -77,8 +91,11 @@ public class UserRoleController {
     }
 
     @PutMapping
-    public Result<UserRole> UpdateUserRole(@RequestBody UserRole userRole) {
+    public Result<UserRole> UpdateUserRole(@RequestBody UserRole userRole,
+                                           @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "UpdateUserRole");
+
             userRole = userRoleService.UpdateUserRole(userRole);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
@@ -95,8 +112,11 @@ public class UserRoleController {
 
     @DeleteMapping(path = "{userID}/{businessID}")
     public Result<UserRoleKey> UserRoleIDUser(@PathVariable("userID") Long userID,
-                                              @PathVariable("businessID") Long businessID) {
+                                              @PathVariable("businessID") Long businessID,
+                                              @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "UserRoleIDUser");
+
             UserRoleKey userRoleKey = userRoleService.DeleteUserRole(userID, businessID);
             return new Result<>(userRoleKey);
         } catch (Exceptions.BadRequestException ex) {

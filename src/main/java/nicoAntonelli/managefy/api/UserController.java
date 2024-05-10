@@ -34,7 +34,7 @@ public class UserController {
     @GetMapping()
     public Result<List<User>> GetUsers(@RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneUser");
+            authService.validateTokenFromHeaders(headers, "GetUsers");
 
             List<User> users = userService.GetUsers();
             return new Result<>(users);
@@ -108,7 +108,7 @@ public class UserController {
     public Result<User> UpdateUser(@RequestBody User user,
                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneUser");
+            authService.validateTokenFromHeaders(headers, "UpdateUser");
 
             user = userService.UpdateUser(user);
             return new Result<>(user);
@@ -128,7 +128,7 @@ public class UserController {
     public Result<Long> DeleteUser(@PathVariable("userID") Long userID,
                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneUser");
+            authService.validateTokenFromHeaders(headers, "DeleteUser");
 
             userID = userService.DeleteUser(userID);
             return new Result<>(userID);

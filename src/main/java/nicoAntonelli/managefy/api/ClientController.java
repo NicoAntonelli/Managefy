@@ -1,11 +1,13 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Client;
+import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ClientService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,17 +17,23 @@ import java.util.List;
 @RequestMapping(path = "api/clients")
 public class ClientController {
     private final ClientService clientService;
+    private final AuthService authService; // Dependency
     private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
-    public ClientController(ClientService clientService, ErrorLogService errorLogService) {
+    public ClientController(ClientService clientService,
+                            AuthService authService,
+                            ErrorLogService errorLogService) {
         this.clientService = clientService;
+        this.authService = authService;
         this.errorLogService = errorLogService;
     }
 
     @GetMapping
-    public Result<List<Client>> GetClients() {
+    public Result<List<Client>> GetClients(@RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetClients");
+
             List<Client> clients = clientService.GetClients();
             return new Result<>(clients);
         } catch (Exceptions.BadRequestException ex) {
@@ -41,8 +49,11 @@ public class ClientController {
     }
 
     @GetMapping(path = "{clientID}")
-    public Result<Client> GetOneClient(@PathVariable("clientID") Long clientID) {
+    public Result<Client> GetOneClient(@PathVariable("clientID") Long clientID,
+                                       @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetOneClient");
+
             Client client = clientService.GetOneClient(clientID);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
@@ -58,8 +69,11 @@ public class ClientController {
     }
 
     @PostMapping
-    public Result<Client> CreateClient(@RequestBody Client client) {
+    public Result<Client> CreateClient(@RequestBody Client client,
+                                       @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "CreateClient");
+
             client = clientService.CreateClient(client);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
@@ -75,8 +89,11 @@ public class ClientController {
     }
 
     @PutMapping
-    public Result<Client> UpdateClient(@RequestBody Client client) {
+    public Result<Client> UpdateClient(@RequestBody Client client,
+                                       @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "UpdateClient");
+
             client = clientService.UpdateClient(client);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
@@ -92,8 +109,11 @@ public class ClientController {
     }
 
     @DeleteMapping(path = "{clientID}")
-    public Result<Client> DeleteClient(@PathVariable("clientID") Long clientID) {
+    public Result<Client> DeleteClient(@PathVariable("clientID") Long clientID,
+                                       @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "DeleteClient");
+
             Client client = clientService.DeleteClient(clientID);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
