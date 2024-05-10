@@ -56,7 +56,7 @@ public class ErrorLog {
 
     // Frontend errors
     public ErrorLog(String description, String origin, LocalDateTime date, String browser, String userIPAddress) {
-        this.date = date;
+        this.date = date != null ? date : LocalDateTime.now();
         this.origin = origin;
         this.description = description;
         this.browser = browser;
