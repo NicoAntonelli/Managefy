@@ -4,6 +4,7 @@ import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserRoleService;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +29,10 @@ public class UserRoleController {
         try {
             List<UserRole> userRoles = userRoleService.GetUserRoles();
             return new Result<>(userRoles);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -46,10 +47,10 @@ public class UserRoleController {
         try {
             UserRole userRole = userRoleService.GetOneUserRole(userID, businessID);
             return new Result<>(userRole);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -63,10 +64,10 @@ public class UserRoleController {
         try {
             userRole = userRoleService.CreateUserRole(userRole);
             return new Result<>(userRole);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -80,10 +81,10 @@ public class UserRoleController {
         try {
             userRole = userRoleService.UpdateUserRole(userRole);
             return new Result<>(userRole);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -98,10 +99,10 @@ public class UserRoleController {
         try {
             UserRoleKey userRoleKey = userRoleService.DeleteUserRole(userID, businessID);
             return new Result<>(userRoleKey);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {

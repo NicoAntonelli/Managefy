@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.Notification;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.NotificationService;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +28,10 @@ public class NotificationController {
         try {
             List<Notification> notifications = notificationService.GetNotificationsByUser(userID);
             return new Result<>(notifications);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -44,10 +45,10 @@ public class NotificationController {
         try {
             Notification notification = notificationService.GetOneNotification(notificationID);
             return new Result<>(notification);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -61,10 +62,10 @@ public class NotificationController {
         try {
             notification = notificationService.CreateNotification(notification);
             return new Result<>(notification);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -79,10 +80,10 @@ public class NotificationController {
         try {
             Notification notification = notificationService.UpdateNotificationState(notificationID, state);
             return new Result<>(notification);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -96,10 +97,10 @@ public class NotificationController {
         try {
             Long operationResult = notificationService.DeleteNotification(notificationID);
             return new Result<>(operationResult);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {

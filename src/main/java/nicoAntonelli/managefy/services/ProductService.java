@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.repositories.ProductRepository;
+import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class ProductService {
     public Product GetOneProduct(Long productID) {
         Optional<Product> product = productRepository.findById(productID);
         if (product.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
         }
 
         return product.get();
@@ -44,10 +45,10 @@ public class ProductService {
         // Validate associated business
         Business business = product.getBusiness();
         if (business == null || business.getId() == null) {
-            throw new IllegalStateException("Error at 'CreateProduct' - Business not supplied");
+            throw new Exceptions.BadRequestException("Error at 'CreateProduct' - Business not supplied");
         }
         if (!businessService.ExistsBusiness(business.getId())) {
-            throw new IllegalStateException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist");
         }
 
         product.setId(null);
@@ -59,7 +60,7 @@ public class ProductService {
     public Product UpdateProduct(Product product) {
         boolean exists = ExistsProduct(product.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist");
         }
 
         return productRepository.save(product);

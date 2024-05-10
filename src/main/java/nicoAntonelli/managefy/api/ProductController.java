@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.ProductService;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +28,10 @@ public class ProductController {
         try {
             List<Product> products = productService.GetProducts();
             return new Result<>(products);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -44,10 +45,10 @@ public class ProductController {
         try {
             Product product = productService.GetOneProduct(productID);
             return new Result<>(product);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -61,10 +62,10 @@ public class ProductController {
         try {
             product = productService.CreateProduct(product);
             return new Result<>(product);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -78,10 +79,10 @@ public class ProductController {
         try {
             product = productService.UpdateProduct(product);
             return new Result<>(product);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -95,10 +96,10 @@ public class ProductController {
         try {
             Product product = productService.DeleteProduct(productID);
             return new Result<>(product);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {

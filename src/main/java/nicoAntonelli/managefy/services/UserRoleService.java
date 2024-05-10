@@ -6,6 +6,7 @@ import nicoAntonelli.managefy.entities.UserRoleKey;
 import nicoAntonelli.managefy.repositories.BusinessRepository;
 import nicoAntonelli.managefy.repositories.UserRepository;
 import nicoAntonelli.managefy.repositories.UserRoleRepository;
+import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class UserRoleService {
 
         Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
         if (userRole.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUserRole' - UserRole with ID: " + userRoleKey + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneUserRole' - UserRole with ID: " + userRoleKey + " doesn't exist");
         }
 
         return userRole.get();
@@ -53,13 +54,13 @@ public class UserRoleService {
         // Validate user
         Long userID = userRole.getUser().getId();
         if (!userRepository.existsById(userID)) {
-            throw new IllegalStateException("Error at 'CreateUserRole' - User with ID: " + userID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - User with ID: " + userID + " doesn't exist");
         }
 
         // Validate business
         Long businessID = userRole.getBusiness().getId();
         if (!businessRepository.existsById(businessID)) {
-            throw new IllegalStateException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exist");
         }
 
         return userRoleRepository.save(userRole);
@@ -68,7 +69,7 @@ public class UserRoleService {
     public UserRole UpdateUserRole(UserRole userRole) {
         boolean exists = userRoleRepository.existsById(userRole.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateUserRole' - UserRole with ID: " + userRole.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateUserRole' - UserRole with ID: " + userRole.getId() + " doesn't exist");
         }
 
         return userRoleRepository.save(userRole);
@@ -78,7 +79,7 @@ public class UserRoleService {
         UserRoleKey userRoleKey = new UserRoleKey(userRoleID, businessID);
         boolean exists = ExistsUserRole(userRoleID, businessID);
         if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteUserRole' - User with ID: " + userRoleKey + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'DeleteUserRole' - User with ID: " + userRoleKey + " doesn't exist");
         }
 
         userRoleRepository.deleteById(userRoleKey);

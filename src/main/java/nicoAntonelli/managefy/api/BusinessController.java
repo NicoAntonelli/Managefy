@@ -4,6 +4,7 @@ import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.dto.BusinessWithUser;
 import nicoAntonelli.managefy.services.BusinessService;
 import nicoAntonelli.managefy.services.ErrorLogService;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +29,10 @@ public class BusinessController {
         try {
             List<Business> businesses = businessService.GetBusinesses();
             return new Result<>(businesses);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -45,10 +46,10 @@ public class BusinessController {
         try {
             Business business = businessService.GetOneBusiness(businessID);
             return new Result<>(business);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -62,10 +63,10 @@ public class BusinessController {
         try {
             Business business = businessService.CreateBusiness(businessWithUser);
             return new Result<>(business);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -79,10 +80,10 @@ public class BusinessController {
         try {
             business = businessService.UpdateBusiness(business);
             return new Result<>(business);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -96,10 +97,10 @@ public class BusinessController {
         try {
             businessID = businessService.DeleteBusiness(businessID);
             return new Result<>(businessID);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {

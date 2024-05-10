@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Client;
 import nicoAntonelli.managefy.repositories.ClientRepository;
+import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class ClientService {
     public Client GetOneClient(Long clientID) {
         Optional<Client> client = clientRepository.findById(clientID);
         if (client.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exist");
         }
 
         return client.get();
@@ -47,7 +48,7 @@ public class ClientService {
     public Client UpdateClient(Client client) {
         boolean exists = ExistsClient(client.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exist");
         }
 
         return clientRepository.save(client);

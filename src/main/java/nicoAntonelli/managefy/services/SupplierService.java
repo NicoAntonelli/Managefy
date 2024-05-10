@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.repositories.SupplierRepository;
+import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class SupplierService {
     public Supplier GetOneSupplier(Long supplierID) {
         Optional<Supplier> supplier = supplierRepository.findById(supplierID);
         if (supplier.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exist");
         }
 
         return supplier.get();
@@ -47,7 +48,7 @@ public class SupplierService {
     public Supplier UpdateSupplier(Supplier supplier) {
         boolean exists = ExistsSupplier(supplier.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist");
         }
 
         return supplierRepository.save(supplier);

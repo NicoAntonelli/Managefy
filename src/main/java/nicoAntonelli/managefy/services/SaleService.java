@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.utils.DateFormatterSingleton;
 import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.repositories.SaleLineRepository;
+import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class SaleService {
     public List<Sale> GetSalesByInterval(String initialDate, String finalDate) {
         if (initialDate == null || finalDate == null
                 || initialDate.isBlank() || finalDate.isBlank()) {
-            throw new IllegalStateException("Error at 'GetSalesByInterval' - Both start and end dates must be supplied");
+            throw new Exceptions.BadRequestException("Error at 'GetSalesByInterval' - Both start and end dates must be supplied");
         }
 
         LocalDateTime startDate, endDate;
@@ -52,7 +53,7 @@ public class SaleService {
             endDate = LocalDateTime.parse(finalDate, dateFormatterSingleton.value);
         }
         catch(Exception ex) {
-            throw new IllegalStateException("Error at 'GetSalesByInterval' - Both start and end dates must be a valid date form", ex);
+            throw new Exceptions.BadRequestException("Error at 'GetSalesByInterval' - Both start and end dates must be a valid date form", ex);
         }
 
         return saleRepository.findByInterval(startDate, endDate);
@@ -61,7 +62,7 @@ public class SaleService {
     public Sale GetOneSale(Long saleID) {
         Optional<Sale> sale = saleRepository.findById(saleID);
         if (sale.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneSale' - Sale with ID: " + saleID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneSale' - Sale with ID: " + saleID + " doesn't exist");
         }
 
         return sale.get();
@@ -71,43 +72,43 @@ public class SaleService {
         // Validate associated business
         Business business = sale.getBusiness();
         if (business == null || business.getId() == null) {
-            throw new IllegalStateException("Error at 'CreateSale' - Business not supplied");
+            throw new Exceptions.BadRequestException("Error at 'CreateSale' - Business not supplied");
         }
         if (!businessService.ExistsBusiness(business.getId())) {
-            throw new IllegalStateException("Error at 'CreateSale' - Business with ID: " + business.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'CreateSale' - Business with ID: " + business.getId() + " doesn't exist");
         }
 
         // Optional associated client: validate if it was supplied
         Client client = sale.getClient();
         if (client != null) {
             if (client.getId() == null) {
-                throw new IllegalStateException("Error at 'CreateSale' - Optional client was supplied but without an ID, business: " + business.getId());
+                throw new Exceptions.BadRequestException("Error at 'CreateSale' - Optional client was supplied but without an ID, business: " + business.getId());
             }
             if (!clientService.ExistsClient(client.getId())) {
-                throw new IllegalStateException("Error at 'CreateSale' - Client with ID: " + client.getId() + " doesn't exist, business: " + business.getId());
+                throw new Exceptions.BadRequestException("Error at 'CreateSale' - Client with ID: " + client.getId() + " doesn't exist, business: " + business.getId());
             }
         }
 
         // At least one saleLine
         List<SaleLine> lines = sale.getSaleLines();
         if (lines == null || lines.isEmpty()) {
-            throw new IllegalStateException("Error at 'CreateSale' - No SaleLines supplied, business: " + business.getId());
+            throw new Exceptions.BadRequestException("Error at 'CreateSale' - No SaleLines supplied, business: " + business.getId());
         }
 
         // All saleLines must have positive subtotal and a valid product
         for (int i = 0; i < lines.size(); i++) {
             SaleLine line = lines.get(i);
             if (line.getSubtotal() <= 0) {
-                throw new IllegalStateException("Error at 'CreateSale' - The SaleLine in position: " + (i+1) + " had an invalid subtotal of $" + line.getPrice() + ", business: " + business.getId());
+                throw new Exceptions.BadRequestException("Error at 'CreateSale' - The SaleLine in position: " + (i+1) + " had an invalid subtotal of $" + line.getPrice() + ", business: " + business.getId());
             }
 
             // Validate associated product for current line
             Product product = line.getProduct();
             if (product == null || product.getId() == null) {
-                throw new IllegalStateException("Error at 'CreateSale' - Product not supplied for the saleLine in position: " + (i+1) + ", business: " + business.getId());
+                throw new Exceptions.BadRequestException("Error at 'CreateSale' - Product not supplied for the saleLine in position: " + (i+1) + ", business: " + business.getId());
             }
             if (!productService.ExistsProduct(product.getId())) {
-                throw new IllegalStateException("Error at 'CreateSale' - Product with ID: " + product.getId() + " doesn't exist, business: " + business.getId());
+                throw new Exceptions.BadRequestException("Error at 'CreateSale' - Product with ID: " + product.getId() + " doesn't exist, business: " + business.getId());
             }
 
             line.setSale(null);
@@ -117,16 +118,16 @@ public class SaleService {
         // Set state if a valid value was provided
         Boolean result = sale.setStateByText(sale.getState().toString());
         if (!result) {
-            throw new IllegalStateException("Error at 'CreateSale' - Unexpected value for state: " + sale.getState() + ", business: " + business.getId());
+            throw new Exceptions.BadRequestException("Error at 'CreateSale' - Unexpected value for state: " + sale.getState() + ", business: " + business.getId());
         }
         if (sale.getState() == Sale.SaleState.Cancelled) {
-            throw new IllegalStateException("Error at 'CreateSale' - The sale can't have Cancelled state, business: " + business.getId());
+            throw new Exceptions.BadRequestException("Error at 'CreateSale' - The sale can't have Cancelled state, business: " + business.getId());
         }
 
         // Partial payment (if it was given)
         Float partialPayment = sale.getPartialPayment();
         if (partialPayment != null && partialPayment <= 0) {
-            throw new IllegalStateException("Error at 'CreateSale' - Can't make a partial payment of $" + partialPayment + ", business: " + business.getId());
+            throw new Exceptions.BadRequestException("Error at 'CreateSale' - Can't make a partial payment of $" + partialPayment + ", business: " + business.getId());
         }
 
         sale.setId(null);
@@ -148,7 +149,7 @@ public class SaleService {
         Sale sale = GetOneSale(saleID);
         Boolean result = sale.setStateByText(state);
         if (!result) {
-            throw new IllegalStateException("Error at 'UpdateNotificationState' - Unexpected value: " + state);
+            throw new Exceptions.BadRequestException("Error at 'UpdateNotificationState' - Unexpected value: " + state);
         }
 
         return sale;
@@ -158,11 +159,11 @@ public class SaleService {
         Sale sale = GetOneSale(saleID);
         if (sale.getState() != Sale.SaleState.PendingPayment &&
             sale.getState() != Sale.SaleState.PartialPayment) {
-            throw new IllegalStateException("Error at 'UpdateSalePartialPayment' - Sale: " + saleID + " has the state: " + sale.getState());
+            throw new Exceptions.BadRequestException("Error at 'UpdateSalePartialPayment' - Sale: " + saleID + " has the state: " + sale.getState());
         }
 
         if (partialPayment <= 0) {
-            throw new IllegalStateException("Error at 'UpdateSalePartialPayment' - Can't make a partial payment of $" + partialPayment + ", sale: " + saleID);
+            throw new Exceptions.BadRequestException("Error at 'UpdateSalePartialPayment' - Can't make a partial payment of $" + partialPayment + ", sale: " + saleID);
         }
 
         float updatedPartialPayment = sale.getPartialPayment() + partialPayment;
