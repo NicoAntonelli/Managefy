@@ -63,11 +63,13 @@ public class ErrorLogService {
         return errorLogRepository.findByOriginAndInterval(ErrorLog.CLIENT, startDate, endDate);
     }
 
-    public void SetBackendError(String description) {
+    public void SetBackendError(String description, String httpCode, Throwable innerException) {
         // Empty error message
         if (description.isBlank()) return;
 
-        ErrorLog errorLog = new ErrorLog(description, ErrorLog.SERVER);
+        String innerExceptionMessage = innerException != null ? innerException.getMessage() : null;
+        ErrorLog errorLog = new ErrorLog(description, ErrorLog.SERVER, httpCode, innerExceptionMessage);
+
         errorLogRepository.save(errorLog);
     }
 
