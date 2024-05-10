@@ -22,15 +22,15 @@ public class ClientService {
     }
 
     public List<Client> GetClients() {
-        return clientRepository.findAll();
+        return clientRepository.findAllActives();
     }
 
     public Boolean ExistsClient(Long clientID) {
-        return clientRepository.existsById(clientID);
+        return clientRepository.existsByIdActive(clientID);
     }
 
     public Client GetOneClient(Long clientID) {
-        Optional<Client> client = clientRepository.findById(clientID);
+        Optional<Client> client = clientRepository.findByIdActive(clientID);
         if (client.isEmpty()) {
             throw new Exceptions.BadRequestException("Error at 'GetOneClient' - Client with ID: " + clientID + " doesn't exist");
         }

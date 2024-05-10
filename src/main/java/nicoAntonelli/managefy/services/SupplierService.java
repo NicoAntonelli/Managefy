@@ -22,15 +22,15 @@ public class SupplierService {
     }
 
     public List<Supplier> GetSuppliers() {
-        return supplierRepository.findAll();
+        return supplierRepository.findAllActives();
     }
 
     public Boolean ExistsSupplier(Long supplierID) {
-        return supplierRepository.existsById(supplierID);
+        return supplierRepository.existsByIdActive(supplierID);
     }
 
     public Supplier GetOneSupplier(Long supplierID) {
-        Optional<Supplier> supplier = supplierRepository.findById(supplierID);
+        Optional<Supplier> supplier = supplierRepository.findByIdActive(supplierID);
         if (supplier.isEmpty()) {
             throw new Exceptions.BadRequestException("Error at 'GetOneSupplier' - Supplier with ID: " + supplierID + " doesn't exist");
         }

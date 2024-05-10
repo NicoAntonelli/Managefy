@@ -25,15 +25,15 @@ public class ProductService {
     }
 
     public List<Product> GetProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllActives();
     }
 
     public Boolean ExistsProduct(Long productID) {
-        return productRepository.existsById(productID);
+        return productRepository.existsByIdActive(productID);
     }
 
     public Product GetOneProduct(Long productID) {
-        Optional<Product> product = productRepository.findById(productID);
+        Optional<Product> product = productRepository.findByIdActive(productID);
         if (product.isEmpty()) {
             throw new Exceptions.BadRequestException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
         }
