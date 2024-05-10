@@ -6,6 +6,7 @@ import nicoAntonelli.managefy.entities.dto.Registration;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -31,14 +32,16 @@ public class UserController {
     }
 
     @GetMapping()
-    public Result<List<User>> GetUsers() {
+    public Result<List<User>> GetUsers(@RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetOneUser");
+
             List<User> users = userService.GetUsers();
             return new Result<>(users);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -55,10 +58,10 @@ public class UserController {
 
             User user = userService.GetOneUser(userID);
             return new Result<>(user);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -72,10 +75,10 @@ public class UserController {
         try {
             String token = userService.CreateUser(registration);
             return new Result<>(token);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -89,10 +92,10 @@ public class UserController {
         try {
             String token = userService.Login(login);
             return new Result<>(token);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -102,14 +105,17 @@ public class UserController {
     }
 
     @PutMapping
-    public Result<User> UpdateUser(@RequestBody User user) {
+    public Result<User> UpdateUser(@RequestBody User user,
+                                   @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetOneUser");
+
             user = userService.UpdateUser(user);
             return new Result<>(user);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
@@ -119,14 +125,17 @@ public class UserController {
     }
 
     @DeleteMapping(path = "{userID}")
-    public Result<Long> DeleteUser(@PathVariable("userID") Long userID) {
+    public Result<Long> DeleteUser(@PathVariable("userID") Long userID,
+                                   @RequestHeader HttpHeaders headers) {
         try {
+            authService.validateTokenFromHeaders(headers, "GetOneUser");
+
             userID = userService.DeleteUser(userID);
             return new Result<>(userID);
-        } catch (IllegalStateException ex) {
+        } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
-        } catch (SecurityException ex) {
+        } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {

@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
 import nicoAntonelli.managefy.repositories.UserRepository;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.JWTHelper;
 import nicoAntonelli.managefy.utils.PasswordEncoder;
 import nicoAntonelli.managefy.utils.Validation;
@@ -38,7 +39,7 @@ public class UserService {
     public User GetOneUser(Long userID) {
         Optional<User> user = userRepository.findById(userID);
         if (user.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUser' - User with ID: " + userID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneUser' - User with ID: " + userID + " doesn't exist");
         }
 
         return user.get();
@@ -47,12 +48,12 @@ public class UserService {
     public User GetOneUserByEmail(String email) {
         // Email format validation
         if (!Validation.email(email)) {
-            throw new IllegalStateException("Error at 'GetOneUserByEmail' - Email bad formatted: " + email);
+            throw new Exceptions.BadRequestException("Error at 'GetOneUserByEmail' - Email bad formatted: " + email);
         }
 
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
-            throw new IllegalStateException("Error at 'GetOneUserByEmail' - User with email: " + email + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneUserByEmail' - User with email: " + email + " doesn't exist");
         }
 
         return user.get();
@@ -62,18 +63,18 @@ public class UserService {
         // Validate fields
         String email = registration.getEmail();
         if (!Validation.email(email)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
         String password = registration.getPassword();
         if (!Validation.password(password)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
         // Email unique validation
         Optional<User> possibleUser = userRepository.findByEmail(email);
         if (possibleUser.isPresent()) {
-            throw new IllegalStateException("Error at 'CreateUser' - Email '" + email + "' already taken");
+            throw new Exceptions.BadRequestException("Error at 'CreateUser' - Email '" + email + "' already taken");
         }
 
         // Encode password
@@ -90,12 +91,12 @@ public class UserService {
     public String Login(Login login) {
         String email = login.getEmail();
         if (!Validation.email(email)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Email bad formatted: " + email);
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - Email bad formatted: " + email);
         }
 
         String password = login.getPassword();
         if (!Validation.password(password)) {
-            throw new IllegalStateException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
         // Encode password
@@ -104,7 +105,7 @@ public class UserService {
         // Email & password comparison against DB
         User user = GetOneUserByEmail(email);
         if (!Objects.equals(email, user.getEmail()) || !Objects.equals(password, user.getPassword())) {
-            throw new SecurityException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
         }
         // Generate JWT Token
         return JWTHelper.generateToken(user.toStringSafe());
@@ -113,14 +114,14 @@ public class UserService {
     public User UpdateUser(User user) {
         boolean exists = ExistsUser(user.getId());
         if (!exists) {
-            throw new IllegalStateException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
         }
         // Email unique validation
         Optional<User> possibleUser = userRepository.findByEmail(user.getEmail());
         if (possibleUser.isPresent()) {
             // Only fail validation if it's not the same user
             if (!Objects.equals(possibleUser.get().getId(), user.getId())) {
-                throw new IllegalStateException("Error at 'UpdateUser' - Email '" + user.getEmail() + "' already taken");
+                throw new Exceptions.BadRequestException("Error at 'UpdateUser' - Email '" + user.getEmail() + "' already taken");
             }
         }
 
@@ -130,7 +131,7 @@ public class UserService {
     public Long DeleteUser(Long userID) {
         boolean exists = ExistsUser(userID);
         if (!exists) {
-            throw new IllegalStateException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exist");
         }
 
         userRepository.deleteById(userID);
