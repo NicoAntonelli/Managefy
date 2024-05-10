@@ -110,10 +110,10 @@ public class BusinessController {
     }
 
     @DeleteMapping(path = "{businessID}")
-    public Result<Long> BusinessIDUser(@PathVariable("businessID") Long businessID,
+    public Result<Long> DeleteBusiness(@PathVariable("businessID") Long businessID,
                                        @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "BusinessIDUser");
+            authService.validateTokenFromHeaders(headers, "DeleteBusiness");
 
             businessID = businessService.DeleteBusiness(businessID);
             return new Result<>(businessID);

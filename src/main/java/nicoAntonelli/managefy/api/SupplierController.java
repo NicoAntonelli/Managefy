@@ -109,13 +109,13 @@ public class SupplierController {
     }
 
     @DeleteMapping(path = "{supplierID}")
-    public Result<Supplier> DeleteSupplier(@PathVariable("supplierID") Long supplierID,
+    public Result<Long> DeleteSupplier(@PathVariable("supplierID") Long supplierID,
                                            @RequestHeader HttpHeaders headers) {
         try {
             authService.validateTokenFromHeaders(headers, "DeleteSupplier");
 
-            Supplier supplier = supplierService.DeleteSupplier(supplierID);
-            return new Result<>(supplier);
+            supplierID = supplierService.DeleteSupplier(supplierID);
+            return new Result<>(supplierID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());

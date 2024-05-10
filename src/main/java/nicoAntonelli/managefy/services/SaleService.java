@@ -181,11 +181,11 @@ public class SaleService {
     }
 
     // Logic deletion (field: sale state)
-    public Sale CancelSale(Long saleID) {
+    public Long CancelSale(Long saleID) {
         Sale sale = GetOneSale(saleID);
         sale.setState(Sale.SaleState.Cancelled);
         saleRepository.save(sale);
 
-        return sale;
+        return saleID;
     }
 }

@@ -116,8 +116,8 @@ public class NotificationController {
         try {
             authService.validateTokenFromHeaders(headers, "DeleteNotification");
 
-            Long operationResult = notificationService.DeleteNotification(notificationID);
-            return new Result<>(operationResult);
+            notificationID = notificationService.DeleteNotification(notificationID);
+            return new Result<>(notificationID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());

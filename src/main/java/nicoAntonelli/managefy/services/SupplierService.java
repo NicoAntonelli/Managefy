@@ -55,11 +55,11 @@ public class SupplierService {
     }
 
     // Logic deletion (field: deletion date)
-    public Supplier DeleteSupplier(Long supplierID) {
+    public Long DeleteSupplier(Long supplierID) {
         Supplier supplier = GetOneSupplier(supplierID);
         supplier.setDeletionDate(LocalDateTime.now());
         supplierRepository.save(supplier);
 
-        return supplier;
+        return supplierID;
     }
 }

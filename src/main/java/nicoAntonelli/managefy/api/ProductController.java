@@ -109,13 +109,13 @@ public class ProductController {
     }
 
     @DeleteMapping(path = "{productID}")
-    public Result<Product> DeleteProduct(@PathVariable("productID") Long productID,
+    public Result<Long> DeleteProduct(@PathVariable("productID") Long productID,
                                          @RequestHeader HttpHeaders headers) {
         try {
             authService.validateTokenFromHeaders(headers, "DeleteProduct");
 
-            Product product = productService.DeleteProduct(productID);
-            return new Result<>(product);
+            productID = productService.DeleteProduct(productID);
+            return new Result<>(productID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());

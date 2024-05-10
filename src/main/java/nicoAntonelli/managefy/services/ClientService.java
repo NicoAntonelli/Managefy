@@ -55,11 +55,11 @@ public class ClientService {
     }
 
     // Logic deletion (field: deletion date)
-    public Client DeleteClient(Long clientID) {
+    public Long DeleteClient(Long clientID) {
         Client client = GetOneClient(clientID);
         client.setDeletionDate(LocalDateTime.now());
         clientRepository.save(client);
 
-        return client;
+        return clientID;
     }
 }

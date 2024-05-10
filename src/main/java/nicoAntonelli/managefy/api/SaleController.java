@@ -152,13 +152,13 @@ public class SaleController {
     }
 
     @DeleteMapping(path = "{saleID}")
-    public Result<Sale> CancelSale(@PathVariable("saleID") Long saleID,
+    public Result<Long> CancelSale(@PathVariable("saleID") Long saleID,
                                    @RequestHeader HttpHeaders headers) {
         try {
             authService.validateTokenFromHeaders(headers, "CancelSale");
 
-            Sale sale = saleService.CancelSale(saleID);
-            return new Result<>(sale);
+            saleID = saleService.CancelSale(saleID);
+            return new Result<>(saleID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());

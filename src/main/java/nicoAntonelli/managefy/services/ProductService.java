@@ -67,11 +67,11 @@ public class ProductService {
     }
 
     // Logic deletion (field: deletion date)
-    public Product DeleteProduct(Long productID) {
+    public Long DeleteProduct(Long productID) {
         Product product = GetOneProduct(productID);
         product.setDeletionDate(LocalDateTime.now());
         productRepository.save(product);
 
-        return product;
+        return productID;
     }
 }

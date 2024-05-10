@@ -109,13 +109,13 @@ public class ClientController {
     }
 
     @DeleteMapping(path = "{clientID}")
-    public Result<Client> DeleteClient(@PathVariable("clientID") Long clientID,
+    public Result<Long> DeleteClient(@PathVariable("clientID") Long clientID,
                                        @RequestHeader HttpHeaders headers) {
         try {
             authService.validateTokenFromHeaders(headers, "DeleteClient");
 
-            Client client = clientService.DeleteClient(clientID);
-            return new Result<>(client);
+            clientID = clientService.DeleteClient(clientID);
+            return new Result<>(clientID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage());
             return new Result<>(null, 400, ex.getMessage());
