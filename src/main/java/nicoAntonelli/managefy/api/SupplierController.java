@@ -37,13 +37,13 @@ public class SupplierController {
             List<Supplier> suppliers = supplierService.GetSuppliers();
             return new Result<>(suppliers);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -57,13 +57,13 @@ public class SupplierController {
             Supplier supplier = supplierService.GetOneSupplier(supplierID);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -77,13 +77,13 @@ public class SupplierController {
             supplier = supplierService.CreateSupplier(supplier);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -97,13 +97,13 @@ public class SupplierController {
             supplier = supplierService.UpdateSupplier(supplier);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -117,13 +117,13 @@ public class SupplierController {
             supplierID = supplierService.DeleteSupplier(supplierID);
             return new Result<>(supplierID);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }

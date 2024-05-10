@@ -37,13 +37,13 @@ public class ProductController {
             List<Product> products = productService.GetProducts();
             return new Result<>(products);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -57,13 +57,13 @@ public class ProductController {
             Product product = productService.GetOneProduct(productID);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -77,13 +77,13 @@ public class ProductController {
             product = productService.CreateProduct(product);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -97,13 +97,13 @@ public class ProductController {
             product = productService.UpdateProduct(product);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -117,13 +117,13 @@ public class ProductController {
             productID = productService.DeleteProduct(productID);
             return new Result<>(productID);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }

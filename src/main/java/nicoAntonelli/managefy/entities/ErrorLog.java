@@ -25,10 +25,13 @@ public class ErrorLog {
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private LocalDateTime date;
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
     @Column(nullable = false)
     private String origin;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String description;
+    @Column(columnDefinition = "TEXT")
+    private String innerException; // Nullable
+    private String httpCode; // Nullable
     private String browser; // Nullable
     private String userIPAddress; // Nullable
 
@@ -36,22 +39,26 @@ public class ErrorLog {
         this.id = id;
     }
 
-    public ErrorLog(String description, String origin) {
+    public ErrorLog(String description, String origin, String httpCode, String innerException) {
         this.date = LocalDateTime.now();
-        this.description = description;
         this.origin = origin;
+        this.description = description;
+        if (innerException != null && !innerException.isEmpty()) this.innerException = innerException;
+        this.httpCode = httpCode;
     }
 
-    public ErrorLog(LocalDateTime date, String description, String origin) {
-        this.date = date;
-        this.description = description;
+    public ErrorLog(String description, String origin, String httpCode) {
+        this.date = LocalDateTime.now();
         this.origin = origin;
+        this.description = description;
+        this.httpCode = httpCode;
     }
 
-    public ErrorLog(LocalDateTime date, String description, String origin, String browser, String userIPAddress) {
+    // Frontend errors
+    public ErrorLog(String description, String origin, LocalDateTime date, String browser, String userIPAddress) {
         this.date = date;
-        this.description = description;
         this.origin = origin;
+        this.description = description;
         this.browser = browser;
         this.userIPAddress = userIPAddress;
     }

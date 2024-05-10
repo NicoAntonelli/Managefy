@@ -39,13 +39,13 @@ public class UserController {
             List<User> users = userService.GetUsers();
             return new Result<>(users);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -59,13 +59,13 @@ public class UserController {
             User user = userService.GetOneUser(userID);
             return new Result<>(user);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -76,13 +76,13 @@ public class UserController {
             String token = userService.CreateUser(registration);
             return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -93,13 +93,13 @@ public class UserController {
             String token = userService.Login(login);
             return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -113,13 +113,13 @@ public class UserController {
             user = userService.UpdateUser(user);
             return new Result<>(user);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -133,13 +133,13 @@ public class UserController {
             userID = userService.DeleteUser(userID);
             return new Result<>(userID);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }

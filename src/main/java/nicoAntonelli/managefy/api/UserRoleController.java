@@ -38,13 +38,13 @@ public class UserRoleController {
             List<UserRole> userRoles = userRoleService.GetUserRoles();
             return new Result<>(userRoles);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -59,13 +59,13 @@ public class UserRoleController {
             UserRole userRole = userRoleService.GetOneUserRole(userID, businessID);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -79,13 +79,13 @@ public class UserRoleController {
             userRole = userRoleService.CreateUserRole(userRole);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -99,13 +99,13 @@ public class UserRoleController {
             userRole = userRoleService.UpdateUserRole(userRole);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -120,13 +120,13 @@ public class UserRoleController {
             UserRoleKey userRoleKey = userRoleService.DeleteUserRole(userID, businessID);
             return new Result<>(userRoleKey);
         } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 401, ex.getMessage());
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }

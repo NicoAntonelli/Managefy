@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.ErrorLog;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
+import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +33,7 @@ public class ErrorLogController {
             List<ErrorLog> errors = errorLogService.GetErrors();
             return new Result<>(errors);
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -47,7 +48,7 @@ public class ErrorLogController {
             List<ErrorLog> errors = errorLogService.GetFrontendErrorsByInterval(from, to);
             return new Result<>(errors);
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -62,7 +63,7 @@ public class ErrorLogController {
             List<ErrorLog> errors = errorLogService.GetBackendErrorsByInterval(from, to);
             return new Result<>(errors);
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
@@ -76,7 +77,7 @@ public class ErrorLogController {
             Boolean operationResult = errorLogService.SetFrontendError(errorLog);
             return new Result<>(operationResult);
         } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage());
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
     }
