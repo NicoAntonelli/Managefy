@@ -2,9 +2,11 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.UserValidation;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
 import nicoAntonelli.managefy.repositories.UserRepository;
+import nicoAntonelli.managefy.repositories.UserValidationRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.JWTHelper;
 import nicoAntonelli.managefy.utils.PasswordEncoder;
@@ -12,6 +14,7 @@ import nicoAntonelli.managefy.utils.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,11 +23,13 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final UserValidationRepository userValidationRepository; // Dependency
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserValidationRepository userValidationRepository) {
         this.userRepository = userRepository;
+        this.userValidationRepository = userValidationRepository;
         this.passwordEncoder = PasswordEncoder.getInstance();
     }
 
@@ -126,6 +131,43 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
+    public Boolean GenerateUserValidation(Long userID) {
+        User user = GetOneUser(userID);
+
+        // Replace any existing entity
+        UserValidation userValidation = new UserValidation(user);
+        userValidationRepository.save(userValidation);
+
+        return true;
+    }
+
+    public Boolean ValidateUser(Long userID, String code) {
+        User user = GetOneUser(userID);
+        if (user.getValidated()) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - User with ID: " + user.getId() + " has already been validated");
+        }
+
+        Optional<UserValidation> optionalValidation = userValidationRepository.findByUser(userID);
+        if (optionalValidation.isEmpty()) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - No validation code was generated for the User ID: " + userID);
+        }
+
+        // Code and expiry date validations
+        UserValidation userValidation = optionalValidation.get();
+        if (!Objects.equals(userValidation.getCode(), code)) {
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code mismatch for the User ID: " + userID);
+        }
+        if (userValidation.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code has expired for the User ID: " + userID);
+        }
+
+        // Update user with validation OK
+        user.setValidated(true);
+        userRepository.save(user);
+
+        return true;
     }
 
     public Long DeleteUser(Long userID) {

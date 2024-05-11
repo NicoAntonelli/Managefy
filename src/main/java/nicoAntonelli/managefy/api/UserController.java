@@ -70,7 +70,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(path = "/register")
+    @PostMapping(path = "register")
     public Result<String> Register(@RequestBody Registration registration) {
         try {
             String token = userService.CreateUser(registration);
@@ -87,7 +87,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(path = "/login")
+    @PostMapping(path = "login")
     public Result<String> Login(@RequestBody Login login) {
         try {
             String token = userService.Login(login);
@@ -112,6 +112,47 @@ public class UserController {
 
             user = userService.UpdateUser(user);
             return new Result<>(user);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "{userID}/generateValidation")
+    public Result<Boolean> GenerateUserValidation(@PathVariable("userID") Long userID,
+                                                  @RequestHeader HttpHeaders headers) {
+        try {
+            authService.validateTokenFromHeaders(headers, "GenerateUserValidation");
+
+            Boolean response = userService.GenerateUserValidation(userID);
+            return new Result<>(response);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "{userID}/validate/{code}")
+    public Result<Boolean> ValidateUser(@PathVariable("userID") Long userID,
+                                        @PathVariable("code") String code,
+                                        @RequestHeader HttpHeaders headers) {
+        try {
+            authService.validateTokenFromHeaders(headers, "ValidateUser");
+
+            Boolean response = userService.ValidateUser(userID, code);
+            return new Result<>(response);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
