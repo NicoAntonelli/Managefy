@@ -26,6 +26,8 @@ public class Business {
     private String description;
     @Column(nullable = false)
     private String link;
+    @Column(nullable = false)
+    private Boolean isPublic;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false)
@@ -57,16 +59,19 @@ public class Business {
         this.id = id;
     }
 
-    public Business(String name, String description, String link, SortedMap<String, Boolean> businessDays) {
+    public Business(String name, String description, String link,
+                    Boolean isPublic, SortedMap<String, Boolean> businessDays) {
         this.name = name;
         this.description = description;
         this.link = link;
+        this.isPublic = isPublic;
         this.businessDays = businessDays;
     }
 
-    public Business(String name, String description, String link) {
+    public Business(String name, String description, String link, Boolean isPublic) {
         this.name = name;
         this.description = description;
+        this.isPublic = isPublic;
         this.link = link;
     }
 }
