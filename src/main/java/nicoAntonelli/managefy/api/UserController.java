@@ -51,7 +51,7 @@ public class UserController {
         }
     }
 
-    @GetMapping(path = "{userID}")
+    @GetMapping(path = "{userID:[\\d]+}")
     public Result<User> GetOneUser(@PathVariable("userID") Long userID,
                                    @RequestHeader HttpHeaders headers) {
         try {
@@ -125,7 +125,7 @@ public class UserController {
         }
     }
 
-    @PutMapping(path = "{userID}/generateValidation")
+    @PutMapping(path = "{userID:[\\d]+}/generateValidation")
     public Result<Boolean> GenerateUserValidation(@PathVariable("userID") Long userID,
                                                   @RequestHeader HttpHeaders headers) {
         try {
@@ -145,7 +145,7 @@ public class UserController {
         }
     }
 
-    @PutMapping(path = "{userID}/validate/{code}")
+    @PutMapping(path = "{userID:[\\d]+}/validate/{code:[\\d]+}")
     public Result<Boolean> ValidateUser(@PathVariable("userID") Long userID,
                                         @PathVariable("code") String code,
                                         @RequestHeader HttpHeaders headers) {
@@ -166,7 +166,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping(path = "{userID}")
+    @DeleteMapping(path = "{userID:[\\d]+}")
     public Result<Long> DeleteUser(@PathVariable("userID") Long userID,
                                    @RequestHeader HttpHeaders headers) {
         try {

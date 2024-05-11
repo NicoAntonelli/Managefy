@@ -48,7 +48,7 @@ public class ClientController {
         }
     }
 
-    @GetMapping(path = "{clientID}")
+    @GetMapping(path = "{clientID:[\\d]+}")
     public Result<Client> GetOneClient(@PathVariable("clientID") Long clientID,
                                        @RequestHeader HttpHeaders headers) {
         try {
@@ -108,7 +108,7 @@ public class ClientController {
         }
     }
 
-    @DeleteMapping(path = "{clientID}")
+    @DeleteMapping(path = "{clientID:[\\d]+}")
     public Result<Long> DeleteClient(@PathVariable("clientID") Long clientID,
                                        @RequestHeader HttpHeaders headers) {
         try {

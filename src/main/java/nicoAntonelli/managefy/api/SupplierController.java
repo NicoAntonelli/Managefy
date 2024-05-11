@@ -48,7 +48,7 @@ public class SupplierController {
         }
     }
 
-    @GetMapping(path = "{supplierID}")
+    @GetMapping(path = "{supplierID:[\\d]+}")
     public Result<Supplier> GetOneSupplier(@PathVariable("supplierID") Long supplierID,
                                            @RequestHeader HttpHeaders headers) {
         try {
@@ -108,7 +108,7 @@ public class SupplierController {
         }
     }
 
-    @DeleteMapping(path = "{supplierID}")
+    @DeleteMapping(path = "{supplierID:[\\d]+}")
     public Result<Long> DeleteSupplier(@PathVariable("supplierID") Long supplierID,
                                            @RequestHeader HttpHeaders headers) {
         try {

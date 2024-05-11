@@ -49,7 +49,7 @@ public class BusinessController {
         }
     }
 
-    @GetMapping(path = "{businessID}")
+    @GetMapping(path = "{businessID:[\\d]+}")
     public Result<Business> GetOneBusiness(@PathVariable("businessID") Long businessID,
                                            @RequestHeader HttpHeaders headers) {
         try {
@@ -109,7 +109,7 @@ public class BusinessController {
         }
     }
 
-    @DeleteMapping(path = "{businessID}")
+    @DeleteMapping(path = "{businessID:[\\d]+}")
     public Result<Long> DeleteBusiness(@PathVariable("businessID") Long businessID,
                                        @RequestHeader HttpHeaders headers) {
         try {

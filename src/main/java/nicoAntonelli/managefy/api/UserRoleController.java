@@ -49,7 +49,7 @@ public class UserRoleController {
         }
     }
 
-    @GetMapping(path = "{userID}/{businessID}")
+    @GetMapping(path = "{userID:[\\d]+}/{businessID:[\\d]+}")
     public Result<UserRole> GetOneUserRole(@PathVariable("userID") Long userID,
                                            @PathVariable("businessID") Long businessID,
                                            @RequestHeader HttpHeaders headers) {
@@ -110,7 +110,7 @@ public class UserRoleController {
         }
     }
 
-    @DeleteMapping(path = "{userID}/{businessID}")
+    @DeleteMapping(path = "{userID:[\\d]+}/{businessID:[\\d]+}")
     public Result<UserRoleKey> UserRoleIDUser(@PathVariable("userID") Long userID,
                                               @PathVariable("businessID") Long businessID,
                                               @RequestHeader HttpHeaders headers) {

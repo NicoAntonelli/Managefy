@@ -48,7 +48,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping(path = "{productID}")
+    @GetMapping(path = "{productID:[\\d]+}")
     public Result<Product> GetOneProduct(@PathVariable("productID") Long productID,
                                          @RequestHeader HttpHeaders headers) {
         try {
@@ -108,7 +108,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping(path = "{productID}")
+    @DeleteMapping(path = "{productID:[\\d]+}")
     public Result<Long> DeleteProduct(@PathVariable("productID") Long productID,
                                          @RequestHeader HttpHeaders headers) {
         try {

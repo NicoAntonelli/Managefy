@@ -29,7 +29,7 @@ public class NotificationController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping(path = "/user/{userID}")
+    @GetMapping(path = "/user/{userID:[\\d]+}")
     public Result<List<Notification>> GetNotificationsByUser(@PathVariable("userID") Long userID,
                                                              @RequestHeader HttpHeaders headers) {
         try {
@@ -49,7 +49,7 @@ public class NotificationController {
         }
     }
 
-    @GetMapping(path = "{notificationID}")
+    @GetMapping(path = "{notificationID:[\\d]+}")
     public Result<Notification> GetOneNotification(@PathVariable("notificationID") Long notificationID,
                                                    @RequestHeader HttpHeaders headers) {
         try {
@@ -89,7 +89,7 @@ public class NotificationController {
         }
     }
 
-    @PutMapping(path = "{notificationID}/state/{state}")
+    @PutMapping(path = "{notificationID:[\\d]+}/state/{state:[a-zA-Z]+}")
     public Result<Notification> UpdateNotificationState(@PathVariable("notificationID") Long notificationID,
                                                         @PathVariable("state") String state,
                                                         @RequestHeader HttpHeaders headers) {
@@ -110,7 +110,7 @@ public class NotificationController {
         }
     }
 
-    @DeleteMapping(path = "{notificationID}")
+    @DeleteMapping(path = "{notificationID:[\\d]+}")
     public Result<Long> DeleteNotification(@PathVariable("notificationID") Long notificationID,
                                            @RequestHeader HttpHeaders headers) {
         try {

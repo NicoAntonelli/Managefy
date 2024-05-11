@@ -69,7 +69,7 @@ public class SaleController {
         }
     }
 
-    @GetMapping(path = "{saleID}")
+    @GetMapping(path = "{saleID:[\\d]+}")
     public Result<Sale> GetOneSale(@PathVariable("saleID") Long saleID,
                                    @RequestHeader HttpHeaders headers) {
         try {
@@ -109,7 +109,7 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID}/state/{state}")
+    @PutMapping(path = "{saleID}/state/{state:[a-zA-Z]+}")
     public Result<Sale> UpdateSaleState(@PathVariable("saleID") Long saleID,
                                         @PathVariable("state") String state,
                                         @RequestHeader HttpHeaders headers) {
@@ -130,7 +130,7 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID}/partialPayment/{partialPayment}")
+    @PutMapping(path = "{saleID:[\\d]+}/partialPayment/{partialPayment:(?:[0-9]*[.])?[0-9]+}")
     public Result<Sale> UpdateSalePartialPayment(@PathVariable("saleID") Long saleID,
                                                  @PathVariable("partialPayment") Float partialPayment,
                                                  @RequestHeader HttpHeaders headers) {
@@ -151,7 +151,7 @@ public class SaleController {
         }
     }
 
-    @DeleteMapping(path = "{saleID}")
+    @DeleteMapping(path = "{saleID:[\\d]+}")
     public Result<Long> CancelSale(@PathVariable("saleID") Long saleID,
                                    @RequestHeader HttpHeaders headers) {
         try {
