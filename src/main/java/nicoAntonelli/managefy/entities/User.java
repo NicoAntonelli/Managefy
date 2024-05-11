@@ -44,6 +44,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = { CascadeType.ALL })
     private Set<UserRole> userRoles = new HashSet<>();
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = { CascadeType.ALL })
+    private UserValidation userValidation;
+
     public User(Long id) {
         this.id = id;
     }
