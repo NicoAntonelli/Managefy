@@ -2,7 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
@@ -10,19 +10,23 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
-    private final JavaMailSender emailSender;
-    @Value("${emailConfig.email.sender.user}")
-    private String user;
+    private final JavaMailSender javaMailSender;
+    private final String username;
 
     @Autowired
-    public EmailService(JavaMailSender emailSender) {
-        this.emailSender = emailSender;
+    public EmailService(JavaMailSender javaMailSender, Environment env) {
+        if (env == null) {
+            throw new RuntimeException("Can't access to environment variables from the file 'application.properties'!");
+        }
+
+        this.javaMailSender = javaMailSender;
+        username = env.getProperty("spring.mail.username");
     }
 
     @Async
     public void CodeValidationEmail(String address, String code) {
         String text = "Hi there, this is an email from Managefy App!\n" +
-                "In order to validate your email you must now enter" +
+                "In order to validate your email you must now enter " +
                 "this number in the app: '" + code + "'.\n" +
                 "If you did not request any email validation, "
                 +"please ignore this message.\n\n\n" +
@@ -47,10 +51,10 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(address);
-        message.setFrom(user);
+        message.setFrom(username);
         message.setSubject(subject);
         message.setText(body);
 
-        emailSender.send(message);
+        javaMailSender.send(message);
     }
 }
