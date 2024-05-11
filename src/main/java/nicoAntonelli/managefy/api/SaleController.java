@@ -1,6 +1,5 @@
 package nicoAntonelli.managefy.api;
 
-import jakarta.servlet.http.HttpServletRequest;
 import nicoAntonelli.managefy.entities.Sale;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
@@ -170,14 +169,5 @@ public class SaleController {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
             return new Result<>(null, 500, ex.getMessage());
         }
-    }
-
-    @GetMapping(path = "**")
-    public Result<Object> NotFound(HttpServletRequest req) {
-        String url = req.getRequestURL().toString();
-        Exceptions.NotFoundException ex = new Exceptions.NotFoundException("Route not found: " + url);
-
-        errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-        return new Result<>(null, 404, ex.getMessage());
     }
 }
