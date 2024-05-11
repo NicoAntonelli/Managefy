@@ -5,11 +5,9 @@ import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-// Controller used to handle non-existent URIs cases only (404)
+// Controller used to handle non-existent URIs cases (404)
 @RestController
 @SuppressWarnings("unused")
 @RequestMapping(path = "api")
@@ -21,7 +19,11 @@ public class PathController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping(path = "**")
+    @RequestMapping(path = "**",
+                    method = {RequestMethod.GET, RequestMethod.POST,
+                              RequestMethod.PUT, RequestMethod.DELETE,
+                              RequestMethod.HEAD, RequestMethod.OPTIONS,
+                              RequestMethod.PATCH, RequestMethod.TRACE})
     public Result<Object> NotFound(HttpServletRequest req) {
         String url = req.getRequestURL().toString();
         Exceptions.NotFoundException ex = new Exceptions.NotFoundException("Route not found: " + url);
