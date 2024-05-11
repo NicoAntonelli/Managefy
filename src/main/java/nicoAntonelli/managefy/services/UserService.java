@@ -24,12 +24,16 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final UserValidationRepository userValidationRepository; // Dependency
+    private final EmailService emailService; // Dependency
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserValidationRepository userValidationRepository) {
+    public UserService(UserRepository userRepository,
+                       UserValidationRepository userValidationRepository,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.userValidationRepository = userValidationRepository;
+        this.emailService = emailService;
         this.passwordEncoder = PasswordEncoder.getInstance();
     }
 
@@ -139,6 +143,9 @@ public class UserService {
         // Replace any existing entity
         UserValidation userValidation = new UserValidation(user);
         userValidationRepository.save(userValidation);
+
+        // Send an email with the code to the user
+        emailService.CodeValidationEmail(user.getEmail(), userValidation.getCode());
 
         return true;
     }
