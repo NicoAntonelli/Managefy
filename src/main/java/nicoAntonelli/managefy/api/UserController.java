@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
+import nicoAntonelli.managefy.entities.dto.Token;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
@@ -71,9 +72,9 @@ public class UserController {
     }
 
     @PostMapping(path = "register")
-    public Result<String> Register(@RequestBody Registration registration) {
+    public Result<Token> Register(@RequestBody Registration registration) {
         try {
-            String token = userService.CreateUser(registration);
+            Token token = userService.CreateUser(registration);
             return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -88,9 +89,9 @@ public class UserController {
     }
 
     @PostMapping(path = "login")
-    public Result<String> Login(@RequestBody Login login) {
+    public Result<Token> Login(@RequestBody Login login) {
         try {
-            String token = userService.Login(login);
+            Token token = userService.Login(login);
             return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

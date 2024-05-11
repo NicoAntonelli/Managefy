@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserValidation;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
+import nicoAntonelli.managefy.entities.dto.Token;
 import nicoAntonelli.managefy.repositories.UserRepository;
 import nicoAntonelli.managefy.repositories.UserValidationRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
@@ -68,7 +69,7 @@ public class UserService {
         return user.get();
     }
 
-    public String CreateUser(Registration registration) {
+    public Token CreateUser(Registration registration) {
         // Validate fields
         String email = registration.getEmail();
         if (!Validation.email(email)) {
@@ -94,10 +95,12 @@ public class UserService {
         user = userRepository.save(user);
 
         // Generate JWT Token
-        return JWTHelper.generateToken(user.toStringSafe());
+        String JWT = JWTHelper.generateToken(user.toStringSafe());
+
+        return new Token(JWT, user.getId());
     }
 
-    public String Login(Login login) {
+    public Token Login(Login login) {
         String email = login.getEmail();
         if (!Validation.email(email)) {
             throw new Exceptions.BadRequestException("Error at 'ValidateUser' - Email bad formatted: " + email);
@@ -117,7 +120,9 @@ public class UserService {
             throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
         }
         // Generate JWT Token
-        return JWTHelper.generateToken(user.toStringSafe());
+        String JWT = JWTHelper.generateToken(user.toStringSafe());
+
+        return new Token(JWT, user.getId());
     }
 
     public User UpdateUser(User user) {
