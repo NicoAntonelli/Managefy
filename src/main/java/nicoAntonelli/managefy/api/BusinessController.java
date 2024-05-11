@@ -1,7 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Business;
-import nicoAntonelli.managefy.entities.dto.BusinessWithUser;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.BusinessService;
 import nicoAntonelli.managefy.services.ErrorLogService;
@@ -33,9 +33,9 @@ public class BusinessController {
     @GetMapping
     public Result<List<Business>> GetBusinesses(@RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetBusinesses");
+            User user = authService.validateTokenFromHeaders(headers, "GetBusinesses");
 
-            List<Business> businesses = businessService.GetBusinesses();
+            List<Business> businesses = businessService.GetBusinesses(user);
             return new Result<>(businesses);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -53,9 +53,9 @@ public class BusinessController {
     public Result<Business> GetOneBusiness(@PathVariable("businessID") Long businessID,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneBusiness");
+            User user = authService.validateTokenFromHeaders(headers, "GetOneBusiness");
 
-            Business business = businessService.GetOneBusiness(businessID);
+            Business business = businessService.GetOneBusiness(businessID, user);
             return new Result<>(business);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -70,12 +70,12 @@ public class BusinessController {
     }
 
     @PostMapping
-    public Result<Business> CreateBusiness(@RequestBody BusinessWithUser businessWithUser,
+    public Result<Business> CreateBusiness(@RequestBody Business business,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateBusiness");
+            User user = authService.validateTokenFromHeaders(headers, "CreateBusiness");
 
-            Business business = businessService.CreateBusiness(businessWithUser);
+            business = businessService.CreateBusiness(business, user);
             return new Result<>(business);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -93,9 +93,9 @@ public class BusinessController {
     public Result<Business> UpdateBusiness(@RequestBody Business business,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateBusiness");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateBusiness");
 
-            business = businessService.UpdateBusiness(business);
+            business = businessService.UpdateBusiness(business, user);
             return new Result<>(business);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -113,9 +113,9 @@ public class BusinessController {
     public Result<Long> DeleteBusiness(@PathVariable("businessID") Long businessID,
                                        @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "DeleteBusiness");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteBusiness");
 
-            businessID = businessService.DeleteBusiness(businessID);
+            businessID = businessService.DeleteBusiness(businessID, user);
             return new Result<>(businessID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

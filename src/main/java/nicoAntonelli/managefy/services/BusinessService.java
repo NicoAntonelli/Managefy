@@ -29,58 +29,58 @@ public class BusinessService {
         this.userRoleService = userRoleService;
     }
 
-    public List<Business> GetBusinesses() {
-        return businessRepository.findAll();
+    public List<Business> GetBusinesses(User user) {
+        return businessRepository.findByUser(user.getId());
     }
 
-    public Boolean ExistsBusiness(Long businessID) {
-        return businessRepository.existsById(businessID);
+    public Boolean ExistsBusiness(Long businessID, User user, String role) {
+        return switch (role) {
+            case "admin" -> businessRepository.existsByIdAndUserAdmin(businessID, user.getId());
+            case "manager" -> businessRepository.existsByIdAndUserManager(businessID, user.getId());
+            default -> businessRepository.existsByIdAndUser(businessID, user.getId());
+        };
     }
 
-    public Business GetOneBusiness(Long businessID) {
-        Optional<Business> business = businessRepository.findById(businessID);
+    public Business GetOneBusiness(Long businessID, User user) {
+        Optional<Business> business = businessRepository.findByIdAndUser(businessID, user.getId());
         if (business.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " don't have a rol in it");
         }
 
         return business.get();
     }
 
-    public Business CreateBusiness(BusinessWithUser businessWithUser) {
+    public Business CreateBusiness(Business business, User user) {
         // Validate associated user ID
-        boolean exists = userService.ExistsUser(businessWithUser.getUserID());
+        boolean exists = userService.ExistsUser(user.getId());
         if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - User with ID: " + businessWithUser.getUserID() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - User with ID: " + user.getId() + " doesn't exist");
         }
 
         // Create business
-        Business business = businessWithUser.getBusiness();
         business.setId(null);
         business = businessRepository.save(business);
 
-        // Set associated user
-        User user = new User(businessWithUser.getUserID());
-
-        // Create user role
+        // Create user role (Manager)
         UserRole userRole = new UserRole(user, business, true, false, false);
         userRoleService.CreateUserRole(userRole);
 
         return business;
     }
 
-    public Business UpdateBusiness(Business business) {
-        boolean exists = ExistsBusiness(business.getId());
+    public Business UpdateBusiness(Business business, User user) {
+        boolean exists = ExistsBusiness(business.getId(), user, "admin");
         if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exist or the user: " + user.getId() + " isn't an Admin");
         }
 
         return businessRepository.save(business);
     }
 
-    public Long DeleteBusiness(Long businessID) {
-        boolean exists = ExistsBusiness(businessID);
+    public Long DeleteBusiness(Long businessID, User user) {
+        boolean exists = ExistsBusiness(businessID, user, "manager");
         if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'DeleteBusiness' - Business with ID: " + businessID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'DeleteBusiness' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " isn't the Manager");
         }
 
         businessRepository.deleteById(businessID);
