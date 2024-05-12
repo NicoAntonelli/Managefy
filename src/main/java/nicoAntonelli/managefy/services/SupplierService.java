@@ -96,7 +96,7 @@ public class SupplierService {
         // Validate supplier existence
         boolean exists = ExistsSupplier(supplier, user);
         if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist or it's not associated with the user: " + user.getId());
         }
 
         return supplierRepository.save(supplier);
@@ -115,10 +115,10 @@ public class SupplierService {
         // At least one product
         Set<Product> products = supplier.getProducts();
         if (products == null || products.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Any product was supplied");
+            throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - No product was supplied");
         }
 
-        // Products need to exist, be associated with the user and all for the same business
+        // Products need to exist, be associated with the user and each product associated with the same business
         Long businessID = 0L;
         for (Product product : products) {
             if (!productService.ExistsProduct(product, user)) {
