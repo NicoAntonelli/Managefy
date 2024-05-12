@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserRole;
-import nicoAntonelli.managefy.entities.dto.BusinessWithUser;
 import nicoAntonelli.managefy.repositories.BusinessRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +16,11 @@ import java.util.Optional;
 @Transactional
 public class BusinessService {
     private final BusinessRepository businessRepository;
-    private final UserService userService; // Dependency
     private final UserRoleService userRoleService; // Dependency
 
     @Autowired
-    public BusinessService(BusinessRepository businessRepository,
-                           UserService userService,
-                           UserRoleService userRoleService) {
+    public BusinessService(BusinessRepository businessRepository, UserRoleService userRoleService) {
         this.businessRepository = businessRepository;
-        this.userService = userService;
         this.userRoleService = userRoleService;
     }
 
@@ -51,14 +46,9 @@ public class BusinessService {
     }
 
     public Business CreateBusiness(Business business, User user) {
-        // Validate associated user ID
-        boolean exists = userService.ExistsUser(user.getId());
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - User with ID: " + user.getId() + " doesn't exist");
-        }
-
-        // Create business
+        // Forced initial state
         business.setId(null);
+
         business = businessRepository.save(business);
 
         // Create user role (Manager)
