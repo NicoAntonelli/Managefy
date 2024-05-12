@@ -42,10 +42,6 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Boolean ExistsUser(Long userID) {
-        return userRepository.existsById(userID);
-    }
-
     public User GetOneUser(Long userID) {
         Optional<User> user = userRepository.findById(userID);
         if (user.isEmpty()) {
