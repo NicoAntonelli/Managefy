@@ -133,6 +133,10 @@ public class UserService {
             }
         }
 
+        // Retrieve password from DB
+        String password = userRepository.getEncodedPassword(user.getId());
+        user.setPassword(password);
+
         return userRepository.save(user);
     }
 
