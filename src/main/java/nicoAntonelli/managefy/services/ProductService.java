@@ -167,7 +167,7 @@ public class ProductService {
     private void CheckOrCreateSupplierForProduct(Product product, User user) {
         Supplier supplier = product.getSupplier();
 
-        // Product not supplied is OK
+        // Supplier not supplied is OK
         if (supplier == null) return;
 
         // With ID: validate it
