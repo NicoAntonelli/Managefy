@@ -14,25 +14,29 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT s " +
             "FROM Sale s " +
             "INNER JOIN s.business b " +
-            "WHERE s.date >= ?1 AND s.date <= ?2" +
-            "AND s.state <> 'Cancelled' AND b.id = ?3")
+            "WHERE s.date >= ?1 AND s.date <= ?2 " +
+            "AND s.state <> 'Cancelled' AND b.id = ?3 " +
+            "ORDER BY s.date DESC")
     List<Sale> findActivesByIntervalAndBusiness(LocalDateTime initialDate, LocalDateTime finalDate, Long businessID);
 
     @Query("SELECT s " +
             "FROM Sale s " +
             "INNER JOIN s.business b " +
-            "WHERE (s.state = 'PendingPayment' OR s.state = 'PartialPayment') AND b.id = ?1")
+            "WHERE (s.state = 'PendingPayment' OR s.state = 'PartialPayment') AND b.id = ?1 " +
+            "ORDER BY s.date DESC")
     List<Sale> findIncompleteByBusiness(Long businessID);
 
     @Query("SELECT s " +
             "FROM Sale s " +
             "INNER JOIN s.business b " +
-            "WHERE s.id = ?1 AND s.state <> 'Cancelled' IS NULL AND b.id = ?2")
+            "WHERE s.id = ?1 AND s.state <> 'Cancelled' IS NULL AND b.id = ?2 " +
+            "ORDER BY s.date DESC")
     Optional<Sale> findByIdActiveAndBusiness(Long productID, Long businessID);
 
     @Query("SELECT COUNT(s) > 0 " +
             "FROM Sale s " +
             "INNER JOIN s.business b " +
-            "WHERE s.id = ?1 AND s.state <> 'Cancelled' IS NULL AND b.id = ?2")
+            "WHERE s.id = ?1 AND s.state <> 'Cancelled' IS NULL AND b.id = ?2 " +
+            "ORDER BY s.date DESC")
     Boolean existsByIdActiveAndBusiness(Long productID, Long businessID);
 }
