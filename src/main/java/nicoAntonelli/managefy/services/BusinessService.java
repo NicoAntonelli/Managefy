@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.SortedMap;
 
 @Service
 @Transactional
@@ -28,8 +29,8 @@ public class BusinessService {
         return businessRepository.findByUser(user.getId());
     }
 
-    public Boolean ExistsBusiness(Long businessID, User user, String role) {
-        return switch (role) {
+    public Boolean ExistsBusiness(Long businessID, User user, String minimumRole) {
+        return switch (minimumRole) {
             case "admin" -> businessRepository.existsByIdAndUserAdmin(businessID, user.getId());
             case "manager" -> businessRepository.existsByIdAndUserManager(businessID, user.getId());
             default -> businessRepository.existsByIdAndUser(businessID, user.getId());
@@ -46,6 +47,14 @@ public class BusinessService {
     }
 
     public Business CreateBusiness(Business business, User user) {
+        // Validate simple attributes
+        if (business.getName() == null || business.getDescription() == null || business.getLink() == null) {
+            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - One or more of the required fields were not supplied");
+        }
+
+        // Validate business days (Optional: has a default value if not supplied)
+        ValidateBusinessDays(business);
+
         // Forced initial state
         business.setId(null);
 
@@ -64,6 +73,14 @@ public class BusinessService {
             throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exist or the user: " + user.getId() + " isn't an Admin");
         }
 
+        // Validate simple attributes
+        if (business.getName() == null || business.getDescription() == null || business.getLink() == null) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - One or more of the required fields were not supplied");
+        }
+
+        // Validate business days (Optional: has a default value if not supplied)
+        ValidateBusinessDays(business);
+
         return businessRepository.save(business);
     }
 
@@ -75,5 +92,21 @@ public class BusinessService {
 
         businessRepository.deleteById(businessID);
         return businessID;
+    }
+
+    private void ValidateBusinessDays(Business business) {
+        SortedMap<String, Boolean> businessDays = business.getBusinessDays();
+        if (business.getBusinessDays() != null) {
+            if (businessDays.size() != 7) {
+                throw new Exceptions.BadRequestException("Error at 'ValidateBusinessDays' - Business days need to have a total of 7 days");
+            }
+
+            List<String> weekDays = List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+            for (String key : businessDays.keySet()) {
+                if (!weekDays.contains(key)) {
+                    throw new Exceptions.BadRequestException("Error at 'ValidateBusinessDays' - Business days don't contain '" + key + "'");
+                }
+            }
+        }
     }
 }
