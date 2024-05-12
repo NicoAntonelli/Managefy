@@ -59,6 +59,28 @@ public class SaleService {
         return saleRepository.findByInterval(startDate, endDate);
     }
 
+    public Boolean ExistsSale(Sale sale, User user) {
+        // Sale has ID
+        if (sale.getId() == null) {
+            throw new Exceptions.BadRequestException("Error at 'ExistsSale' - Sale not supplied");
+        }
+
+        // Business not null
+        Business business = sale.getBusiness();
+        if (business == null || business.getId() == null) {
+            throw new Exceptions.BadRequestException("Error at 'ExistsSale' - Business not supplied");
+        }
+
+        return ExistsProduct(sale.getId(), business.getId(), user);
+    }
+
+    public Boolean ExistsSale(Long saleID, Long businessID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        return saleRepository.existsByIdActiveAndBusiness(saleID, businessID);
+    }
+
     public Sale GetOneSale(Long saleID) {
         Optional<Sale> sale = saleRepository.findById(saleID);
         if (sale.isEmpty()) {
