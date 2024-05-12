@@ -22,12 +22,10 @@ public class Supplier {
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
-    @Column(nullable = false)
-    private String email;
-    @Column(nullable = false)
-    private String phone;
+    @Column(columnDefinition = "TEXT")
+    private String description; // Nullable
+    private String email; // Nullable
+    private String phone; // Nullable
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private LocalDateTime deletionDate; // Nullable
 
