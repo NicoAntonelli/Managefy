@@ -97,6 +97,6 @@ public class User {
         String validated = payload.substring(payload.indexOf(filters.get(3)) + filters.get(3).length(), payload.indexOf(filters.get(4)) - 2);
         String emailNotifications = payload.substring(payload.indexOf(filters.get(4)) + filters.get(4).length(), payload.indexOf("}"));
 
-        return new User(Long.parseLong(id), email, "null", name, Boolean.parseBoolean(validated), Boolean.parseBoolean(emailNotifications));
+        return new User(Long.parseLong(id), email, null, name, Boolean.parseBoolean(validated), Boolean.parseBoolean(emailNotifications));
     }
 }
