@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Notification;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.NotificationService;
@@ -29,13 +30,12 @@ public class NotificationController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping(path = "/user/{userID:[\\d]+}")
-    public Result<List<Notification>> GetNotificationsByUser(@PathVariable("userID") Long userID,
-                                                             @RequestHeader HttpHeaders headers) {
+    @GetMapping
+    public Result<List<Notification>> GetNotifications(@RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetNotificationsByUser");
+            User user = authService.validateTokenFromHeaders(headers, "GetNotifications");
 
-            List<Notification> notifications = notificationService.GetNotificationsByUser(userID);
+            List<Notification> notifications = notificationService.GetNotifications(user);
             return new Result<>(notifications);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -53,9 +53,9 @@ public class NotificationController {
     public Result<Notification> GetOneNotification(@PathVariable("notificationID") Long notificationID,
                                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneNotification");
+            User user = authService.validateTokenFromHeaders(headers, "GetOneNotification");
 
-            Notification notification = notificationService.GetOneNotification(notificationID);
+            Notification notification = notificationService.GetOneNotification(notificationID, user);
             return new Result<>(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -73,9 +73,9 @@ public class NotificationController {
     public Result<Notification> CreateNotification(@RequestBody Notification notification,
                                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateNotification");
+            User user = authService.validateTokenFromHeaders(headers, "CreateNotification");
 
-            notification = notificationService.CreateNotification(notification);
+            notification = notificationService.CreateNotification(notification, user);
             return new Result<>(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -94,9 +94,9 @@ public class NotificationController {
                                                         @PathVariable("state") String state,
                                                         @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateNotificationState");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateNotificationState");
 
-            Notification notification = notificationService.UpdateNotificationState(notificationID, state);
+            Notification notification = notificationService.UpdateNotificationState(notificationID, state, user);
             return new Result<>(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -114,9 +114,9 @@ public class NotificationController {
     public Result<Long> DeleteNotification(@PathVariable("notificationID") Long notificationID,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "DeleteNotification");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteNotification");
 
-            notificationID = notificationService.DeleteNotification(notificationID);
+            notificationID = notificationService.DeleteNotification(notificationID, user);
             return new Result<>(notificationID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
