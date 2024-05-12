@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Supplier;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.SupplierService;
@@ -29,12 +30,13 @@ public class SupplierController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping
-    public Result<List<Supplier>> GetSuppliers(@RequestHeader HttpHeaders headers) {
+    @GetMapping(path = "business/{businessID:[\\d]+}")
+    public Result<List<Supplier>> GetSuppliers(@PathVariable("businessID") Long businessID,
+                                               @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetSuppliers");
+            User user = authService.validateTokenFromHeaders(headers, "GetSuppliers");
 
-            List<Supplier> suppliers = supplierService.GetSuppliers();
+            List<Supplier> suppliers = supplierService.GetSuppliers(businessID, user);
             return new Result<>(suppliers);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -48,13 +50,14 @@ public class SupplierController {
         }
     }
 
-    @GetMapping(path = "{supplierID:[\\d]+}")
+    @GetMapping(path = "{supplierID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Supplier> GetOneSupplier(@PathVariable("supplierID") Long supplierID,
+                                           @PathVariable("businessID") Long businessID,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneSupplier");
+            User user = authService.validateTokenFromHeaders(headers, "GetOneSupplier");
 
-            Supplier supplier = supplierService.GetOneSupplier(supplierID);
+            Supplier supplier = supplierService.GetOneSupplier(supplierID, businessID, user);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -72,9 +75,9 @@ public class SupplierController {
     public Result<Supplier> CreateSupplier(@RequestBody Supplier supplier,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateSupplier");
+            User user = authService.validateTokenFromHeaders(headers, "CreateSupplier");
 
-            supplier = supplierService.CreateSupplier(supplier);
+            supplier = supplierService.CreateSupplier(supplier, user);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -92,9 +95,9 @@ public class SupplierController {
     public Result<Supplier> UpdateSupplier(@RequestBody Supplier supplier,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateSupplier");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateSupplier");
 
-            supplier = supplierService.UpdateSupplier(supplier);
+            supplier = supplierService.UpdateSupplier(supplier, user);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -108,13 +111,14 @@ public class SupplierController {
         }
     }
 
-    @DeleteMapping(path = "{supplierID:[\\d]+}")
+    @DeleteMapping(path = "{supplierID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Long> DeleteSupplier(@PathVariable("supplierID") Long supplierID,
-                                           @RequestHeader HttpHeaders headers) {
+                                       @PathVariable("businessID") Long businessID,
+                                       @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "DeleteSupplier");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteSupplier");
 
-            supplierID = supplierService.DeleteSupplier(supplierID);
+            supplierID = supplierService.DeleteSupplier(supplierID, businessID, user);
             return new Result<>(supplierID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

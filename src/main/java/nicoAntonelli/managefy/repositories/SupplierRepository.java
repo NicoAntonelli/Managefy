@@ -12,16 +12,22 @@ import java.util.Optional;
 public interface SupplierRepository extends JpaRepository<Supplier, Long> {
     @Query("SELECT s " +
             "FROM Supplier s " +
-            "WHERE s.deletionDate IS NULL")
-    List<Supplier> findAllActives();
+            "INNER JOIN s.products p " +
+            "INNER JOIN p.business b " +
+            "WHERE s.deletionDate IS NULL AND b.id = ?1")
+    List<Supplier> findActivesByBusiness(Long businessID);
 
     @Query("SELECT s " +
             "FROM Supplier s " +
-            "WHERE s.id = ?1 AND s.deletionDate IS NULL")
-    Optional<Supplier> findByIdActive(Long supplierID);
+            "INNER JOIN s.products p " +
+            "INNER JOIN p.business b " +
+            "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?1")
+    Optional<Supplier> findByIdActiveAndBusiness(Long supplierID, Long businessID);
 
-    @Query("SELECT COUNT(s) > 0 " +
+    @Query("SELECT COUNT(s) " +
             "FROM Supplier s " +
-            "WHERE s.id = ?1 AND s.deletionDate IS NULL")
-    Boolean existsByIdActive(Long supplierID);
+            "INNER JOIN s.products p " +
+            "INNER JOIN p.business b " +
+            "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?1")
+    Boolean existsByIdActiveAndBusiness(Long supplierID, Long businessID);
 }
