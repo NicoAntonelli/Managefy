@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 
@@ -70,6 +71,12 @@ public class BusinessService {
             throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - One or more of the required fields were not supplied");
         }
 
+        // Link unique validation
+        Optional<Business> possibleBusiness = businessRepository.findByLink(business.getLink(), user.getId());
+        if (possibleBusiness.isPresent()) {
+            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - Link '" + business.getLink() + "' already taken");
+        }
+
         // Validate business days (Optional: has a default value if not supplied)
         ValidateBusinessDays(business);
 
@@ -94,6 +101,15 @@ public class BusinessService {
         // Validate simple attributes
         if (business.getName() == null || business.getDescription() == null || business.getLink() == null) {
             throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - One or more of the required fields were not supplied");
+        }
+
+        // Link unique validation
+        Optional<Business> possibleBusiness = businessRepository.findByLink(business.getLink(), user.getId());
+        if (possibleBusiness.isPresent()) {
+            // Only fail validation if it's not the same business
+            if (!Objects.equals(possibleBusiness.get().getId(), business.getId())) {
+                throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Link '" + business.getLink() + "' already taken");
+            }
         }
 
         // Validate business days (Optional: has a default value if not supplied)

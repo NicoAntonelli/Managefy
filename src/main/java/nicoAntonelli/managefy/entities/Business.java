@@ -11,7 +11,10 @@ import org.hibernate.type.SqlTypes;
 import java.util.*;
 
 @Entity
-@Table(name = "businesses")
+@Table(name = "businesses",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "businesses_link_unique", columnNames = "link")
+        })
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Business {
     @Id
@@ -25,7 +28,7 @@ public class Business {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false)
-    private String link;
+    private String link; // Unique
     @Column(nullable = false)
     private Boolean isPublic;
 
