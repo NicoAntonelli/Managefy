@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Client;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ClientService;
 import nicoAntonelli.managefy.services.ErrorLogService;
@@ -29,12 +30,13 @@ public class ClientController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping
-    public Result<List<Client>> GetClients(@RequestHeader HttpHeaders headers) {
+    @GetMapping(path = "business/{businessID:[\\d]+}")
+    public Result<List<Client>> GetClients(@PathVariable("businessID") Long businessID,
+                                           @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetClients");
+            User user = authService.validateTokenFromHeaders(headers, "GetClients");
 
-            List<Client> clients = clientService.GetClients();
+            List<Client> clients = clientService.GetClients(businessID, user);
             return new Result<>(clients);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -48,13 +50,14 @@ public class ClientController {
         }
     }
 
-    @GetMapping(path = "{clientID:[\\d]+}")
+    @GetMapping(path = "{clientID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Client> GetOneClient(@PathVariable("clientID") Long clientID,
+                                       @PathVariable("businessID") Long businessID,
                                        @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneClient");
+            User user = authService.validateTokenFromHeaders(headers, "GetOneClient");
 
-            Client client = clientService.GetOneClient(clientID);
+            Client client = clientService.GetOneClient(clientID, businessID, user);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -72,9 +75,9 @@ public class ClientController {
     public Result<Client> CreateClient(@RequestBody Client client,
                                        @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateClient");
+            User user = authService.validateTokenFromHeaders(headers, "CreateClient");
 
-            client = clientService.CreateClient(client);
+            client = clientService.CreateClient(client, user);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -92,9 +95,9 @@ public class ClientController {
     public Result<Client> UpdateClient(@RequestBody Client client,
                                        @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateClient");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateClient");
 
-            client = clientService.UpdateClient(client);
+            client = clientService.UpdateClient(client, user);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -108,13 +111,14 @@ public class ClientController {
         }
     }
 
-    @DeleteMapping(path = "{clientID:[\\d]+}")
+    @DeleteMapping(path = "{clientID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Long> DeleteClient(@PathVariable("clientID") Long clientID,
-                                       @RequestHeader HttpHeaders headers) {
+                                     @PathVariable("businessID") Long businessID,
+                                     @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "DeleteClient");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteClient");
 
-            clientID = clientService.DeleteClient(clientID);
+            clientID = clientService.DeleteClient(clientID, businessID, user);
             return new Result<>(clientID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

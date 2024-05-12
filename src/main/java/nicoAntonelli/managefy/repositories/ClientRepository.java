@@ -12,16 +12,22 @@ import java.util.Optional;
 public interface ClientRepository extends JpaRepository<Client, Long> {
     @Query("SELECT c " +
             "FROM Client c " +
-            "WHERE c.deletionDate IS NULL")
-    List<Client> findAllActives();
+            "INNER JOIN c.sales s " +
+            "INNER JOIN s.business b " +
+            "WHERE c.deletionDate IS NULL AND b.id = ?1")
+    List<Client> findActivesByBusiness(Long businessID);
 
     @Query("SELECT c " +
             "FROM Client c " +
-            "WHERE c.id = ?1 AND c.deletionDate IS NULL")
-    Optional<Client> findByIdActive(Long clientID);
+            "INNER JOIN c.sales s " +
+            "INNER JOIN s.business b " +
+            "WHERE c.id = ?1 AND c.deletionDate IS NULL AND b.id = ?1")
+    Optional<Client> findByIdActiveAndBusiness(Long supplierID, Long businessID);
 
     @Query("SELECT COUNT(c) > 0 " +
             "FROM Client c " +
-            "WHERE c.id = ?1 AND c.deletionDate IS NULL")
-    Boolean existsByIdActive(Long clientID);
+            "INNER JOIN c.sales s " +
+            "INNER JOIN s.business b " +
+            "WHERE c.id = ?1 AND c.deletionDate IS NULL AND b.id = ?1")
+    Boolean existsByIdActiveAndBusiness(Long supplierID, Long businessID);
 }
