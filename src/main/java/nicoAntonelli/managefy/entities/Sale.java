@@ -14,7 +14,7 @@ import java.util.List;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Sale {
     // State enum
-    public enum SaleState { Cancelled, PendingPayment, PartialPayment, Payed, PayedAndBilled }
+    public enum SaleState { Cancelled, PendingPayment, PartialPayment, Paid, PaidAndBilled }
 
     @Id
     @SequenceGenerator(name = "sales_sequence", sequenceName = "sales_sequence")
@@ -92,8 +92,8 @@ public class Sale {
             case "cancelled" -> setState(Sale.SaleState.Cancelled);
             case "pendingpayment" -> setState(Sale.SaleState.PendingPayment);
             case "partialpayment" -> setState(Sale.SaleState.PartialPayment);
-            case "payed" -> setState(Sale.SaleState.Payed);
-            case "payedandbilled" -> setState(Sale.SaleState.PayedAndBilled);
+            case "paid" -> setState(Sale.SaleState.Paid);
+            case "paidandbilled" -> setState(SaleState.PaidAndBilled);
             default -> { return false; }
         }
 

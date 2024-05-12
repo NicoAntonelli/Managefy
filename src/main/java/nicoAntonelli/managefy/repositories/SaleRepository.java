@@ -16,7 +16,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "INNER JOIN s.business b " +
             "WHERE s.date >= ?1 AND s.date <= ?2" +
             "AND s.state <> 'Cancelled' AND b.id = ?3")
-    List<Sale> findActivesByIntervalAndBusiness(Long businessID, LocalDateTime initialDate, LocalDateTime finalDate);
+    List<Sale> findActivesByIntervalAndBusiness(LocalDateTime initialDate, LocalDateTime finalDate, Long businessID);
 
     @Query("SELECT s " +
             "FROM Sale s " +
