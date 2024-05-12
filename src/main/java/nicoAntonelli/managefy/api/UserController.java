@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @SuppressWarnings("unused")
@@ -109,7 +110,10 @@ public class UserController {
     public Result<User> UpdateUser(@RequestBody User user,
                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateUser");
+            User loggedUser = authService.validateTokenFromHeaders(headers, "UpdateUser");
+            if (!Objects.equals(loggedUser.getId(), user.getId())) {
+                throw new Exceptions.UnauthorizedException("Error at 'UpdateUser' - User: " + user.getId() + " can't update other users");
+            }
 
             user = userService.UpdateUser(user);
             return new Result<>(user);
@@ -125,13 +129,12 @@ public class UserController {
         }
     }
 
-    @PutMapping(path = "{userID:[\\d]+}/generateValidation")
-    public Result<Boolean> GenerateUserValidation(@PathVariable("userID") Long userID,
-                                                  @RequestHeader HttpHeaders headers) {
+    @PutMapping(path = "generateValidation")
+    public Result<Boolean> GenerateUserValidation(@RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GenerateUserValidation");
+            User user = authService.validateTokenFromHeaders(headers, "GenerateUserValidation");
 
-            Boolean response = userService.GenerateUserValidation(userID);
+            Boolean response = userService.GenerateUserValidation(user);
             return new Result<>(response);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -145,14 +148,13 @@ public class UserController {
         }
     }
 
-    @PutMapping(path = "{userID:[\\d]+}/validate/{code:[\\d]+}")
-    public Result<Boolean> ValidateUser(@PathVariable("userID") Long userID,
-                                        @PathVariable("code") String code,
+    @PutMapping(path = "validate/{code:[\\d]+}")
+    public Result<Boolean> ValidateUser(@PathVariable("code") String code,
                                         @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "ValidateUser");
+            User user = authService.validateTokenFromHeaders(headers, "ValidateUser");
 
-            Boolean response = userService.ValidateUser(userID, code);
+            Boolean response = userService.ValidateUser(code, user);
             return new Result<>(response);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -166,13 +168,12 @@ public class UserController {
         }
     }
 
-    @DeleteMapping(path = "{userID:[\\d]+}")
-    public Result<Long> DeleteUser(@PathVariable("userID") Long userID,
-                                   @RequestHeader HttpHeaders headers) {
+    @DeleteMapping
+    public Result<Long> DeleteUser(@RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "DeleteUser");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteUser");
 
-            userID = userService.DeleteUser(userID);
+            Long userID = userService.DeleteUser(user);
             return new Result<>(userID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

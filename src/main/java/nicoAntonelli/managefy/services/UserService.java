@@ -119,17 +119,15 @@ public class UserService {
         if (!Objects.equals(email, user.getEmail()) || !Objects.equals(password, user.getPassword())) {
             throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
         }
+
         // Generate JWT Token
         String JWT = JWTHelper.generateToken(user.toStringSafe());
 
         return new Token(JWT, user.getId());
     }
 
+    // Only logged-user can update itself
     public User UpdateUser(User user) {
-        boolean exists = ExistsUser(user.getId());
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateUser' - User with ID: " + user.getId() + " doesn't exist");
-        }
         // Email unique validation
         Optional<User> possibleUser = userRepository.findByEmail(user.getEmail());
         if (possibleUser.isPresent()) {
@@ -142,9 +140,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Boolean GenerateUserValidation(Long userID) {
-        User user = GetOneUser(userID);
-
+    // Only logged-user can generate its own code
+    public Boolean GenerateUserValidation(User user) {
         // Replace any existing entity
         UserValidation userValidation = new UserValidation(user);
         userValidationRepository.save(userValidation);
@@ -155,24 +152,24 @@ public class UserService {
         return true;
     }
 
-    public Boolean ValidateUser(Long userID, String code) {
-        User user = GetOneUser(userID);
+    // Only logged-user can validate itself
+    public Boolean ValidateUser(String code, User user) {
         if (user.getValidated()) {
             throw new Exceptions.BadRequestException("Error at 'ValidateUser' - User with ID: " + user.getId() + " has already been validated");
         }
 
-        Optional<UserValidation> optionalValidation = userValidationRepository.findByUser(userID);
+        Optional<UserValidation> optionalValidation = userValidationRepository.findByUser(user.getId());
         if (optionalValidation.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - No validation code was generated for the User ID: " + userID);
+            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - No validation code was generated for the User ID: " + user.getId());
         }
 
         // Code and expiry date validations
         UserValidation userValidation = optionalValidation.get();
         if (!Objects.equals(userValidation.getCode(), code)) {
-            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code mismatch for the User ID: " + userID);
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code mismatch for the User ID: " + user.getId());
         }
         if (userValidation.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code has expired for the User ID: " + userID);
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code has expired for the User ID: " + user.getId());
         }
 
         // Update user with validation OK
@@ -182,13 +179,9 @@ public class UserService {
         return true;
     }
 
-    public Long DeleteUser(Long userID) {
-        boolean exists = ExistsUser(userID);
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'DeleteUser' - User with ID: " + userID + " doesn't exist");
-        }
-
-        userRepository.deleteById(userID);
-        return userID;
+    // Only logged-user can delete its own account
+    public Long DeleteUser(User user) {
+        userRepository.deleteById(user.getId());
+        return user.getId();
     }
 }
