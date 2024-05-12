@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Notification {
     // Type enum
-    public enum NotificationType { Normal, Important, Priority }
+    public enum NotificationType { Low, Normal, Priority }
 
     // State enum
     public enum NotificationState { Unread, Read, Closed }
@@ -60,6 +60,17 @@ public class Notification {
     public void setUserByID(Long userID) {
         user = new User();
         user.setId(userID);
+    }
+
+    public Boolean setTypeByText(String type) {
+        switch (type.toLowerCase()) {
+            case "low" -> setType(Notification.NotificationType.Low);
+            case "normal" -> setType(Notification.NotificationType.Normal);
+            case "priority" -> setType(Notification.NotificationType.Priority);
+            default -> { return false; }
+        }
+
+        return true;
     }
 
     public Boolean setStateByText(String state) {

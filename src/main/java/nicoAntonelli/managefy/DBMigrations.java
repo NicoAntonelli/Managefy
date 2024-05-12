@@ -71,8 +71,8 @@ public class DBMigrations {
     }
 
     private static List<Business> generateBusinesses() {
-        Business business1 = new Business("Groceryfy", "Buy everything", "groceryfy/");
-        Business business2 = new Business("Dean's Butchery", "The best meat", "deans-butchery/");
+        Business business1 = new Business("Groceryfy", "Buy everything", "groceryfy/", false);
+        Business business2 = new Business("Dean's Butchery", "The best meat", "deans-butchery/", false);
 
         return List.of(business1, business2);
     }
@@ -94,16 +94,16 @@ public class DBMigrations {
 
     private static List<Notification> generateNotifications() {
         Notification not1 = new Notification("You made 10 sales this week, 2 more than the previous",
-                Notification.NotificationType.Normal, Notification.NotificationState.Read,
+                Notification.NotificationType.Low, Notification.NotificationState.Read,
                 LocalDateTime.now(), 1L);
         Notification not2 = new Notification("The sale has been completed successfully",
-                Notification.NotificationType.Normal, Notification.NotificationState.Closed,
+                Notification.NotificationType.Low, Notification.NotificationState.Closed,
                 LocalDateTime.now(), 1L);
         Notification not3 = new Notification("An admin has removed you from the 'MinShop' business",
                 Notification.NotificationType.Priority, Notification.NotificationState.Unread,
                 LocalDateTime.now(), 1L);
         Notification not4 = new Notification("Minimum storage for Soda reached at 'MyShop': 3 units left",
-                Notification.NotificationType.Important, Notification.NotificationState.Unread,
+                Notification.NotificationType.Normal, Notification.NotificationState.Unread,
                 LocalDateTime.now(), 1L);
 
         return List.of(not1, not2, not3, not4);
