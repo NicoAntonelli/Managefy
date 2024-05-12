@@ -47,7 +47,7 @@ public class ErrorLogService {
 
     public List<ErrorLog> GetFrontendErrorsByInterval(String initialDate, String finalDate) {
         if (initialDate == null || finalDate == null
-                || initialDate.isBlank() || finalDate.isBlank()) {
+            || initialDate.isBlank() || finalDate.isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'GetFrontendErrorsByInterval' - Both start and end dates must be supplied");
         }
 
@@ -64,8 +64,11 @@ public class ErrorLogService {
     }
 
     public void SetBackendError(String description, String httpCode, Throwable innerException) {
-        // Empty error message
-        if (description.isBlank()) return;
+        // Empty error message - No save
+        if (description == null || description.isBlank()) return;
+
+        // No HTTP code - Force 500 status
+        if (httpCode == null || httpCode.isBlank()) httpCode = Exceptions.InternalServerErrorException.status;
 
         String innerExceptionMessage = innerException != null ? innerException.getMessage() : null;
         ErrorLog errorLog = new ErrorLog(description, ErrorLog.SERVER, httpCode, innerExceptionMessage);
