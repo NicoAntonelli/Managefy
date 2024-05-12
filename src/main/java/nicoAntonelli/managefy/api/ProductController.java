@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Product;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.ProductService;
@@ -29,12 +30,13 @@ public class ProductController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping
-    public Result<List<Product>> GetProducts(@RequestHeader HttpHeaders headers) {
+    @GetMapping(path = "business/{businessID:[\\d]+}")
+    public Result<List<Product>> GetProducts(@PathVariable("businessID") Long businessID,
+                                             @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetProducts");
+            User user = authService.validateTokenFromHeaders(headers, "GetProducts");
 
-            List<Product> products = productService.GetProducts();
+            List<Product> products = productService.GetProducts(businessID, user);
             return new Result<>(products);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -48,13 +50,14 @@ public class ProductController {
         }
     }
 
-    @GetMapping(path = "{productID:[\\d]+}")
+    @GetMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Product> GetOneProduct(@PathVariable("productID") Long productID,
+                                         @PathVariable("businessID") Long businessID,
                                          @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneProduct");
+            User user = authService.validateTokenFromHeaders(headers, "GetOneProduct");
 
-            Product product = productService.GetOneProduct(productID);
+            Product product = productService.GetOneProduct(productID,businessID, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -72,9 +75,9 @@ public class ProductController {
     public Result<Product> CreateProduct(@RequestBody Product product,
                                          @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateProduct");
+            User user = authService.validateTokenFromHeaders(headers, "CreateProduct");
 
-            product = productService.CreateProduct(product);
+            product = productService.CreateProduct(product, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -92,9 +95,9 @@ public class ProductController {
     public Result<Product> UpdateProduct(@RequestBody Product product,
                                          @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateProduct");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateProduct");
 
-            product = productService.UpdateProduct(product);
+            product = productService.UpdateProduct(product, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -108,13 +111,14 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping(path = "{productID:[\\d]+}")
+    @DeleteMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Long> DeleteProduct(@PathVariable("productID") Long productID,
-                                         @RequestHeader HttpHeaders headers) {
+                                      @PathVariable("businessID") Long businessID,
+                                      @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "DeleteProduct");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteProduct");
 
-            productID = productService.DeleteProduct(productID);
+            productID = productService.DeleteProduct(productID, businessID, user);
             return new Result<>(productID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

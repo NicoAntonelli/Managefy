@@ -3,6 +3,8 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.Product;
+import nicoAntonelli.managefy.entities.Supplier;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.repositories.ProductRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,62 +18,166 @@ import java.util.Optional;
 @Transactional
 public class ProductService {
     private final ProductRepository productRepository;
-    private final BusinessService businessService;
+    private final BusinessService businessService; // Dependency
+    private final SupplierService supplierService; // Dependency
 
     @Autowired
-    public ProductService(ProductRepository productRepository, BusinessService businessService) {
+    public ProductService(ProductRepository productRepository,
+                          BusinessService businessService,
+                          SupplierService supplierService) {
         this.productRepository = productRepository;
         this.businessService = businessService;
+        this.supplierService = supplierService;
     }
 
-    public List<Product> GetProducts() {
-        return productRepository.findAllActives();
+    public List<Product> GetProducts(Long businessID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        return productRepository.findActivesByBusiness(businessID);
     }
 
-    public Boolean ExistsProduct(Long productID) {
-        return productRepository.existsByIdActive(productID);
+    public Boolean ExistsProduct(Product product, User user) {
+        // Business not null
+        Business business = product.getBusiness();
+        if (business == null || business.getId() == null) {
+            throw new Exceptions.BadRequestException("Error at 'ExistsProduct' - Business not supplied");
+        }
+
+        return ExistsProduct(product.getId(), business.getId(), user);
     }
 
-    public Product GetOneProduct(Long productID) {
-        Optional<Product> product = productRepository.findByIdActive(productID);
+    public Boolean ExistsProduct(Long productID, Long businessID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        return productRepository.existsByIdActiveAndBusiness(productID, businessID);
+    }
+
+    public Product GetOneProduct(Long productID, Long businessID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        Optional<Product> product = productRepository.findByIdActiveAndBusiness(productID, businessID);
         if (product.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneProduct' - Product with ID: " + productID + " doesn't exist or it's not associated with the business: " + businessID);
         }
 
         return product.get();
     }
 
-    public Product CreateProduct(Product product) {
+    public Product CreateProduct(Product product, User user) {
+        // Validate required and optional simple attributes
+        ValidateSimpleAttributesForProduct(product);
+
         // Validate associated business
         Business business = product.getBusiness();
         if (business == null || business.getId() == null) {
             throw new Exceptions.BadRequestException("Error at 'CreateProduct' - Business not supplied");
         }
-        if (!businessService.ExistsBusiness(business.getId())) {
-            throw new Exceptions.BadRequestException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist");
+        if (!businessService.ExistsBusiness(business.getId(), user, "collaborator")) {
+            throw new Exceptions.BadRequestException("Error at 'CreateProduct' - Business with ID: " + business.getId() + " doesn't exist or it's not associated with the user: " + user.getId());
         }
 
+        // Optional associated supplier - check it or create a new one (and update product)
+        Supplier supplier = product.getSupplier();
+        if (supplier != null) {
+            CheckOrCreateSupplierForProduct(product);
+        }
+
+        // Forced initial state
         product.setId(null);
         product.setDeletionDate(null);
 
         return productRepository.save(product);
     }
 
-    public Product UpdateProduct(Product product) {
-        boolean exists = ExistsProduct(product.getId());
+    public Product UpdateProduct(Product product, User user) {
+        // Validate required and optional simple attributes
+        ValidateSimpleAttributesForProduct(product);
+
+        // Validate associated business
+        Business business = product.getBusiness();
+        if (business == null || business.getId() == null) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateProduct' - Business not supplied");
+        }
+        if (!businessService.ExistsBusiness(business.getId(), user, "collaborator")) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateProduct' - Business with ID: " + business.getId() + " doesn't exist or it's not associated with the user: " + user.getId());
+        }
+
+        // Validate product existence
+        boolean exists = ExistsProduct(product.getId(), business.getId(), user);
         if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'UpdateProduct' - Product with ID: " + product.getId() + " doesn't exist or it's not associated with the business: " + business.getId());
+        }
+
+        // Optional associated supplier - check it or create a new one (and update product)
+        Supplier supplier = product.getSupplier();
+        if (supplier != null) {
+            CheckOrCreateSupplierForProduct(product);
         }
 
         return productRepository.save(product);
     }
 
     // Logic deletion (field: deletion date)
-    public Long DeleteProduct(Long productID) {
-        Product product = GetOneProduct(productID);
+    public Long DeleteProduct(Long productID, Long businessID, User user) {
+        Product product = GetOneProduct(productID, businessID, user);
         product.setDeletionDate(LocalDateTime.now());
         productRepository.save(product);
 
         return productID;
+    }
+
+    private void ValidateSimpleAttributesForProduct(Product product) {
+        if (product.getDeletionDate() != null) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Product can't have a deletion date");
+        }
+
+        if (product.getUnitCost() == null || product.getUnitPrice() == null || product.getStock() == null) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - One or more of the required fields were not supplied");
+        }
+
+        if (product.getUnitCost() < 0) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Unit cost can't be negative");
+        }
+
+        if (product.getUnitPrice() < 0 || product.getUnitPrice() < product.getUnitCost()) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Unit price can't be negative or lesser than unit cost");
+        }
+
+        if (product.getStock() < 0) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Stock can't be negative");
+        }
+
+        if (product.getStockMin() != null && product.getStockMin() <= 0) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Optional stock min can't be negative or zero");
+        }
+
+        if (product.getSaleMinAmount() != null && product.getSaleMinAmount() <= 0) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Optional sale's minimum amount can't be negative or zero");
+        }
+    }
+
+    private void CheckOrCreateSupplierForProduct(Product product) {
+        Supplier supplier = product.getSupplier();
+
+        // Product not supplied is OK
+        if (supplier == null) return;
+
+        // With ID: validate it
+        if (supplier.getId() != null) {
+            Business business = product.getBusiness();
+            boolean exists = supplierService.ExistsSupplier(supplier.getId(), business.getId());
+            if (!exists) {
+                throw new Exceptions.BadRequestException("Error at 'CheckOrCreateSupplierForProduct' - Optional supplier: " + supplier.getId() + " supplied it's not valid");
+            }
+
+            return;
+        }
+
+        // Without ID: create it, then set it updated in product
+        supplier = supplierService.CreateSupplier(supplier);
+        product.setSupplier(supplier);
     }
 }
