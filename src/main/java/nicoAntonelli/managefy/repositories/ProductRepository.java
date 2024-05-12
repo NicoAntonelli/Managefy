@@ -12,16 +12,19 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p " +
             "FROM Product p " +
-            "WHERE p.deletionDate IS NULL")
-    List<Product> findAllActives();
+            "INNER JOIN p.business b " +
+            "WHERE p.deletionDate IS NULL AND b.id = ?1")
+    List<Product> findActivesByBusiness(Long businessID);
 
     @Query("SELECT p " +
             "FROM Product p " +
-            "WHERE p.id = ?1 AND p.deletionDate IS NULL")
-    Optional<Product> findByIdActive(Long productID);
+            "INNER JOIN p.business b " +
+            "WHERE p.id = ?1 AND p.deletionDate IS NULL AND b.id = ?2")
+    Optional<Product> findByIdActiveAndBusiness(Long productID, Long businessID);
 
     @Query("SELECT COUNT(p) > 0 " +
             "FROM Product p " +
-            "WHERE p.id = ?1 AND p.deletionDate IS NULL")
-    Boolean existsByIdActive(Long productID);
+            "INNER JOIN p.business b " +
+            "WHERE p.id = ?1 AND p.deletionDate IS NULL AND b.id = ?2")
+    Boolean existsByIdActiveAndBusiness(Long productID, Long businessID);
 }
