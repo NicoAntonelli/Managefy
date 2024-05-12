@@ -38,6 +38,11 @@ public class ProductService {
     }
 
     public Boolean ExistsProduct(Product product, User user) {
+        // Product has ID
+        if (product.getId() == null) {
+            throw new Exceptions.BadRequestException("Error at 'ExistsProduct' - Product not supplied");
+        }
+
         // Business not null
         Business business = product.getBusiness();
         if (business == null || business.getId() == null) {
@@ -82,7 +87,7 @@ public class ProductService {
         // Optional associated supplier - check it or create a new one (and update product)
         Supplier supplier = product.getSupplier();
         if (supplier != null) {
-            CheckOrCreateSupplierForProduct(product);
+            CheckOrCreateSupplierForProduct(product, user);
         }
 
         // Forced initial state
@@ -114,7 +119,7 @@ public class ProductService {
         // Optional associated supplier - check it or create a new one (and update product)
         Supplier supplier = product.getSupplier();
         if (supplier != null) {
-            CheckOrCreateSupplierForProduct(product);
+            CheckOrCreateSupplierForProduct(product, user);
         }
 
         return productRepository.save(product);
@@ -159,7 +164,7 @@ public class ProductService {
         }
     }
 
-    private void CheckOrCreateSupplierForProduct(Product product) {
+    private void CheckOrCreateSupplierForProduct(Product product, User user) {
         Supplier supplier = product.getSupplier();
 
         // Product not supplied is OK
@@ -168,7 +173,7 @@ public class ProductService {
         // With ID: validate it
         if (supplier.getId() != null) {
             Business business = product.getBusiness();
-            boolean exists = supplierService.ExistsSupplier(supplier.getId(), business.getId());
+            boolean exists = supplierService.ExistsSupplier(supplier.getId(), business.getId(), user);
             if (!exists) {
                 throw new Exceptions.BadRequestException("Error at 'CheckOrCreateSupplierForProduct' - Optional supplier: " + supplier.getId() + " supplied it's not valid");
             }
@@ -177,7 +182,7 @@ public class ProductService {
         }
 
         // Without ID: create it, then set it updated in product
-        supplier = supplierService.CreateSupplier(supplier);
+        supplier = supplierService.CreateSupplier(supplier, user);
         product.setSupplier(supplier);
     }
 }
