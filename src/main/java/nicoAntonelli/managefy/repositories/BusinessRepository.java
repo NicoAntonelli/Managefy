@@ -21,31 +21,31 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
-            "WHERE b.isPublic = TRUE " +
-            "OR (b.id = ?1 AND u.id = ?2)")
+            "WHERE b.id = ?1 " +
+            "AND (b.isPublic = TRUE OR u.id = ?2)")
     Optional<Business> findByIdAndUser(Long businessID, Long userID);
 
     @Query("SELECT COUNT(b) " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
-            "WHERE b.isPublic = TRUE" +
-            "OR (b.id = ?1 AND u.id = ?2)")
+            "WHERE b.id = ?1 " +
+            "AND (b.isPublic = TRUE OR u.id = ?2)")
     Boolean existsByIdAndUser(Long businessID, Long userID);
 
     @Query("SELECT COUNT(b) " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
-            "WHERE b.isPublic = TRUE" +
-            "OR (b.id = ?1 AND u.id = ?2 AND (ur.isAdmin = TRUE OR ur.isManager = TRUE))")
+            "WHERE b.id = ?1" +
+            "AND (b.isPublic = TRUE OR (u.id = ?2 AND (ur.isAdmin = TRUE OR ur.isManager = TRUE)))")
     Boolean existsByIdAndUserAdmin(Long businessID, Long userID);
 
     @Query("SELECT COUNT(b) " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
-            "WHERE b.isPublic = TRUE" +
-            "OR (b.id = ?1 AND u.id = ?2 AND ur.isManager = TRUE))")
+            "WHERE b.id = ?1" +
+            "AND (b.isPublic = TRUE OR (u.id = ?2 AND ur.isManager = TRUE))")
     Boolean existsByIdAndUserManager(Long businessID, Long userID);
 }
