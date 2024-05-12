@@ -25,6 +25,20 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
             "AND (b.isPublic = TRUE OR u.id = ?2)")
     Optional<Business> findByIdAndUser(Long businessID, Long userID);
 
+    @Query("SELECT b " +
+            "FROM Business b " +
+            "INNER JOIN b.userRoles ur " +
+            "INNER JOIN ur.user u " +
+            "WHERE b.link = ?1 " +
+            "AND (b.isPublic = TRUE OR u.id = ?2)")
+    Optional<Business> findByLink(String link, Long userID);
+
+    @Query("SELECT b " +
+            "FROM Business b " +
+            "WHERE b.link = ?1 " +
+            "AND b.isPublic = TRUE")
+    Optional<Business> findByLinkPublic(String link);
+
     @Query("SELECT COUNT(b) " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +

@@ -69,6 +69,43 @@ public class BusinessController {
         }
     }
 
+    @GetMapping(path = "/link/{link:[A-Za-z0-9_-]+}")
+    public Result<Business> GetOneBusinessByLink(@PathVariable("link") String link,
+                                                 @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "GetOneBusinessByLink");
+
+            Business business = businessService.GetOneBusinessByLink(link, user);
+            return new Result<>(business);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/linkPublic/{link:[A-Za-z0-9_-]+}")
+    public Result<Business> GetOneBusinessByLinkPublic(@PathVariable("link") String link) {
+        try {
+            Business business = businessService.GetOneBusinessByLinkPublic(link);
+            return new Result<>(business);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @PostMapping
     public Result<Business> CreateBusiness(@RequestBody Business business,
                                            @RequestHeader HttpHeaders headers) {

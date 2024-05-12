@@ -46,6 +46,24 @@ public class BusinessService {
         return business.get();
     }
 
+    public Business GetOneBusinessByLink(String link, User user) {
+        Optional<Business> business = businessRepository.findByLink(link, user.getId());
+        if (business.isEmpty()) {
+            throw new Exceptions.BadRequestException("Error at 'GetOneBusinessByLink' - Business with Link: " + link + " doesn't exist or the user: " + user.getId() + " don't have a rol in it");
+        }
+
+        return business.get();
+    }
+
+    public Business GetOneBusinessByLinkPublic(String link) {
+        Optional<Business> business = businessRepository.findByLinkPublic(link);
+        if (business.isEmpty()) {
+            throw new Exceptions.BadRequestException("Error at 'GetOneBusinessByLinkPublic' - Business with Link: " + link + " doesn't exist or the business it's not public");
+        }
+
+        return business.get();
+    }
+
     public Business CreateBusiness(Business business, User user) {
         // Validate simple attributes
         if (business.getName() == null || business.getDescription() == null || business.getLink() == null) {
