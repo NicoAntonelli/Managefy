@@ -182,7 +182,7 @@ public class ProductService {
         }
 
         // Without ID: create it, then set it updated in product
-        supplier = supplierService.CreateSupplier(supplier, user);
+        supplier = supplierService.CreateSupplier(supplier, user, true);
         product.setSupplier(supplier);
     }
 }

@@ -65,14 +65,14 @@ public class SupplierService {
         return supplier.get();
     }
 
-    public Supplier CreateSupplier(Supplier supplier, User user) {
+    public Supplier CreateSupplier(Supplier supplier, User user, Boolean noSalesControlled) {
         // Validate name
         if (supplier.getName() == null || supplier.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateSupplier' - Name field was not supplied");
         }
 
         // Validate associated products
-        ValidateProductsForSupplier(supplier, user);
+        ValidateProductsForSupplier(supplier, user, noSalesControlled);
 
         // Forced initial state
         supplier.setId(null);
@@ -91,7 +91,7 @@ public class SupplierService {
         }
 
         // Validate associated products
-        ValidateProductsForSupplier(supplier, user);
+        ValidateProductsForSupplier(supplier, user, false);
 
         // Validate supplier existence
         boolean exists = ExistsSupplier(supplier, user);
@@ -111,7 +111,13 @@ public class SupplierService {
         return supplierID;
     }
 
-    private void ValidateProductsForSupplier(Supplier supplier, User user) {
+    private void ValidateProductsForSupplier(Supplier supplier, User user, Boolean noSalesControlled) {
+        // Supplier created in the context of a current new product creation
+        if (noSalesControlled) {
+            supplier.setProducts(null);
+            return;
+        }
+
         // At least one product
         Set<Product> products = supplier.getProducts();
         if (products == null || products.isEmpty()) {

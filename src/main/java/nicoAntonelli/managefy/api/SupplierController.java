@@ -77,7 +77,7 @@ public class SupplierController {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateSupplier");
 
-            supplier = supplierService.CreateSupplier(supplier, user);
+            supplier = supplierService.CreateSupplier(supplier, user, false);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
