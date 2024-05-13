@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Sale;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.SaleService;
@@ -29,12 +30,13 @@ public class SaleController {
         this.errorLogService = errorLogService;
     }
 
-    @GetMapping
-    public Result<List<Sale>> GetSales(@RequestHeader HttpHeaders headers) {
+    @GetMapping(path = "business/{businessID:[\\d]+}")
+    public Result<List<Sale>> GetSalesIncomplete(@PathVariable("businessID") Long businessID,
+                                                 @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetSales");
+            User user = authService.validateTokenFromHeaders(headers, "GetSalesIncomplete");
 
-            List<Sale> sales = saleService.GetSales();
+            List<Sale> sales = saleService.GetSalesIncomplete(businessID, user);
             return new Result<>(sales);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -48,14 +50,15 @@ public class SaleController {
         }
     }
 
-    @GetMapping(path = "interval")
-    public Result<List<Sale>> GetSalesByInterval(@RequestParam String from,
+    @GetMapping(path = "business/{businessID:[\\d]+}/interval")
+    public Result<List<Sale>> GetSalesByInterval(@PathVariable("businessID") Long businessID,
+                                                 @RequestParam String from,
                                                  @RequestParam String to,
                                                  @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetSalesByInterval");
+            User user = authService.validateTokenFromHeaders(headers, "GetSalesByInterval");
 
-            List<Sale> sales = saleService.GetSalesByInterval(from, to);
+            List<Sale> sales = saleService.GetSalesByInterval(businessID, from, to, user);
             return new Result<>(sales);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -69,13 +72,14 @@ public class SaleController {
         }
     }
 
-    @GetMapping(path = "{saleID:[\\d]+}")
+    @GetMapping(path = "{saleID:[\\d]+}/")
     public Result<Sale> GetOneSale(@PathVariable("saleID") Long saleID,
+                                   @PathVariable("businessID") Long businessID,
                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneSale");
+            User user = authService.validateTokenFromHeaders(headers, "GetOneSale");
 
-            Sale sale = saleService.GetOneSale(saleID);
+            Sale sale = saleService.GetOneSale(saleID, businessID, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -93,9 +97,9 @@ public class SaleController {
     public Result<Sale> CreateSale(@RequestBody Sale sale,
                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateSale");
+            User user = authService.validateTokenFromHeaders(headers, "CreateSale");
 
-            sale = saleService.CreateSale(sale);
+            sale = saleService.CreateSale(sale, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -109,14 +113,15 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID}/state/{state:[a-zA-Z]+}")
+    @PutMapping(path = "{saleID}/state/{state:[a-zA-Z]+}/{businessID:[\\d]+}")
     public Result<Sale> UpdateSaleState(@PathVariable("saleID") Long saleID,
                                         @PathVariable("state") String state,
+                                        @PathVariable("businessID") Long businessID,
                                         @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateSaleState");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateSaleState");
 
-            Sale sale = saleService.UpdateSaleState(saleID, state);
+            Sale sale = saleService.UpdateSaleState(saleID, state, businessID, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -130,14 +135,15 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID:[\\d]+}/partialPayment/{partialPayment:(?:[0-9]*[.])?[0-9]+}")
+    @PutMapping(path = "{saleID:[\\d]+}/partialPayment/{partialPayment:(?:[0-9]*[.])?[0-9]+}/{businessID:[\\d]+}")
     public Result<Sale> UpdateSalePartialPayment(@PathVariable("saleID") Long saleID,
                                                  @PathVariable("partialPayment") Float partialPayment,
+                                                 @PathVariable("businessID") Long businessID,
                                                  @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UpdateSalePartialPayment");
+            User user = authService.validateTokenFromHeaders(headers, "UpdateSalePartialPayment");
 
-            Sale sale = saleService.UpdateSalePartialPayment(saleID, partialPayment);
+            Sale sale = saleService.UpdateSalePartialPayment(saleID, partialPayment, businessID, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -151,13 +157,14 @@ public class SaleController {
         }
     }
 
-    @DeleteMapping(path = "{saleID:[\\d]+}")
+    @DeleteMapping(path = "{saleID:[\\d]+}/{businessID:[\\d]+}")
     public Result<Long> CancelSale(@PathVariable("saleID") Long saleID,
+                                   @PathVariable("businessID") Long businessID,
                                    @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CancelSale");
+            User user = authService.validateTokenFromHeaders(headers, "CancelSale");
 
-            saleID = saleService.CancelSale(saleID);
+            saleID = saleService.CancelSale(saleID, businessID, user);
             return new Result<>(saleID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
