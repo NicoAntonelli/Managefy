@@ -87,7 +87,7 @@ public class BusinessService {
 
         // Create user role (Manager)
         UserRole userRole = new UserRole(user, business, true, false, false);
-        userRoleService.CreateUserRole(userRole);
+        userRoleService.CreateUserRoleForNewBusiness(userRole);
 
         return business;
     }

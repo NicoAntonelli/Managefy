@@ -1,5 +1,6 @@
 package nicoAntonelli.managefy.api;
 
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
 import nicoAntonelli.managefy.services.AuthService;
@@ -33,9 +34,9 @@ public class UserRoleController {
     @GetMapping
     public Result<List<UserRole>> GetUserRoles(@RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetUserRoles");
+            User user = authService.validateTokenFromHeaders(headers, "GetUserRoles");
 
-            List<UserRole> userRoles = userRoleService.GetUserRoles();
+            List<UserRole> userRoles = userRoleService.GetUserRoles(user);
             return new Result<>(userRoles);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -49,14 +50,76 @@ public class UserRoleController {
         }
     }
 
-    @GetMapping(path = "{userID:[\\d]+}/{businessID:[\\d]+}")
-    public Result<UserRole> GetOneUserRole(@PathVariable("userID") Long userID,
+    @GetMapping(path = "business/{businessID:[\\d]+}")
+    public Result<List<UserRole>> GetUserRolesByBusiness(@PathVariable("businessID") Long businessID,
+                                                         @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "GetUserRoles");
+
+            List<UserRole> userRoles = userRoleService.GetUserRolesByBusiness(businessID, user);
+            return new Result<>(userRoles);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "loggedRole/business/{businessID:[\\d]+}")
+    public Result<UserRole> GetOneUserRoleForLogged(@PathVariable("businessID") Long businessID,
+                                                    @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "GetOneUserRole");
+
+            UserRole userRole = userRoleService.GetOneUserRoleForLogged(businessID, user);
+            return new Result<>(userRole);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}")
+    public Result<UserRole> GetOneUserRoleForOther(@PathVariable("otherUserID") Long otherUserID,
+                                                   @PathVariable("businessID") Long businessID,
+                                                   @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "GetOneUserRole");
+
+            UserRole userRole = userRoleService.GetOneUserRoleForOther(otherUserID, businessID, user);
+            return new Result<>(userRole);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}/createRole/{role:[a-zA-Z]+}")
+    public Result<UserRole> CreateUserRole(@PathVariable("otherUserID") Long otherUserID,
                                            @PathVariable("businessID") Long businessID,
+                                           @PathVariable("role") String role,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "GetOneUserRole");
+            User user = authService.validateTokenFromHeaders(headers, "CreateUserRole");
 
-            UserRole userRole = userRoleService.GetOneUserRole(userID, businessID);
+            UserRole userRole = userRoleService.CreateUserRole(otherUserID, businessID, role, user);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -70,13 +133,15 @@ public class UserRoleController {
         }
     }
 
-    @PostMapping
-    public Result<UserRole> CreateUserRole(@RequestBody UserRole userRole,
+    @PutMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}/updateRole/{role:[a-zA-Z]+}")
+    public Result<UserRole> UpdateUserRole(@PathVariable("otherUserID") Long otherUserID,
+                                           @PathVariable("businessID") Long businessID,
+                                           @PathVariable("role") String role,
                                            @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "CreateUserRole");
+            User user = authService.validateTokenFromHeaders(headers, "CreateUserRole");
 
-            userRole = userRoleService.CreateUserRole(userRole);
+            UserRole userRole = userRoleService.UpdateUserRole(otherUserID, businessID, role, user);
             return new Result<>(userRole);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -90,34 +155,14 @@ public class UserRoleController {
         }
     }
 
-    @PutMapping
-    public Result<UserRole> UpdateUserRole(@RequestBody UserRole userRole,
-                                           @RequestHeader HttpHeaders headers) {
-        try {
-            authService.validateTokenFromHeaders(headers, "UpdateUserRole");
-
-            userRole = userRoleService.UpdateUserRole(userRole);
-            return new Result<>(userRole);
-        } catch (Exceptions.BadRequestException ex) {
-            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
-        } catch (Exceptions.UnauthorizedException ex) {
-            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
-        } catch (Exception ex) {
-            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
-        }
-    }
-
-    @DeleteMapping(path = "{userID:[\\d]+}/{businessID:[\\d]+}")
-    public Result<UserRoleKey> UserRoleIDUser(@PathVariable("userID") Long userID,
+    @DeleteMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}")
+    public Result<UserRoleKey> DeleteUserRole(@PathVariable("otherUserID") Long otherUserID,
                                               @PathVariable("businessID") Long businessID,
                                               @RequestHeader HttpHeaders headers) {
         try {
-            authService.validateTokenFromHeaders(headers, "UserRoleIDUser");
+            User user = authService.validateTokenFromHeaders(headers, "DeleteUserRole");
 
-            UserRoleKey userRoleKey = userRoleService.DeleteUserRole(userID, businessID);
+            UserRoleKey userRoleKey = userRoleService.DeleteUserRole(otherUserID, businessID, user);
             return new Result<>(userRoleKey);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

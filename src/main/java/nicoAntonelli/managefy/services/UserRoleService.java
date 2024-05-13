@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
+import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
 import nicoAntonelli.managefy.repositories.BusinessRepository;
@@ -17,72 +18,145 @@ import java.util.Optional;
 @Transactional
 public class UserRoleService {
     private final UserRoleRepository userRoleRepository;
-    private final UserRepository userRepository; // Dependency
-    private final BusinessRepository businessRepository; // Dependency
+    private final BusinessService businessService; // Dependency
+    private final UserService userService; // Dependency
 
     @Autowired
     public UserRoleService(UserRoleRepository userRoleRepository,
-                           UserRepository userRepository,
-                           BusinessRepository businessRepository) {
+                           BusinessService businessService,
+                           UserService userService) {
         this.userRoleRepository = userRoleRepository;
-        this.userRepository = userRepository;
-        this.businessRepository = businessRepository;
+        this.businessService = businessService;
+        this.userService = userService;
     }
 
-    public List<UserRole> GetUserRoles() {
-        return userRoleRepository.findAll();
+    public List<UserRole> GetUserRoles(User user) {
+        return userRoleRepository.findByUser(user.getId());
+    }
+
+    public List<UserRole> GetUserRolesByBusiness(Long businessID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        return userRoleRepository.findByBusiness(businessID);
     }
 
     public Boolean ExistsUserRole(Long userID, Long businessID) {
+        userService.GetOneUser(userID);
+
         UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
 
         return userRoleRepository.existsById(userRoleKey);
     }
 
-    public UserRole GetOneUserRole(Long userID, Long businessID) {
-        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
+    public UserRole GetOneUserRoleForOther(Long otherUserID, Long businessID, User user) {
+        // Validate business, logged user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        // Validate other user
+        userService.GetOneUser(otherUserID);
+
+        UserRoleKey userRoleKey = new UserRoleKey(otherUserID, businessID);
 
         Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
         if (userRole.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'GetOneUserRole' - UserRole with ID: " + userRoleKey + " doesn't exist");
+            throw new Exceptions.BadRequestException("Error at 'GetOneUserRoleForOther' - UserRole with ID: " + userRoleKey + " doesn't exist");
         }
 
         return userRole.get();
     }
 
-    public UserRole CreateUserRole(UserRole userRole) {
-        // Validate user
-        Long userID = userRole.getUser().getId();
-        if (!userRepository.existsById(userID)) {
-            throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - User with ID: " + userID + " doesn't exist");
+    public UserRole GetOneUserRoleForLogged(Long businessID, User user) {
+        // Validate business, logged user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        UserRoleKey userRoleKey = new UserRoleKey(user.getId(), businessID);
+
+        Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
+        if (userRole.isEmpty()) {
+            throw new Exceptions.BadRequestException("Error at 'GetOneUserRoleForLogged' - UserRole with ID: " + userRoleKey + " doesn't exist");
         }
 
-        // Validate business
-        Long businessID = userRole.getBusiness().getId();
-        if (!businessRepository.existsById(businessID)) {
-            throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - Business with ID: " + businessID + " doesn't exist");
-        }
-
-        return userRoleRepository.save(userRole);
+        return userRole.get();
     }
 
-    public UserRole UpdateUserRole(UserRole userRole) {
-        boolean exists = userRoleRepository.existsById(userRole.getId());
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateUserRole' - UserRole with ID: " + userRole.getId() + " doesn't exist");
+    public UserRole CreateUserRole(Long otherUserID, Long businessID, String role, User user) {
+        // Validate business and current user and other user's roles
+        UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+        userService.GetOneUser(otherUserID);
+
+        // Validate role
+        if (!List.of("collaborator", "admin", "manager").contains(role)) {
+            throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - Invalid role: " + role);
         }
 
-        return userRoleRepository.save(userRole);
+        UserRole roleToCreate = new UserRole(otherUserID, businessID, role);
+
+        // Validate authorization for role creation
+        if (roleToCreate.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'CreateUserRole' - Can't create another manager role!");
+        }
+
+        if (roleToCreate.getIsAdmin() && !currentUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'CreateUserRole' - Can't create an admin role for other user if you don't have a manager role");
+        }
+
+        if (roleToCreate.getIsCollaborator() && currentUserRole.getIsCollaborator()) {
+            throw new Exceptions.UnauthorizedException("Error at 'CreateUserRole' - Can't create a collaborator role for other user if you don't have an admin or manager role");
+        }
+
+        return userRoleRepository.save(roleToCreate);
     }
 
-    public UserRoleKey DeleteUserRole(Long userRoleID, long businessID) {
-        UserRoleKey userRoleKey = new UserRoleKey(userRoleID, businessID);
-        boolean exists = ExistsUserRole(userRoleID, businessID);
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'DeleteUserRole' - User with ID: " + userRoleKey + " doesn't exist");
+    public void CreateUserRoleForNewBusiness(UserRole userRole) {
+        userRoleRepository.save(userRole);
+    }
+
+    public UserRole UpdateUserRole(Long otherUserID, Long businessID, String role, User user) {
+        // Validate business and current user and other user's roles
+        UserRole roleToUpdate = GetOneUserRoleForOther(otherUserID, businessID, user);
+        UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        // Validate role
+        if (!roleToUpdate.setRoleByText(role)) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateUserRole' - Invalid role: " + role);
         }
 
-        userRoleRepository.deleteById(userRoleKey);
-        return userRoleKey;
+        // Validate authorization for role creation
+        if (roleToUpdate.getIsManager() && !currentUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'UpdateUserRole' - Only the manager can update it's own role!");
+        }
+
+        if (roleToUpdate.getIsAdmin() && !currentUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'UpdateUserRole' - Can't update an admin role for other user if you don't have a manager role");
+        }
+
+        if (roleToUpdate.getIsCollaborator() && currentUserRole.getIsCollaborator()) {
+            throw new Exceptions.UnauthorizedException("Error at 'UpdateUserRole' - Can't update a collaborator role for other user if you don't have an admin or manager role");
+        }
+
+        return userRoleRepository.save(roleToUpdate);
+    }
+
+    public UserRoleKey DeleteUserRole(Long otherUserID, long businessID, User user) {
+        // Validate business and current user and other user's roles
+        UserRole roleToDelete = GetOneUserRoleForOther(otherUserID, businessID, user);
+        UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        // Validate authorization for role creation
+        if (roleToDelete.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'DeleteUserRole' - Can't delete the manager role!");
+        }
+
+        if (roleToDelete.getIsAdmin() && !currentUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'DeleteUserRole' - Can't delete an admin role for other user if you don't have a manager role");
+        }
+
+        if (roleToDelete.getIsCollaborator() && currentUserRole.getIsCollaborator()) {
+            throw new Exceptions.UnauthorizedException("Error at 'DeleteUserRole' - Can't delete a collaborator role for other user if you don't have an admin or manager role");
+        }
+
+        userRoleRepository.deleteById(roleToDelete.getId());
+        return roleToDelete.getId();
     }
 }
