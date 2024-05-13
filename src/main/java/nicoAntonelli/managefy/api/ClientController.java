@@ -77,7 +77,7 @@ public class ClientController {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateClient");
 
-            client = clientService.CreateClient(client, user);
+            client = clientService.CreateClient(client, user, false);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

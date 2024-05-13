@@ -63,14 +63,14 @@ public class ClientService {
         return client.get();
     }
 
-    public Client CreateClient(Client client, User user) {
+    public Client CreateClient(Client client, User user, Boolean noProductsControlled) {
         // Validate name
         if (client.getName() == null || client.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateClient' - Name field was not supplied");
         }
 
         // Validate associated sales
-        ValidateSalesForClient(client, user);
+        ValidateSalesForClient(client, user, noProductsControlled);
 
         // Forced initial state
         client.setId(null);
@@ -89,7 +89,7 @@ public class ClientService {
         }
 
         // Validate associated sales
-        ValidateSalesForClient(client, user);
+        ValidateSalesForClient(client, user, false);
 
         // Validate client existence
         boolean exists = ExistsClient(client, user);
@@ -109,7 +109,13 @@ public class ClientService {
         return clientID;
     }
 
-    private void ValidateSalesForClient(Client client, User user) {
+    private void ValidateSalesForClient(Client client, User user, Boolean noProductsControlled) {
+        // Client created in the context of a current new sale creation
+        if (noProductsControlled) {
+            client.setSales(null);
+            return;
+        }
+
         // At least one sale
         Set<Sale> sales = client.getSales();
         if (sales == null || sales.isEmpty()) {
