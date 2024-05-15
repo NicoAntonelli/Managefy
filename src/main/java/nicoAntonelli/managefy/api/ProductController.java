@@ -50,6 +50,27 @@ public class ProductController {
         }
     }
 
+    @GetMapping(path = "business/{businessID:[\\d]+}/supplier/{supplierID:[\\d]+}")
+    public Result<List<Product>> GetProductsBySupplier(@PathVariable("businessID") Long businessID,
+                                                       @PathVariable("supplierID") Long supplierID,
+                                                       @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "GetProductsBySupplier");
+
+            List<Product> products = productService.GetProductsBySupplier(businessID, supplierID, user);
+            return new Result<>(products);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Product> GetOneProduct(@PathVariable("productID") Long productID,
                                          @PathVariable("businessID") Long businessID,

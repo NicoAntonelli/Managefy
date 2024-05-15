@@ -37,6 +37,13 @@ public class ProductService {
         return productRepository.findActivesByBusiness(businessID);
     }
 
+    public List<Product> GetProductsBySupplier(Long businessID, Long supplierID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        return productRepository.findActivesByBusinessAndSupplier(businessID, supplierID);
+    }
+
     public Boolean ExistsProduct(Product product, User user) {
         // Product has ID
         if (product.getId() == null) {

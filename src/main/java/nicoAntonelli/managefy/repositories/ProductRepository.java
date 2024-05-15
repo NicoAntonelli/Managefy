@@ -19,6 +19,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p " +
             "FROM Product p " +
             "INNER JOIN p.business b " +
+            "INNER JOIN p.supplier s " +
+            "WHERE p.deletionDate IS NULL " +
+            "AND s.id = ?1 AND s.id = ?2")
+    List<Product> findActivesByBusinessAndSupplier(Long businessID, Long supplierID);
+
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "INNER JOIN p.business b " +
             "WHERE p.id = ?1 AND p.deletionDate IS NULL AND b.id = ?2")
     Optional<Product> findByIdActiveAndBusiness(Long productID, Long businessID);
 
