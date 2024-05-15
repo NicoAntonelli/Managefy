@@ -50,6 +50,27 @@ public class SaleController {
         }
     }
 
+    @GetMapping(path = "business/{businessID:[\\d]+}/client/{clientID:[\\d]+}")
+    public Result<List<Sale>> GetSalesByClient(@PathVariable("businessID") Long businessID,
+                                               @PathVariable("clientID") Long clientID,
+                                               @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "GetSalesIncomplete");
+
+            List<Sale> sales = saleService.GetSalesByClient(businessID, clientID, user);
+            return new Result<>(sales);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @GetMapping(path = "business/{businessID:[\\d]+}/interval")
     public Result<List<Sale>> GetSalesByInterval(@PathVariable("businessID") Long businessID,
                                                  @RequestParam String from,

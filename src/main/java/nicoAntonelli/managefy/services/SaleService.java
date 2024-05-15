@@ -44,6 +44,13 @@ public class SaleService {
         return saleRepository.findIncompleteByBusiness(businessID);
     }
 
+    public List<Sale> GetSalesByClient(Long businessID, Long clientID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        return saleRepository.findActivesByBusinessAndClient(businessID, clientID);
+    }
+
     public List<Sale> GetSalesByInterval(Long businessID, String initialDate, String finalDate, User user) {
         // Validate business, user and role
         businessService.GetOneBusiness(businessID, user);

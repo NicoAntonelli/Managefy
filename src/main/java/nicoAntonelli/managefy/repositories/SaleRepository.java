@@ -29,6 +29,15 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT s " +
             "FROM Sale s " +
             "INNER JOIN s.business b " +
+            "INNER JOIN s.client c " +
+            "WHERE s.state <> 'Cancelled' " +
+            "AND b.id = ?1 AND c.id = ?2" +
+            "ORDER BY s.date DESC")
+    List<Sale> findActivesByBusinessAndClient(Long businessID, Long clientID);
+
+    @Query("SELECT s " +
+            "FROM Sale s " +
+            "INNER JOIN s.business b " +
             "WHERE s.id = ?1 AND s.state <> 'Cancelled' IS NULL AND b.id = ?2 " +
             "ORDER BY s.date DESC")
     Optional<Sale> findByIdActiveAndBusiness(Long productID, Long businessID);
