@@ -132,6 +132,14 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    public Product UpdateProductStock(Long productID, Long businessID, Integer stock, User user) {
+        Product product = GetOneProduct(productID, businessID, user);
+        product.setStock(stock);
+        productRepository.save(product);
+
+        return product;
+    }
+
     // Logic deletion (field: deletion date)
     public Long DeleteProduct(Long productID, Long businessID, User user) {
         Product product = GetOneProduct(productID, businessID, user);

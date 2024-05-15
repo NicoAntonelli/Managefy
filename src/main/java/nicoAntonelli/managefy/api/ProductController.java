@@ -78,7 +78,7 @@ public class ProductController {
         try {
             User user = authService.validateTokenFromHeaders(headers, "GetOneProduct");
 
-            Product product = productService.GetOneProduct(productID,businessID, user);
+            Product product = productService.GetOneProduct(productID, businessID, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -119,6 +119,28 @@ public class ProductController {
             User user = authService.validateTokenFromHeaders(headers, "UpdateProduct");
 
             product = productService.UpdateProduct(product, user);
+            return new Result<>(product);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}/stock/{stock:[\\d]+}")
+    public Result<Product> UpdateProductStock(@PathVariable("productID") Long productID,
+                                              @PathVariable("businessID") Long businessID,
+                                              @PathVariable("stock") Integer stock,
+                                              @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "UpdateProductStock");
+
+            Product product = productService.UpdateProductStock(productID, businessID, stock, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
