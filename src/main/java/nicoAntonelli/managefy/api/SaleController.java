@@ -55,7 +55,7 @@ public class SaleController {
                                                @PathVariable("clientID") Long clientID,
                                                @RequestHeader HttpHeaders headers) {
         try {
-            User user = authService.validateTokenFromHeaders(headers, "GetSalesIncomplete");
+            User user = authService.validateTokenFromHeaders(headers, "GetSalesByClient");
 
             List<Sale> sales = saleService.GetSalesByClient(businessID, clientID, user);
             return new Result<>(sales);
