@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -133,6 +135,9 @@ public class SaleService {
             throw new Exceptions.BadRequestException("Error at 'CreateSale' - No SaleLines supplied, business: " + business.getId());
         }
 
+        // Products to update stock later (A sale can have multiple lines with same product!)
+        Map<Long, Integer> productsToUpdate = new HashMap<>();
+
         // All saleLines must have positive subtotal and a valid product
         for (int i = 0; i < lines.size(); i++) {
             SaleLine line = lines.get(i);
@@ -145,9 +150,17 @@ public class SaleService {
             if (product == null || product.getId() == null) {
                 throw new Exceptions.BadRequestException("Error at 'CreateSale' - Product not supplied for the saleLine in position: " + (i+1) + ", business: " + business.getId());
             }
+
             if (!productService.ExistsProduct(product.getId(), business.getId(), user)) {
                 throw new Exceptions.BadRequestException("Error at 'CreateSale' - Product with ID: " + product.getId() + " doesn't exist or it's not associated with the business: " + business.getId());
             }
+
+            // Add product to update map - if already exists add the amount for this line
+            Integer amount = line.getAmount();
+            if (productsToUpdate.containsKey(product.getId())) {
+                amount += productsToUpdate.get(product.getId());
+            }
+            productsToUpdate.put(product.getId(), amount);
 
             // Forced initial state for saleLine (sale will be set after 'sale save')
             line.setSale(null);
@@ -174,6 +187,9 @@ public class SaleService {
                 throw new Exceptions.BadRequestException("Error at 'CreateSale' - Can't set a partial payment if the state supplied is not 'PartialPayment', business: " + business.getId());
             }
         }
+
+        // Check available stock for products and save all
+        productService.UpdateProductStockByMany(productsToUpdate, business.getId(), user);
 
         // Forced initial state for sale
         sale.setId(null);

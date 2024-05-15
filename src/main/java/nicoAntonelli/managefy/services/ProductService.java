@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -138,6 +140,31 @@ public class ProductService {
         productRepository.save(product);
 
         return product;
+    }
+
+    // For sales
+    public void UpdateProductStockByMany(Map<Long, Integer> products, Long businessID, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
+
+        List<Product> productsBatch = new ArrayList<>();
+
+        // Control stock for every product
+        products.forEach((id, amountNeeded) -> {
+            Product product = productRepository.findByIdActiveAndBusiness(id, businessID).orElseThrow(
+                    () -> new Exceptions.BadRequestException("Error at 'UpdateProductStockByMany' - Problem validating product with ID: " + id)
+            );
+
+            Integer currentStock = product.getStock();
+            if (currentStock < amountNeeded) {
+                throw new Exceptions.BadRequestException("Error at 'UpdateProductStockByMany' - Product with ID: " + id + " don't have enough stock!");
+            }
+
+            product.setStock(currentStock - amountNeeded);
+            productsBatch.add(product);
+        });
+
+        productRepository.saveAll(productsBatch);
     }
 
     // Logic deletion (field: deletion date)
