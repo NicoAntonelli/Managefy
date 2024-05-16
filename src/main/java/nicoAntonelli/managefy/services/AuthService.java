@@ -6,6 +6,8 @@ import nicoAntonelli.managefy.utils.JWTHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AuthService {
     // Fails with null
@@ -34,6 +36,12 @@ public class AuthService {
         User user = validateToken(token);
         if (user == null) {
             throw new Exceptions.UnauthorizedException(methodName + " - Invalid access token");
+        }
+
+        // User needs to have mail verification except for a few methods
+        List<String> whiteList = List.of("GenerateUserValidation", "ValidateUser");
+        if (!user.getValidated() && !whiteList.contains(methodName)) {
+            throw new Exceptions.UnauthorizedException(methodName + " - The user is not correctly validated yet!");
         }
 
         return user;
