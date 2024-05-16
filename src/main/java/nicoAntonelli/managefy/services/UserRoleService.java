@@ -4,8 +4,6 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
-import nicoAntonelli.managefy.repositories.BusinessRepository;
-import nicoAntonelli.managefy.repositories.UserRepository;
 import nicoAntonelli.managefy.repositories.UserRoleRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +37,6 @@ public class UserRoleService {
         businessService.GetOneBusiness(businessID, user);
 
         return userRoleRepository.findByBusiness(businessID);
-    }
-
-    public Boolean ExistsUserRole(Long userID, Long businessID) {
-        userService.GetOneUser(userID);
-
-        UserRoleKey userRoleKey = new UserRoleKey(userID, businessID);
-
-        return userRoleRepository.existsById(userRoleKey);
     }
 
     public UserRole GetOneUserRoleForOther(Long otherUserID, Long businessID, User user) {
