@@ -98,7 +98,10 @@ public class UserRoleService {
         return userRoleRepository.save(roleToCreate);
     }
 
-    public void CreateUserRoleForNewBusiness(UserRole userRole) {
+    public void CreateUserRoleForNewBusiness(Long userID, Long businessID) {
+        // Create user role (Manager)
+        UserRole userRole = new UserRole(userID, businessID, "manager");
+
         userRoleRepository.save(userRole);
     }
 

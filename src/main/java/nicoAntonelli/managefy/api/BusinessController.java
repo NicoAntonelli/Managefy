@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.BusinessService;
 import nicoAntonelli.managefy.services.ErrorLogService;
+import nicoAntonelli.managefy.services.UserRoleService;
 import nicoAntonelli.managefy.utils.Exceptions;
 import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,17 @@ import java.util.List;
 @RequestMapping(path = "api/businesses")
 public class BusinessController {
     private final BusinessService businessService;
+    private final UserRoleService userRoleService; // Dependency
     private final AuthService authService; // Dependency
     private final ErrorLogService errorLogService; // Dependency
 
     @Autowired
     public BusinessController(BusinessService businessService,
+                              UserRoleService userRoleService,
                               AuthService authService,
                               ErrorLogService errorLogService) {
         this.businessService = businessService;
+        this.userRoleService = userRoleService;
         this.authService = authService;
         this.errorLogService = errorLogService;
     }
@@ -113,6 +117,10 @@ public class BusinessController {
             User user = authService.validateTokenFromHeaders(headers, "CreateBusiness");
 
             business = businessService.CreateBusiness(business, user);
+
+            // Set new manager role
+            userRoleService.CreateUserRoleForNewBusiness(business.getId(), user.getId());
+
             return new Result<>(business);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

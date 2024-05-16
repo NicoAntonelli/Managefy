@@ -3,7 +3,6 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
-import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.repositories.BusinessRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +17,10 @@ import java.util.SortedMap;
 @Transactional
 public class BusinessService {
     private final BusinessRepository businessRepository;
-    private final UserRoleService userRoleService; // Dependency
 
     @Autowired
-    public BusinessService(BusinessRepository businessRepository, UserRoleService userRoleService) {
+    public BusinessService(BusinessRepository businessRepository) {
         this.businessRepository = businessRepository;
-        this.userRoleService = userRoleService;
     }
 
     public List<Business> GetBusinesses(User user) {
@@ -83,13 +80,8 @@ public class BusinessService {
         // Forced initial state
         business.setId(null);
 
-        business = businessRepository.save(business);
-
-        // Create user role (Manager)
-        UserRole userRole = new UserRole(user, business, true, false, false);
-        userRoleService.CreateUserRoleForNewBusiness(userRole);
-
-        return business;
+        // Note: user role "Manager" creation it's called from controller to prevent circular dependency
+        return businessRepository.save(business);
     }
 
     public Business UpdateBusiness(Business business, User user) {
