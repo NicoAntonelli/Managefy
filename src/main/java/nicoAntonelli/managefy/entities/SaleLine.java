@@ -30,6 +30,8 @@ public class SaleLine {
     private Integer amount;
     @Column(nullable = false)
     private Float price;
+    @Column(nullable = false)
+    private Float cost;
     private Float discountSurcharge; // Nullable
     @Transient
     private Float subtotal; // Calculated
@@ -48,11 +50,12 @@ public class SaleLine {
         this.position = position;
     }
 
-    public SaleLine(Sale sale, Integer position, Integer amount, Float price, Float discountSurcharge) {
+    public SaleLine(Sale sale, Integer position, Integer amount, Float price, Float cost, Float discountSurcharge) {
         this.sale = sale;
         this.position = position;
         this.amount = amount;
         this.price = price;
+        this.cost = cost;
 
         if (discountSurcharge == null) discountSurcharge = 1f;
         this.discountSurcharge = discountSurcharge;
@@ -60,9 +63,10 @@ public class SaleLine {
         calculateAndSetSubtotal();
     }
 
-    public SaleLine(Integer amount, Float price, Float discountSurcharge) {
+    public SaleLine(Integer amount, Float price, Float cost, Float discountSurcharge) {
         this.amount = amount;
         this.price = price;
+        this.cost = cost;
 
         if (discountSurcharge == null) discountSurcharge = 1f;
         this.discountSurcharge = discountSurcharge;

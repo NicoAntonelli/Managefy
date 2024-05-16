@@ -153,11 +153,11 @@ public class DBMigrations {
         sale1.setClientByID(1L);
 
         Product productSoda = products.getFirst();
-        SaleLine saleLineS1L1 = new SaleLine(sale1, 1, 1, productSoda.getUnitPrice(), null);
+        SaleLine saleLineS1L1 = new SaleLine(sale1, 1, 1, productSoda.getUnitPrice(), productSoda.getUnitCost(), null);
         saleLineS1L1.setProductByID(productSoda.getId());
 
         Product productDoritos = products.get(3);
-        SaleLine saleLineS1L2 = new SaleLine(sale1, 2, 1, productDoritos.getUnitPrice(), null);
+        SaleLine saleLineS1L2 = new SaleLine(sale1, 2, 1, productDoritos.getUnitPrice(), productDoritos.getUnitCost(), null);
         saleLineS1L2.setProductByID(productDoritos.getId());
 
         sale1.addSaleLine(saleLineS1L1);
@@ -174,12 +174,12 @@ public class DBMigrations {
         float discountCoefficient = 1 - (discount/100);
 
         Product productChicken = products.get(8);
-        SaleLine saleLineS2L1 = new SaleLine(sale2, 1, 1, productChicken.getUnitPrice(), discountCoefficient);
+        SaleLine saleLineS2L1 = new SaleLine(sale2, 1, 1, productChicken.getUnitPrice(), productChicken.getUnitCost(), discountCoefficient);
         saleLineS2L1.setSaleByID(sale2ID);
         saleLineS2L1.setProductByID(productChicken.getId());
 
         Product productEgg = products.get(6);
-        SaleLine saleLineS2L2 = new SaleLine(sale2, 2, 6, productEgg.getUnitPrice(), discountCoefficient);
+        SaleLine saleLineS2L2 = new SaleLine(sale2, 2, 6, productEgg.getUnitPrice(), productEgg.getUnitCost(), discountCoefficient);
         saleLineS2L2.setSaleByID(sale2ID);
         saleLineS2L2.setProductByID(productEgg.getId());
 
