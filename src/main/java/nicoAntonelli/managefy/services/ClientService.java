@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.repositories.ClientRepository;
+import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,15 @@ import java.util.Set;
 public class ClientService {
     private final ClientRepository clientRepository;
     private final BusinessService businessService; // Dependency
-    private final SaleService saleService; // Dependency
+    private final SaleRepository saleRepository; // Dependency
 
     @Autowired
     public ClientService(ClientRepository clientRepository,
                          BusinessService businessService,
-                         SaleService saleService) {
+                         SaleRepository saleRepository) {
         this.clientRepository = clientRepository;
         this.businessService = businessService;
-        this.saleService = saleService;
+        this.saleRepository = saleRepository;
     }
 
     public List<Client> GetClients(Long businessID, User user) {
@@ -128,20 +129,23 @@ public class ClientService {
             throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - No sale was supplied");
         }
 
-        // Sales need to exist, be associated with the user and each sale associated with the same business
+        // Sales need to exist and each sale associated with the same business
         Long businessID = 0L;
         for (Sale sale : sales) {
-            if (!saleService.ExistsSale(sale, user)) {
-                throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - Sale doesn't exist or it's not associated with the user: " + user.getId());
-            }
-
             // First loop
             if (businessID == 0L) businessID = sale.getBusiness().getId();
+
+            if (!saleRepository.existsByIdActiveAndBusiness(sale.getId(), businessID)) {
+                throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - Sale doesn't exist or it's not associated with the business: " + businessID);
+            }
 
             // Check every sale's businessID
             if (!Objects.equals(businessID, sale.getBusiness().getId())) {
                 throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - Each sale needs to be associated with the same business");
             }
         }
+
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
     }
 }

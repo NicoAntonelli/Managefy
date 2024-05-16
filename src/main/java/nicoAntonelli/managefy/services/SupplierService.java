@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.repositories.ProductRepository;
 import nicoAntonelli.managefy.repositories.SupplierRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,15 @@ import java.util.Set;
 public class SupplierService {
     private final SupplierRepository supplierRepository;
     private final BusinessService businessService; // Dependency
-    private final ProductService productService; // Dependency
+    private final ProductRepository productRepository; // Dependency
 
     @Autowired
     public SupplierService(SupplierRepository supplierRepository,
                            BusinessService businessService,
-                           ProductService productService) {
+                           ProductRepository ProductRepository) {
         this.supplierRepository = supplierRepository;
         this.businessService = businessService;
-        this.productService = productService;
+        this.productRepository = ProductRepository;
     }
 
     public List<Supplier> GetSuppliers(Long businessID, User user) {
@@ -130,20 +131,23 @@ public class SupplierService {
             throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - No product was supplied");
         }
 
-        // Products need to exist, be associated with the user and each product associated with the same business
+        // Products need to exist and each product associated with the same business
         Long businessID = 0L;
         for (Product product : products) {
-            if (!productService.ExistsProduct(product, user)) {
-                throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Product doesn't exist or it's not associated with the user: " + user.getId());
-            }
-
             // First loop
             if (businessID == 0L) businessID = product.getBusiness().getId();
+
+            if (!productRepository.existsByIdActiveAndBusiness(product.getId(), user.getId())) {
+                throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Product doesn't exist or it's not associated with the user: " + user.getId());
+            }
 
             // Check every product's businessID
             if (!Objects.equals(businessID, product.getBusiness().getId())) {
                 throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Each product needs to be associated with the same business");
             }
         }
+
+        // Validate business, user and role
+        businessService.GetOneBusiness(businessID, user);
     }
 }
