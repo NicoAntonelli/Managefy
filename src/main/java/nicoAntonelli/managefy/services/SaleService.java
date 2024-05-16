@@ -207,7 +207,7 @@ public class SaleService {
         return sale;
     }
 
-    public Sale UpdateSaleState(Long saleID, String state, Long businessID, User user) {
+    public Sale UpdateSaleState(Long saleID, Long businessID, String state, User user) {
         Sale sale = GetOneSale(saleID, businessID, user);
         Boolean result = sale.setStateByText(state);
         if (!result) {
@@ -222,7 +222,7 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-    public Sale UpdateSalePartialPayment(Long saleID, Float partialPayment, Long businessID, User user) {
+    public Sale UpdateSalePartialPayment(Long saleID, Long businessID, Float partialPayment, User user) {
         Sale sale = GetOneSale(saleID, businessID, user);
         if (sale.getState() != Sale.SaleState.PendingPayment &&
             sale.getState() != Sale.SaleState.PartialPayment) {
@@ -248,7 +248,7 @@ public class SaleService {
         return sale;
     }
 
-    public Sale UpdateOrAddClientForSale(Long saleID, Long clientID, Long businessID, User user) {
+    public Sale UpdateOrAddClientForSale(Long saleID, Long businessID, Long clientID, User user) {
         if (!clientService.ExistsClient(clientID, businessID, user)) {
             throw new Exceptions.BadRequestException("Error at 'UpdateOrAddClientForSale' - Client with ID: " + clientID + " doesn't exist or it's not associated with the business: " + businessID);
         }

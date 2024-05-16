@@ -134,15 +134,15 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID}/state/{state:[a-zA-Z]+}/{businessID:[\\d]+}")
+    @PutMapping(path = "{saleID}/business/{businessID:[\\d]+}/state/{state:[a-zA-Z]+}")
     public Result<Sale> UpdateSaleState(@PathVariable("saleID") Long saleID,
-                                        @PathVariable("state") String state,
                                         @PathVariable("businessID") Long businessID,
+                                        @PathVariable("state") String state,
                                         @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateSaleState");
 
-            Sale sale = saleService.UpdateSaleState(saleID, state, businessID, user);
+            Sale sale = saleService.UpdateSaleState(saleID, businessID, state, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -156,15 +156,15 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID:[\\d]+}/partialPayment/{partialPayment:(?:[0-9]*[.])?[0-9]+}/{businessID:[\\d]+}")
+    @PutMapping(path = "{saleID:[\\d]+}/business/{businessID:[\\d]+}/partialPayment/{partialPayment:(?:[0-9]*[.])?[0-9]+}")
     public Result<Sale> UpdateSalePartialPayment(@PathVariable("saleID") Long saleID,
-                                                 @PathVariable("partialPayment") Float partialPayment,
                                                  @PathVariable("businessID") Long businessID,
+                                                 @PathVariable("partialPayment") Float partialPayment,
                                                  @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateSalePartialPayment");
 
-            Sale sale = saleService.UpdateSalePartialPayment(saleID, partialPayment, businessID, user);
+            Sale sale = saleService.UpdateSalePartialPayment(saleID, businessID, partialPayment, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -178,15 +178,15 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID}/client/{clientID:[\\d]+}/{businessID:[\\d]+}")
+    @PutMapping(path = "{saleID}/business/{businessID:[\\d]+}/client/{clientID:[\\d]+}")
     public Result<Sale> UpdateOrAddClientForSale(@PathVariable("saleID") Long saleID,
-                                                 @PathVariable("clientID") Long clientID,
                                                  @PathVariable("businessID") Long businessID,
+                                                 @PathVariable("clientID") Long clientID,
                                                  @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateOrAddClientForSale");
 
-            Sale sale = saleService.UpdateOrAddClientForSale(saleID, clientID, businessID, user);
+            Sale sale = saleService.UpdateOrAddClientForSale(saleID, businessID, clientID, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -200,7 +200,7 @@ public class SaleController {
         }
     }
 
-    @PutMapping(path = "{saleID}/{businessID:[\\d]+}/eraseClient")
+    @PutMapping(path = "{saleID}/business/{businessID:[\\d]+}/eraseClient")
     public Result<Sale> EraseClientForSale(@PathVariable("saleID") Long saleID,
                                            @PathVariable("businessID") Long businessID,
                                            @RequestHeader HttpHeaders headers) {
@@ -221,7 +221,7 @@ public class SaleController {
         }
     }
 
-    @DeleteMapping(path = "{saleID:[\\d]+}/{businessID:[\\d]+}")
+    @DeleteMapping(path = "{saleID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Long> CancelSale(@PathVariable("saleID") Long saleID,
                                    @PathVariable("businessID") Long businessID,
                                    @RequestHeader HttpHeaders headers) {
