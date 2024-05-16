@@ -178,6 +178,49 @@ public class SaleController {
         }
     }
 
+    @PutMapping(path = "{saleID}/client/{clientID:[\\d]+}/{businessID:[\\d]+}")
+    public Result<Sale> UpdateOrAddClientForSale(@PathVariable("saleID") Long saleID,
+                                                 @PathVariable("clientID") Long clientID,
+                                                 @PathVariable("businessID") Long businessID,
+                                                 @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "UpdateOrAddClientForSale");
+
+            Sale sale = saleService.UpdateOrAddClientForSale(saleID, clientID, businessID, user);
+            return new Result<>(sale);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "{saleID}/{businessID:[\\d]+}/eraseClient")
+    public Result<Sale> EraseClientForSale(@PathVariable("saleID") Long saleID,
+                                           @PathVariable("businessID") Long businessID,
+                                           @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "EraseClientForSale");
+
+            Sale sale = saleService.EraseClientForSale(saleID, businessID, user);
+            return new Result<>(sale);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @DeleteMapping(path = "{saleID:[\\d]+}/{businessID:[\\d]+}")
     public Result<Long> CancelSale(@PathVariable("saleID") Long saleID,
                                    @PathVariable("businessID") Long businessID,

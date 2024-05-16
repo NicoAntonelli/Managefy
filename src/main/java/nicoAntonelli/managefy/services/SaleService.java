@@ -248,6 +248,24 @@ public class SaleService {
         return sale;
     }
 
+    public Sale UpdateOrAddClientForSale(Long saleID, Long clientID, Long businessID, User user) {
+        if (!clientService.ExistsClient(clientID, businessID, user)) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateOrAddClientForSale' - Client with ID: " + clientID + " doesn't exist or it's not associated with the business: " + businessID);
+        }
+
+        Sale sale = GetOneSale(saleID, businessID, user);
+        sale.setClientByID(clientID);
+
+        return saleRepository.save(sale);
+    }
+
+    public Sale EraseClientForSale(Long saleID, Long businessID, User user) {
+        Sale sale = GetOneSale(saleID, businessID, user);
+        sale.setClient(null);
+
+        return saleRepository.save(sale);
+    }
+
     // Logic deletion (field: sale state)
     public Long CancelSale(Long saleID, Long businessID, User user) {
         Sale sale = GetOneSale(saleID, businessID, user);
