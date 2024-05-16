@@ -186,6 +186,12 @@ public class ProductService {
 
     // Logic deletion (field: deletion date)
     public Long DeleteProduct(Long productID, Long businessID, User user) {
+        // Validate admin role
+        boolean exists = businessService.ExistsBusiness(businessID, user, "admin");
+        if (!exists) {
+            throw new Exceptions.BadRequestException("Error at 'DeleteProduct' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " isn't an Admin or the Manager");
+        }
+
         Product product = GetOneProduct(productID, businessID, user);
         product.setDeletionDate(LocalDateTime.now());
         productRepository.save(product);

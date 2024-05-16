@@ -268,6 +268,12 @@ public class SaleService {
 
     // Logic deletion (field: sale state)
     public Long CancelSale(Long saleID, Long businessID, User user) {
+        // Validate admin role
+        boolean exists = businessService.ExistsBusiness(businessID, user, "admin");
+        if (!exists) {
+            throw new Exceptions.BadRequestException("Error at 'CancelSale' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " isn't an Admin or the Manager");
+        }
+
         Sale sale = GetOneSale(saleID, businessID, user);
         sale.setState(Sale.SaleState.Cancelled);
         saleRepository.save(sale);

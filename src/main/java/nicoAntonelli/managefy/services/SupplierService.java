@@ -104,6 +104,12 @@ public class SupplierService {
 
     // Logic deletion (field: deletion date)
     public Long DeleteSupplier(Long supplierID, Long businessID, User user) {
+        // Validate admin role
+        boolean exists = businessService.ExistsBusiness(businessID, user, "admin");
+        if (!exists) {
+            throw new Exceptions.BadRequestException("Error at 'DeleteSupplier' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " isn't an Admin or the Manager");
+        }
+
         Supplier supplier = GetOneSupplier(supplierID, businessID, user);
         supplier.setDeletionDate(LocalDateTime.now());
         supplierRepository.save(supplier);

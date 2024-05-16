@@ -102,6 +102,12 @@ public class ClientService {
 
     // Logic deletion (field: deletion date)
     public Long DeleteClient(Long clientID, Long businessID, User user) {
+        // Validate admin role
+        boolean exists = businessService.ExistsBusiness(businessID, user, "admin");
+        if (!exists) {
+            throw new Exceptions.BadRequestException("Error at 'DeleteClient' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " isn't an Admin or the Manager");
+        }
+
         Client client = GetOneClient(clientID, businessID, user);
         client.setDeletionDate(LocalDateTime.now());
         clientRepository.save(client);
