@@ -111,12 +111,12 @@ public class NotificationController {
     }
 
     @DeleteMapping(path = "{notificationID:[\\d]+}")
-    public Result<Long> DeleteNotification(@PathVariable("notificationID") Long notificationID,
-                                           @RequestHeader HttpHeaders headers) {
+    public Result<Long> CloseNotification(@PathVariable("notificationID") Long notificationID,
+                                          @RequestHeader HttpHeaders headers) {
         try {
-            User user = authService.validateTokenFromHeaders(headers, "DeleteNotification");
+            User user = authService.validateTokenFromHeaders(headers, "CloseNotification");
 
-            notificationID = notificationService.DeleteNotification(notificationID, user);
+            notificationID = notificationService.CloseNotification(notificationID, user);
             return new Result<>(notificationID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

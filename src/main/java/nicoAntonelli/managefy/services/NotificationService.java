@@ -59,13 +59,12 @@ public class NotificationService {
         return notification;
     }
 
-    public Long DeleteNotification(Long notificationID, User user) {
-        boolean exists = ExistsNotification(notificationID, user);
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'DeleteNotification' - Notification with ID: " + notificationID + " doesn't exist or is not associated with the user: " + user.getId());
-        }
+    // Logic deletion (field: notification date)
+    public Long CloseNotification(Long notificationID, User user) {
+        Notification notification = GetOneNotification(notificationID, user);
+        notification.setState(Notification.NotificationState.Closed);
+        notificationRepository.save(notification);
 
-        notificationRepository.deleteById(notificationID);
         return notificationID;
     }
 }
