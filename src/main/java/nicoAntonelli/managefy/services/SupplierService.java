@@ -118,9 +118,9 @@ public class SupplierService {
         return supplierID;
     }
 
-    private void ValidateProductsForSupplier(Supplier supplier, User user, Boolean noSalesControlled) {
+    private void ValidateProductsForSupplier(Supplier supplier, User user, Boolean noProductsControlled) {
         // Supplier created in the context of a current new product creation
-        if (noSalesControlled) {
+        if (noProductsControlled) {
             supplier.setProducts(null);
             return;
         }

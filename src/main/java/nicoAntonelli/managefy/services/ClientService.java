@@ -116,9 +116,9 @@ public class ClientService {
         return clientID;
     }
 
-    private void ValidateSalesForClient(Client client, User user, Boolean noProductsControlled) {
+    private void ValidateSalesForClient(Client client, User user, Boolean noSalesControlled) {
         // Client created in the context of a current new sale creation
-        if (noProductsControlled) {
+        if (noSalesControlled) {
             client.setSales(null);
             return;
         }
