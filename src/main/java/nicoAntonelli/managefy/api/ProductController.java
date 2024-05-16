@@ -154,6 +154,49 @@ public class ProductController {
         }
     }
 
+    @PutMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}/supplier/{supplierID:[\\d]+}")
+    public Result<Product> UpdateOrAddSupplierForProduct(@PathVariable("productID") Long productID,
+                                              @PathVariable("businessID") Long businessID,
+                                              @PathVariable("supplierID") Long supplierID,
+                                              @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "UpdateOrAddSupplierForProduct");
+
+            Product product = productService.UpdateOrAddSupplierForProduct(productID, businessID, supplierID, user);
+            return new Result<>(product);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @PutMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}/eraseSupplier")
+    public Result<Product> EraseSupplierForProduct(@PathVariable("productID") Long productID,
+                                                   @PathVariable("businessID") Long businessID,
+                                                   @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "EraseSupplierForProduct");
+
+            Product product = productService.EraseSupplierForProduct(productID, businessID, user);
+            return new Result<>(product);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @DeleteMapping(path = "{productID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Long> DeleteProduct(@PathVariable("productID") Long productID,
                                       @PathVariable("businessID") Long businessID,

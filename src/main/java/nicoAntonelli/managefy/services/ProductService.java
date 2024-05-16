@@ -137,9 +137,26 @@ public class ProductService {
     public Product UpdateProductStock(Long productID, Long businessID, Integer stock, User user) {
         Product product = GetOneProduct(productID, businessID, user);
         product.setStock(stock);
-        productRepository.save(product);
 
-        return product;
+        return productRepository.save(product);
+    }
+
+    public Product UpdateOrAddSupplierForProduct(Long productID, Long businessID, Long supplierID, User user) {
+        if (!supplierService.ExistsSupplier(supplierID, businessID, user)) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateOrAddSupplierForProduct' - Supplier with ID: " + supplierID + " doesn't exist or it's not associated with the business: " + businessID);
+        }
+
+        Product product = GetOneProduct(productID, businessID, user);
+        product.setSupplierByID(supplierID);
+
+        return productRepository.save(product);
+    }
+
+    public Product EraseSupplierForProduct(Long productID, Long businessID, User user) {
+        Product product = GetOneProduct(productID, businessID, user);
+        product.setSupplier(null);
+
+        return productRepository.save(product);
     }
 
     // For sales
