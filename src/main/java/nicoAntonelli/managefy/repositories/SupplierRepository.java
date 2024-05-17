@@ -24,7 +24,7 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
             "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?1")
     Optional<Supplier> findByIdActiveAndBusiness(Long supplierID, Long businessID);
 
-    @Query("SELECT COUNT(s) " +
+    @Query("SELECT COUNT(s) > 0 " +
             "FROM Supplier s " +
             "INNER JOIN s.products p " +
             "INNER JOIN p.business b " +

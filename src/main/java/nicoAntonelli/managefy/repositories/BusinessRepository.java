@@ -39,7 +39,7 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
             "AND b.isPublic = TRUE")
     Optional<Business> findByLinkPublic(String link);
 
-    @Query("SELECT COUNT(b) " +
+    @Query("SELECT COUNT(b) > 0 " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
@@ -47,19 +47,19 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
             "AND (b.isPublic = TRUE OR u.id = ?2)")
     Boolean existsByIdAndUser(Long businessID, Long userID);
 
-    @Query("SELECT COUNT(b) " +
+    @Query("SELECT COUNT(b) > 0 " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
-            "WHERE b.id = ?1" +
-            "AND (b.isPublic = TRUE OR (u.id = ?2 AND (ur.isAdmin = TRUE OR ur.isManager = TRUE)))")
+            "WHERE b.id = ?1 " +
+            "AND u.id = ?2 AND (ur.isAdmin = TRUE OR ur.isManager = TRUE)")
     Boolean existsByIdAndUserAdmin(Long businessID, Long userID);
 
-    @Query("SELECT COUNT(b) " +
+    @Query("SELECT COUNT(b) > 0 " +
             "FROM Business b " +
             "INNER JOIN b.userRoles ur " +
             "INNER JOIN ur.user u " +
-            "WHERE b.id = ?1" +
-            "AND (b.isPublic = TRUE OR (u.id = ?2 AND ur.isManager = TRUE))")
+            "WHERE b.id = ?1 " +
+            "AND u.id = ?2 AND ur.isManager = TRUE")
     Boolean existsByIdAndUserManager(Long businessID, Long userID);
 }

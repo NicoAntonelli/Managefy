@@ -24,7 +24,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             "WHERE n.id = ?1 AND u.id = ?2")
     Optional<Notification> findByIdAndUser(Long notificationID, Long userID);
 
-    @Query("SELECT COUNT(n) " +
+    @Query("SELECT COUNT(n) > 0 " +
             "FROM Notification n " +
             "INNER JOIN n.user u " +
             "WHERE n.id = ?1 AND u.id = ?2")
