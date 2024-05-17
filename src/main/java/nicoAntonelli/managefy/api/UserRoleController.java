@@ -90,7 +90,7 @@ public class UserRoleController {
         }
     }
 
-    @GetMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}")
+    @GetMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<UserRole> GetOneUserRoleForOther(@PathVariable("otherUserID") Long otherUserID,
                                                    @PathVariable("businessID") Long businessID,
                                                    @RequestHeader HttpHeaders headers) {
@@ -111,7 +111,7 @@ public class UserRoleController {
         }
     }
 
-    @PutMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}/createRole/{role:[a-zA-Z]+}")
+    @PutMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}/createRole/{role:[a-zA-Z]+}")
     public Result<UserRole> CreateUserRole(@PathVariable("otherUserID") Long otherUserID,
                                            @PathVariable("businessID") Long businessID,
                                            @PathVariable("role") String role,
@@ -133,7 +133,7 @@ public class UserRoleController {
         }
     }
 
-    @PutMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}/updateRole/{role:[a-zA-Z]+}")
+    @PutMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}/updateRole/{role:[a-zA-Z]+}")
     public Result<UserRole> UpdateUserRole(@PathVariable("otherUserID") Long otherUserID,
                                            @PathVariable("businessID") Long businessID,
                                            @PathVariable("role") String role,
@@ -155,7 +155,7 @@ public class UserRoleController {
         }
     }
 
-    @DeleteMapping(path = "{otherUserID:[\\d]+}/{businessID:[\\d]+}")
+    @DeleteMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<UserRoleKey> DeleteUserRole(@PathVariable("otherUserID") Long otherUserID,
                                               @PathVariable("businessID") Long businessID,
                                               @RequestHeader HttpHeaders headers) {
