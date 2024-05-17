@@ -94,7 +94,7 @@ public class SaleController {
         }
     }
 
-    @GetMapping(path = "{saleID:[\\d]+}/")
+    @GetMapping(path = "{saleID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<Sale> GetOneSale(@PathVariable("saleID") Long saleID,
                                    @PathVariable("businessID") Long businessID,
                                    @RequestHeader HttpHeaders headers) {
