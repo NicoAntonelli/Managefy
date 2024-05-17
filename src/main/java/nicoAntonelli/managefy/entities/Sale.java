@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +26,8 @@ public class Sale {
     @Column(nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private LocalDateTime date;
     @Column(nullable = false)
-    private Float totalPrice;
-    private Float partialPayment; // Nullable
+    private BigDecimal totalPrice;
+    private BigDecimal partialPayment; // Nullable
     @Column(nullable = false)
     private SaleState state;
 
@@ -55,7 +56,7 @@ public class Sale {
         this.id = id;
     }
 
-    public Sale(Long id, Float partialPayment, SaleState state) {
+    public Sale(Long id, BigDecimal partialPayment, SaleState state) {
         this.id = id;
         this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
@@ -64,7 +65,7 @@ public class Sale {
         this.state = state;
     }
 
-    public Sale(Float partialPayment, SaleState state) {
+    public Sale(BigDecimal partialPayment, SaleState state) {
         this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
 
@@ -102,22 +103,22 @@ public class Sale {
 
     public void calculateAndSetTotalPrice() {
         List<SaleLine> lines = getSaleLines();
-        if (lines.isEmpty()) this.setTotalPrice(0f);
+        if (lines.isEmpty()) this.setTotalPrice(BigDecimal.ZERO);
 
-        float total = 0;
+        BigDecimal total = BigDecimal.ZERO;
         for (SaleLine line : lines) {
-            total += line.getSubtotal();
+            total = total.add(line.getSubtotal());
         }
 
         this.setTotalPrice(total);
     }
 
     public void calculateAndSetTotalPrice(List<SaleLine> lines) {
-        if (lines.isEmpty()) this.setTotalPrice(0f);
+        if (lines.isEmpty()) this.setTotalPrice(BigDecimal.ZERO);
 
-        float total = 0;
+        BigDecimal total = BigDecimal.ZERO;
         for (SaleLine line : lines) {
-            total += line.getSubtotal();
+            total = total.add(line.getSubtotal());
         }
 
         this.setTotalPrice(total);

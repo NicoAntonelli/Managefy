@@ -9,6 +9,7 @@ import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -141,7 +142,7 @@ public class SaleService {
         // All saleLines must have positive subtotal and a valid product
         for (int i = 0; i < lines.size(); i++) {
             SaleLine line = lines.get(i);
-            if (line.getSubtotal() <= 0) {
+            if (line.getSubtotal().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new Exceptions.BadRequestException("Error at 'CreateSale' - The SaleLine in position: " + (i+1) + " had an invalid subtotal of $" + line.getPrice() + ", business: " + business.getId());
             }
 
@@ -177,9 +178,9 @@ public class SaleService {
         }
 
         // Partial payment (if it was given)
-        Float partialPayment = sale.getPartialPayment();
+        BigDecimal partialPayment = sale.getPartialPayment();
         if (partialPayment != null) {
-            if (partialPayment <= 0) {
+            if (partialPayment.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new Exceptions.BadRequestException("Error at 'CreateSale' - Can't set a partial payment of $" + partialPayment + ", business: " + business.getId());
             }
 
@@ -216,30 +217,30 @@ public class SaleService {
 
         // Erase partial payment if it has a different state than 'partial payment'
         if (sale.getState() != Sale.SaleState.PartialPayment) {
-            sale.setPartialPayment(0F);
+            sale.setPartialPayment(BigDecimal.ZERO);
         }
 
         return saleRepository.save(sale);
     }
 
-    public Sale UpdateSalePartialPayment(Long saleID, Long businessID, Float partialPayment, User user) {
+    public Sale UpdateSalePartialPayment(Long saleID, Long businessID, BigDecimal partialPayment, User user) {
         Sale sale = GetOneSale(saleID, businessID, user);
         if (sale.getState() != Sale.SaleState.PendingPayment &&
             sale.getState() != Sale.SaleState.PartialPayment) {
             throw new Exceptions.BadRequestException("Error at 'UpdateSalePartialPayment' - Sale: " + saleID + " has the state: " + sale.getState());
         }
 
-        if (partialPayment <= 0) {
+        if (partialPayment.compareTo(BigDecimal.ZERO) <= 0) {
             throw new Exceptions.BadRequestException("Error at 'UpdateSalePartialPayment' - Can't make a partial payment of $" + partialPayment + ", sale: " + saleID);
         }
 
-        float updatedPartialPayment = sale.getPartialPayment() + partialPayment;
-        if (updatedPartialPayment < sale.getTotalPrice()) {
+        BigDecimal updatedPartialPayment = sale.getPartialPayment().add(partialPayment);
+        if (updatedPartialPayment.compareTo(sale.getTotalPrice()) < 0) {
             sale.setPartialPayment(updatedPartialPayment);
             sale.setState(Sale.SaleState.PendingPayment);
         } else {
             // Ignore value and set 'paid' state
-            sale.setPartialPayment(0F);
+            sale.setPartialPayment(BigDecimal.ZERO);
             sale.setState(Sale.SaleState.Paid);
         }
 

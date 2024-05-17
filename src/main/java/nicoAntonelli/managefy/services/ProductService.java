@@ -10,6 +10,7 @@ import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -208,11 +209,11 @@ public class ProductService {
             throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - One or more of the required fields were not supplied");
         }
 
-        if (product.getUnitCost() < 0) {
+        if (product.getUnitCost().compareTo(BigDecimal.ZERO) < 0) {
             throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Unit cost can't be negative");
         }
 
-        if (product.getUnitPrice() < 0 || product.getUnitPrice() < product.getUnitCost()) {
+        if (product.getUnitPrice().compareTo(BigDecimal.ZERO) < 0 || product.getUnitPrice().compareTo(product.getUnitCost()) < 0) {
             throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Unit price can't be negative or lesser than unit cost");
         }
 

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @IdClass(SaleLineKey.class)
 @Table(name = "saleLines")
@@ -29,12 +31,12 @@ public class SaleLine {
     @Column(nullable = false)
     private Integer amount;
     @Column(nullable = false)
-    private Float price;
+    private BigDecimal price;
     @Column(nullable = false)
-    private Float cost;
-    private Float discountSurcharge; // Nullable
+    private BigDecimal cost;
+    private BigDecimal discountSurcharge; // Nullable
     @Transient
-    private Float subtotal; // Calculated
+    private BigDecimal subtotal; // Calculated
 
     @ManyToOne
     @JoinColumn(
@@ -50,25 +52,25 @@ public class SaleLine {
         this.position = position;
     }
 
-    public SaleLine(Sale sale, Integer position, Integer amount, Float price, Float cost, Float discountSurcharge) {
+    public SaleLine(Sale sale, Integer position, Integer amount, BigDecimal price, BigDecimal cost, BigDecimal discountSurcharge) {
         this.sale = sale;
         this.position = position;
         this.amount = amount;
         this.price = price;
         this.cost = cost;
 
-        if (discountSurcharge == null) discountSurcharge = 1f;
+        if (discountSurcharge == null) discountSurcharge = BigDecimal.ONE;
         this.discountSurcharge = discountSurcharge;
 
         calculateAndSetSubtotal();
     }
 
-    public SaleLine(Integer amount, Float price, Float cost, Float discountSurcharge) {
+    public SaleLine(Integer amount, BigDecimal price, BigDecimal cost, BigDecimal discountSurcharge) {
         this.amount = amount;
         this.price = price;
         this.cost = cost;
 
-        if (discountSurcharge == null) discountSurcharge = 1f;
+        if (discountSurcharge == null) discountSurcharge = BigDecimal.ONE;
         this.discountSurcharge = discountSurcharge;
 
         calculateAndSetSubtotal();
@@ -89,8 +91,9 @@ public class SaleLine {
     }
 
     public void calculateAndSetSubtotal() {
-        if (discountSurcharge == null) discountSurcharge = 1f;
+        if (discountSurcharge == null) discountSurcharge = BigDecimal.ONE;
         if (price == null) price = getProduct().getUnitPrice();
-        subtotal = amount * price * discountSurcharge;
+
+        subtotal = BigDecimal.valueOf(amount).multiply(price).multiply(discountSurcharge);
     }
 }

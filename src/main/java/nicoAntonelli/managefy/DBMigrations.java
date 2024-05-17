@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,15 +111,16 @@ public class DBMigrations {
     }
 
     private static List<Product> generateProducts() {
-        Product product1 = new Product("S01", "Soda (Big)", "Soda 2L", 100f, 130f, 10, 4, null);
-        Product product2 = new Product("S02", "Soda (Medium)", "Soda 1L", 60f, 80f, 10, 4, null);
-        Product product3 = new Product("S03", "Soda (Small)", "Soda 500ml", 35f, 50f, 20, 8, null);
-        Product product4 = new Product("N01", "Doritos", "Pack of doritos", 60f, 80f, 20, null, null);
-        Product product5 = new Product("D01", "Milk 1L", "Regular milk", 30f, 40f, 10, null, null);
-        Product product6 = new Product("D02", "Diet Yogurt", "Yogurt with less sugar", 30f, 40f, 20, null, null);
-        Product product7 = new Product("M01", "Egg", "Just an egg", 200f, 260f, 10, null, 6);
-        Product product8 = new Product("M02", "Meat 1KG", "Roast beef", 200f, 260f, 20, 4, 2);
-        Product product9 = new Product("M03", "Chicken 1KG", "Chicken leg & thigh", 150f, 200f, 20, 4, 2);
+        Product product1 = new Product("S01", "Soda (Big)", "Soda 2L", BigDecimal.valueOf(100), BigDecimal.valueOf(130), 10, 4, null);
+        Product product2 = new Product("S02", "Soda (Medium)", "Soda 1L", BigDecimal.valueOf(60), BigDecimal.valueOf(80), 10, 4, null);
+        Product product3 = new Product("S03", "Soda (Small)", "Soda 500ml", BigDecimal.valueOf(35), BigDecimal.valueOf(50), 20, 8, null);
+        Product product4 = new Product("N01", "Doritos", "Pack of doritos", BigDecimal.valueOf(60), BigDecimal.valueOf(80), 20, null, null);
+        Product product5 = new Product("D01", "Milk 1L", "Regular milk", BigDecimal.valueOf(30), BigDecimal.valueOf(40), 10, null, null);
+        Product product6 = new Product("D02", "Diet Yogurt", "Yogurt with less sugar", BigDecimal.valueOf(30), BigDecimal.valueOf(40), 20, null, null);
+        Product product7 = new Product("M01", "Egg", "Just an egg", BigDecimal.valueOf(200), BigDecimal.valueOf(260), 10, null, 6);
+        Product product8 = new Product("M02", "Meat 1KG", "Roast beef", BigDecimal.valueOf(200), BigDecimal.valueOf(260), 20, 4, 2);
+        Product product9 = new Product("M03", "Chicken 1KG", "Chicken leg & thigh", BigDecimal.valueOf(150), BigDecimal.valueOf(200), 20, 4, 2);
+
 
         // Set supplier
         product1.setSupplierByID(1L);
@@ -148,7 +150,7 @@ public class DBMigrations {
     private static List<Sale> generateSalesWithLines(List<Product> products) {
         // Sale 1 - Soda & Doritos
         long sale1ID = 1L;
-        Sale sale1 = new Sale(sale1ID, 0f, null);
+        Sale sale1 = new Sale(sale1ID, BigDecimal.ZERO, null);
         sale1.setBusinessByID(1L);
         sale1.setClientByID(1L);
 
@@ -166,12 +168,12 @@ public class DBMigrations {
 
         // Sale 2 - Chicken & Eggs with 10% off
         long sale2ID = 2L;
-        Sale sale2 = new Sale(sale2ID, 0f, null);
+        Sale sale2 = new Sale(sale2ID, BigDecimal.ZERO, null);
         sale2.setBusinessByID(1L);
         sale2.setClientByID(1L);
 
-        float discount = 10f;
-        float discountCoefficient = 1 - (discount/100);
+        // 10% discount = 0.9 coefficient
+        BigDecimal discountCoefficient = BigDecimal.valueOf(0.9);
 
         Product productChicken = products.get(8);
         SaleLine saleLineS2L1 = new SaleLine(sale2, 1, 1, productChicken.getUnitPrice(), productChicken.getUnitCost(), discountCoefficient);

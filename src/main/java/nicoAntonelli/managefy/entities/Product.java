@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 
 @Entity
 @Table(name = "products")
@@ -28,9 +28,9 @@ public class Product {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
     @Column(nullable = false)
-    private Float unitCost;
+    private BigDecimal unitCost;
     @Column(nullable = false)
-    private Float unitPrice;
+    private BigDecimal unitPrice;
     @Column(nullable = false)
     private Integer stock;
     private Integer stockMin; // Nullable
@@ -66,7 +66,7 @@ public class Product {
         this.id = id;
     }
 
-    public Product(String code, String name, String description, Float unitCost, Float unitPrice,
+    public Product(String code, String name, String description, BigDecimal unitCost, BigDecimal unitPrice,
                    Integer stock, Integer stockMin, Integer saleMinAmount) {
         this.code = code;
         this.name = name;
@@ -79,7 +79,7 @@ public class Product {
         this.deletionDate = null;
     }
 
-    public Product(String code, String name, String description, Float unitCost, Float unitPrice,
+    public Product(String code, String name, String description, BigDecimal unitCost, BigDecimal unitPrice,
                    Integer stock, Integer stockMin, Integer saleMinAmount, LocalDateTime deletionDate) {
         this.code = code;
         this.name = name;

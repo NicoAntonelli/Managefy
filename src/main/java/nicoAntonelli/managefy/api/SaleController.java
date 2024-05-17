@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -159,7 +160,7 @@ public class SaleController {
     @PutMapping(path = "{saleID:[\\d]+}/business/{businessID:[\\d]+}/partialPayment/{partialPayment:(?:[0-9]*[.])?[0-9]+}")
     public Result<Sale> UpdateSalePartialPayment(@PathVariable("saleID") Long saleID,
                                                  @PathVariable("businessID") Long businessID,
-                                                 @PathVariable("partialPayment") Float partialPayment,
+                                                 @PathVariable("partialPayment") BigDecimal partialPayment,
                                                  @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateSalePartialPayment");
