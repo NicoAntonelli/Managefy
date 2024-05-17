@@ -142,6 +142,10 @@ public class UserService {
 
     // Only logged-user can generate its own code
     public Boolean GenerateUserValidation(User user) {
+        if (user.getValidated()) {
+            throw new Exceptions.BadRequestException("Error at 'GenerateUserValidation' - User with ID: " + user.getId() + " has already been validated");
+        }
+
         // Replace any existing entity
         UserValidation userValidation = new UserValidation(user);
         userValidationRepository.save(userValidation);
