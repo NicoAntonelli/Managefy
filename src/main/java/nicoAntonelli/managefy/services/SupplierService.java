@@ -148,6 +148,13 @@ public class SupplierService {
         supplier.setDeletionDate(LocalDateTime.now());
         supplierRepository.save(supplier);
 
+        // Erase supplier for associated products too
+        List<Product> products = productRepository.findActivesByBusinessAndSupplier(businessID, supplierID);
+        for (Product product : products) {
+            product.setSupplier(null);
+        }
+        productRepository.saveAll(products);
+
         return supplierID;
     }
 
