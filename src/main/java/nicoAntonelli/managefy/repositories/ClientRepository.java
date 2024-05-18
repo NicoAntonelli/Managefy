@@ -21,13 +21,13 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             "FROM Client c " +
             "INNER JOIN c.sales s " +
             "INNER JOIN s.business b " +
-            "WHERE c.id = ?1 AND c.deletionDate IS NULL AND b.id = ?1")
+            "WHERE c.id = ?1 AND c.deletionDate IS NULL AND b.id = ?2")
     Optional<Client> findByIdActiveAndBusiness(Long supplierID, Long businessID);
 
     @Query("SELECT COUNT(c) > 0 " +
             "FROM Client c " +
             "INNER JOIN c.sales s " +
             "INNER JOIN s.business b " +
-            "WHERE c.id = ?1 AND c.deletionDate IS NULL AND b.id = ?1")
+            "WHERE c.id = ?1 AND c.deletionDate IS NULL AND b.id = ?2")
     Boolean existsByIdActiveAndBusiness(Long supplierID, Long businessID);
 }

@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
+import nicoAntonelli.managefy.entities.dto.ClientCU;
 import nicoAntonelli.managefy.repositories.ClientRepository;
 import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
@@ -9,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -37,14 +35,6 @@ public class ClientService {
         return clientRepository.findActivesByBusiness(businessID);
     }
 
-    // Note: this method needs to be called with a client with sales already-validated
-    public Boolean ExistsClient(Client client, User user) {
-        // Get businessID from first element (
-        Long businessID = client.getSales().iterator().next().getBusiness().getId();
-
-        return ExistsClient(client.getId(), businessID, user);
-    }
-
     public Boolean ExistsClient(Long clientID, Long businessID, User user) {
         // Validate business, user and role
         businessService.GetOneBusiness(businessID, user);
@@ -64,41 +54,84 @@ public class ClientService {
         return client.get();
     }
 
-    public Client CreateClient(Client client, User user, Boolean noProductsControlled) {
+    // On a new sale context
+    public Client CreateClientForNewSale(Client client) {
         // Validate name
         if (client.getName() == null || client.getName().isBlank()) {
-            throw new Exceptions.BadRequestException("Error at 'CreateClient' - Name field was not supplied");
+            throw new Exceptions.BadRequestException("Error at 'CreateClientForNewSale' - Name field was not supplied");
         }
-
-        // Validate associated sales
-        ValidateSalesForClient(client, user, noProductsControlled);
 
         // Forced initial state
         client.setId(null);
         client.setDeletionDate(null);
+        client.setSales(null);
 
         return clientRepository.save(client);
     }
 
-    public Client UpdateClient(Client client, User user) {
-        // Validate name and logic deletion
-        if (client.getName() == null || client.getName().isBlank()) {
+    public Client CreateClient(ClientCU clientCU, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(clientCU.getBusinessID(), user);
+
+        // Validate name
+        if (clientCU.getName() == null || clientCU.getName().isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'CreateClient' - Name field was not supplied");
+        }
+
+        // Validate associated sales' IDs and load each in a collection
+        Set<Sale> sales = ValidateSalesForClient(clientCU, user);
+
+        // New client object with DTO info
+        Client client = new Client(clientCU.getName(), clientCU.getDescription(),
+                                   clientCU.getEmail(), clientCU.getPhone());
+
+        // Save client first (without sales as nested)
+        client = clientRepository.save(client);
+
+        // Set new client ID for every sale
+        for (Sale sale : sales) {
+            sale.setClientByID(client.getId());
+        }
+
+        // Save sales with client set
+        saleRepository.saveAll(sales);
+
+        return client;
+    }
+
+    public Client UpdateClient(ClientCU clientCU, User user) {
+        // Validate business, user and role
+        businessService.GetOneBusiness(clientCU.getBusinessID(), user);
+
+        // Validate name
+        if (clientCU.getName() == null || clientCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'UpdateClient' - Name field was not supplied");
         }
-        if (client.getDeletionDate() != null) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateClient' - Client can't have a deletion date");
+
+        // Validate associated sales' IDs and load each in a collection
+        Set<Sale> sales = ValidateSalesForClient(clientCU, user);
+
+        // Validate client existence and obtain it loaded from DB
+        Client client = GetOneClient(clientCU.getId(), clientCU.getBusinessID(), user);
+
+        // Merge DTO's client with the original - Don't mess up relation w/sales
+        client.setName(clientCU.getName());
+        client.setEmail(clientCU.getEmail());
+        client.setPhone(clientCU.getPhone());
+        client.setDescription(clientCU.getDescription());
+
+        // Save client first (without sales as nested)
+        client = clientRepository.save(client);
+
+        // Set existent client ID for every sale
+        for (Sale sale : sales) {
+            sale.setClientByID(client.getId());
         }
 
-        // Validate associated sales
-        ValidateSalesForClient(client, user, false);
+        // Save sales with client set
+        saleRepository.saveAll(sales);
 
-        // Validate client existence
-        boolean exists = ExistsClient(client, user);
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateClient' - Client with ID: " + client.getId() + " doesn't exist or it's not associated with the user: " + user.getId());
-        }
-
-        return clientRepository.save(client);
+        return client;
     }
 
     // Logic deletion (field: deletion date)
@@ -113,39 +146,34 @@ public class ClientService {
         client.setDeletionDate(LocalDateTime.now());
         clientRepository.save(client);
 
+        // Erase client for associated sales too
+        List<Sale> sales = saleRepository.findActivesByBusinessAndClient(businessID, clientID);
+        for (Sale sale : sales) {
+            sale.setClient(null);
+        }
+        saleRepository.saveAll(sales);
+
         return clientID;
     }
 
-    private void ValidateSalesForClient(Client client, User user, Boolean noSalesControlled) {
-        // Client created in the context of a current new sale creation
-        if (noSalesControlled) {
-            client.setSales(null);
-            return;
-        }
-
+    private Set<Sale> ValidateSalesForClient(ClientCU clientCU, User user) {
         // At least one sale
-        Set<Sale> sales = client.getSales();
-        if (sales == null || sales.isEmpty()) {
+        Set<Long> salesIDs = clientCU.getSalesIDs();
+        if (salesIDs == null || salesIDs.isEmpty()) {
             throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - No sale was supplied");
         }
 
-        // Sales need to exist and each sale associated with the same business
-        Long businessID = 0L;
-        for (Sale sale : sales) {
-            // First loop
-            if (businessID == 0L) businessID = sale.getBusiness().getId();
+        // Validate and retrieve the sales fully-loaded from DB
+        Set<Sale> sales = new HashSet<>();
+        for (Long id : salesIDs) {
+            // Check sale existence & business
+            Sale sale = saleRepository.findByIdActiveAndBusiness(id, clientCU.getBusinessID()).orElseThrow(
+                    () -> new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - Sale doesn't exist or it's not associated with the user: " + user.getId())
+            );
 
-            if (!saleRepository.existsByIdActiveAndBusiness(sale.getId(), businessID)) {
-                throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - Sale doesn't exist or it's not associated with the business: " + businessID);
-            }
-
-            // Check every sale's businessID
-            if (!Objects.equals(businessID, sale.getBusiness().getId())) {
-                throw new Exceptions.BadRequestException("Error at 'ValidateSalesForClient' - Each sale needs to be associated with the same business");
-            }
+            sales.add(sale);
         }
 
-        // Validate business, user and role
-        businessService.GetOneBusiness(businessID, user);
+        return sales;
     }
 }

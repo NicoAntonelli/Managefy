@@ -60,7 +60,7 @@ public class SupplierService {
     public Supplier CreateSupplierForNewProduct(Supplier supplier) {
         // Validate name
         if (supplier.getName() == null || supplier.getName().isBlank()) {
-            throw new Exceptions.BadRequestException("Error at 'CreateSupplier' - Name field was not supplied");
+            throw new Exceptions.BadRequestException("Error at 'CreateSupplierForNewProduct' - Name field was not supplied");
         }
 
         // Forced initial state

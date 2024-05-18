@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Client;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.ClientCU;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ClientService;
 import nicoAntonelli.managefy.services.ErrorLogService;
@@ -72,12 +73,12 @@ public class ClientController {
     }
 
     @PostMapping
-    public Result<Client> CreateClient(@RequestBody Client client,
+    public Result<Client> CreateClient(@RequestBody ClientCU clientCU,
                                        @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateClient");
 
-            client = clientService.CreateClient(client, user, false);
+            Client client = clientService.CreateClient(clientCU, user);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -92,12 +93,12 @@ public class ClientController {
     }
 
     @PutMapping
-    public Result<Client> UpdateClient(@RequestBody Client client,
+    public Result<Client> UpdateClient(@RequestBody ClientCU clientCU,
                                        @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateClient");
 
-            client = clientService.UpdateClient(client, user);
+            Client client = clientService.UpdateClient(clientCU, user);
             return new Result<>(client);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

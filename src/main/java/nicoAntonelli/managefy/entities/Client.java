@@ -52,16 +52,4 @@ public class Client {
         this.phone = phone;
         this.deletionDate = deletionDate;
     }
-
-    public void loadSales(Set<Long> salesIDs, Long businessID) {
-        Set<Sale> salesForSet = new HashSet<>();
-        for (Long id : salesIDs) {
-            Sale sale = new Sale(id);
-            sale.setBusinessByID(businessID);
-
-            salesForSet.add(sale);
-        }
-
-        setSales(salesForSet);
-    }
 }

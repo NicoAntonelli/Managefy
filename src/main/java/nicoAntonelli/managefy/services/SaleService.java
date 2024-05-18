@@ -300,7 +300,7 @@ public class SaleService {
         }
 
         // Without ID: create it, then set it updated in sale
-        client = clientService.CreateClient(client, user, true);
+        client = clientService.CreateClientForNewSale(client);
         sale.setClient(client);
     }
 }
