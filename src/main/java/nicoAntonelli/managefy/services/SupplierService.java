@@ -57,16 +57,15 @@ public class SupplierService {
     }
 
     // On a new product context
-    public Supplier CreateSupplierForNewProduct(Supplier supplier) {
+    public Supplier CreateSupplierForNewProduct(SupplierCU supplierCU) {
         // Validate name
-        if (supplier.getName() == null || supplier.getName().isBlank()) {
+        if (supplierCU.getName() == null || supplierCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateSupplierForNewProduct' - Name field was not supplied");
         }
 
-        // Forced initial state
-        supplier.setId(null);
-        supplier.setDeletionDate(null);
-        supplier.setProducts(null);
+        // New supplier object with DTO info
+        Supplier supplier = new Supplier(supplierCU.getName(), supplierCU.getDescription(),
+                                         supplierCU.getEmail(), supplierCU.getPhone());
 
         return supplierRepository.save(supplier);
     }
@@ -156,6 +155,11 @@ public class SupplierService {
         productRepository.saveAll(products);
 
         return supplierID;
+    }
+
+    // On a delete product context
+    public void DeleteSupplierAfterDeleteProduct(Long supplierID) {
+        supplierRepository.deleteById(supplierID);
     }
 
     private Set<Product> ValidateProductsForSupplier(SupplierCU supplierCU, User user) {
