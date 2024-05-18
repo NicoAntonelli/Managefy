@@ -54,4 +54,16 @@ public class Supplier {
         this.phone = phone;
         this.deletionDate = deletionDate;
     }
+
+    public void loadProducts(Set<Long> productsIDs, Long BusinessID) {
+        Set<Product> productsForSet = new HashSet<>();
+        for (Long id : productsIDs) {
+            Product product = new Product(id);
+            product.setBusinessByID(BusinessID);
+
+            productsForSet.add(product);
+        }
+
+        setProducts(productsForSet);
+    }
 }
