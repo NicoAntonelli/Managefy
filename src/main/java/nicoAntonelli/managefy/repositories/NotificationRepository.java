@@ -14,7 +14,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("SELECT n " +
             "FROM Notification n " +
             "INNER JOIN n.user u " +
-            "WHERE n.state <> NotificationState.Closed AND u.id = ?1" +
+            "WHERE n.state <> NotificationState.Closed AND u.id = ?1 " +
             "ORDER BY n.state DESC, n.type DESC, n.date DESC")
     List<Notification> findByUser(Long userID);
 
