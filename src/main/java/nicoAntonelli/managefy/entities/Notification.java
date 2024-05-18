@@ -45,6 +45,13 @@ public class Notification {
         this.id = id;
     }
 
+    public Notification(String description, String type) {
+        this.description = description;
+        if (!setTypeByText(type)) setTypeByText("low");
+        this.state = NotificationState.Unread;
+        this.date = LocalDateTime.now();
+    }
+
     public Notification(String description, NotificationType type, NotificationState state,
                         LocalDateTime date, Long userID) {
         this.description = description;
@@ -53,8 +60,7 @@ public class Notification {
         this.date = date;
 
         // Load nested entity with ID-only
-        user = new User();
-        user.setId(userID);
+        user = new User(userID);
     }
 
     public void setUserByID(Long userID) {

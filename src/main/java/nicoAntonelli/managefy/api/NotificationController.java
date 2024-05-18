@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Notification;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.NotificationService;
@@ -70,12 +71,12 @@ public class NotificationController {
     }
 
     @PostMapping
-    public Result<Notification> CreateNotification(@RequestBody Notification notification,
+    public Result<Notification> CreateNotification(@RequestBody NotificationC notificationC,
                                                    @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateNotification");
 
-            notification = notificationService.CreateNotification(notification, user);
+            Notification notification = notificationService.CreateNotification(notificationC, user);
             return new Result<>(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

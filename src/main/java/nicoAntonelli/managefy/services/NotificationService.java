@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Notification;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.repositories.NotificationRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,6 @@ public class NotificationService {
         return notificationRepository.findByUser(user.getId());
     }
 
-    public Boolean ExistsNotification(Long notificationID, User user) {
-        return notificationRepository.existsByIdAndUser(notificationID, user.getId());
-    }
-
     public Notification GetOneNotification(Long notificationID, User user) {
         Optional<Notification> notification = notificationRepository.findByIdAndUser(notificationID, user.getId());
         if (notification.isEmpty()) {
@@ -39,12 +36,22 @@ public class NotificationService {
         return notification.get();
     }
 
-    public Notification CreateNotification(Notification notification, User user) {
-        // Forced initial state
-        notification.setId(null);
-        notification.setUser(user);
-        notification.setState(Notification.NotificationState.Unread);
-        notification.setDate(LocalDateTime.now());
+    public Notification CreateNotification(NotificationC notificationC, User user) {
+        String description = notificationC.getDescription();
+        if (description == null || description.isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'CreateNotification' - Description field was not supplied");
+        }
+
+        String type = notificationC.getType();
+        if (type == null || type.isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'CreateNotification' - Type field was not supplied");
+        }
+        if (!List.of("low", "normal", "priority").contains(type.toLowerCase())) {
+            throw new Exceptions.BadRequestException("Error at 'CreateNotification' - Unexpected type value: " + type);
+        }
+
+        Notification notification = new Notification(description, type);
+        notification.setUserByID(user.getId());
 
         return notificationRepository.save(notification);
     }
