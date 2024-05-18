@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -248,7 +245,7 @@ public class ProductService {
         }
 
         // Without ID: create it, then set it updated in product
-        supplier = supplierService.CreateSupplier(supplier, user, true);
+        supplier = supplierService.CreateSupplierForNewProduct(supplier);
         product.setSupplier(supplier);
     }
 }

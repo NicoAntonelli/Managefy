@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.SupplierCU;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.SupplierService;
@@ -72,12 +73,12 @@ public class SupplierController {
     }
 
     @PostMapping
-    public Result<Supplier> CreateSupplier(@RequestBody Supplier supplier,
+    public Result<Supplier> CreateSupplier(@RequestBody SupplierCU supplierCU,
                                            @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateSupplier");
 
-            supplier = supplierService.CreateSupplier(supplier, user, false);
+            Supplier supplier = supplierService.CreateSupplier(supplierCU, user);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -92,12 +93,12 @@ public class SupplierController {
     }
 
     @PutMapping
-    public Result<Supplier> UpdateSupplier(@RequestBody Supplier supplier,
+    public Result<Supplier> UpdateSupplier(@RequestBody SupplierCU supplierCU,
                                            @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateSupplier");
 
-            supplier = supplierService.UpdateSupplier(supplier, user);
+            Supplier supplier = supplierService.UpdateSupplier(supplierCU, user);
             return new Result<>(supplier);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

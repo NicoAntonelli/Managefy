@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.SupplierCU;
 import nicoAntonelli.managefy.repositories.ProductRepository;
 import nicoAntonelli.managefy.repositories.SupplierRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
@@ -11,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -66,23 +64,64 @@ public class SupplierService {
         return supplier.get();
     }
 
-    public Supplier CreateSupplier(Supplier supplier, User user, Boolean noSalesControlled) {
+    // On a new product context
+    public Supplier CreateSupplierForNewProduct(Supplier supplier) {
+        // Validate name
+        if (supplier.getName() == null || supplier.getName().isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'CreateSupplier' - Name field was not supplied");
+        }
+
+        // Forced initial state
+        supplier.setId(null);
+        supplier.setDeletionDate(null);
+        supplier.setProducts(null);
+
+        return supplierRepository.save(supplier);
+    }
+
+    public Supplier CreateSupplier(SupplierCU supplierCU, User user) {
+        // Convert DTO into supplier with products
+        Supplier supplier = supplierCU.getSupplier();
+        supplier.loadProducts(supplierCU.getProducts(), supplierCU.getBusinessID());
+
         // Validate name
         if (supplier.getName() == null || supplier.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateSupplier' - Name field was not supplied");
         }
 
         // Validate associated products
-        ValidateProductsForSupplier(supplier, user, noSalesControlled);
+        ValidateProductsForSupplier(supplier, user);
 
         // Forced initial state
         supplier.setId(null);
         supplier.setDeletionDate(null);
 
-        return supplierRepository.save(supplier);
+        // Don't save products as nested
+        supplier.setProducts(null);
+
+        // Save supplier first
+        supplier = supplierRepository.save(supplier);
+
+        // Update each (complete) product and save it
+        Set<Product> products = new HashSet<>();
+        for (Long id : supplierCU.getProducts()) {
+            Product product = productRepository.findById(id).orElseThrow(
+                    () -> new Exceptions.BadRequestException("Error at 'CreateSupplier' - Problem validating product with ID: " + id)
+            );
+
+            product.setSupplierByID(supplier.getId());
+        }
+
+        productRepository.saveAll(products);
+
+        return supplier;
     }
 
-    public Supplier UpdateSupplier(Supplier supplier, User user) {
+    public Supplier UpdateSupplier(SupplierCU supplierCU, User user) {
+        // Convert DTO into supplier with products
+        Supplier supplier = supplierCU.getSupplier();
+        supplier.loadProducts(supplierCU.getProducts(), supplierCU.getBusinessID());
+
         // Validate name and logic deletion
         if (supplier.getName() == null || supplier.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Name field was not supplied");
@@ -92,15 +131,33 @@ public class SupplierService {
         }
 
         // Validate associated products
-        ValidateProductsForSupplier(supplier, user, false);
+        ValidateProductsForSupplier(supplier, user);
 
-        // Validate supplier existence
-        boolean exists = ExistsSupplier(supplier, user);
-        if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Supplier with ID: " + supplier.getId() + " doesn't exist or it's not associated with the user: " + user.getId());
+        // Validate supplier existence and obtain it loaded from DB
+        Supplier realSupplier = GetOneSupplier(supplier.getId(), supplierCU.getBusinessID(), user);
+
+        // Merge DTO's supplier with the original - Don't mess up relation w/products
+        realSupplier.setName(supplier.getName());
+        realSupplier.setEmail(supplier.getEmail());
+        realSupplier.setPhone(supplier.getPhone());
+        realSupplier.setDescription(supplier.getDescription());
+
+        // Save supplier first
+        supplier = supplierRepository.save(realSupplier);
+
+        // Update each (complete) product and save it
+        Set<Product> products = new HashSet<>();
+        for (Long id : supplierCU.getProducts()) {
+            Product product = productRepository.findById(id).orElseThrow(
+                    () -> new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Problem validating product with ID: " + id)
+            );
+
+            product.setSupplierByID(supplier.getId());
         }
 
-        return supplierRepository.save(supplier);
+        productRepository.saveAll(products);
+
+        return supplier;
     }
 
     // Logic deletion (field: deletion date)
@@ -118,13 +175,7 @@ public class SupplierService {
         return supplierID;
     }
 
-    private void ValidateProductsForSupplier(Supplier supplier, User user, Boolean noProductsControlled) {
-        // Supplier created in the context of a current new product creation
-        if (noProductsControlled) {
-            supplier.setProducts(null);
-            return;
-        }
-
+    private void ValidateProductsForSupplier(Supplier supplier, User user) {
         // At least one product
         Set<Product> products = supplier.getProducts();
         if (products == null || products.isEmpty()) {
