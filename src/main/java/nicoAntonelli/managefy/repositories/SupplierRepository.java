@@ -21,13 +21,13 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
             "FROM Supplier s " +
             "INNER JOIN s.products p " +
             "INNER JOIN p.business b " +
-            "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?1")
+            "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?2")
     Optional<Supplier> findByIdActiveAndBusiness(Long supplierID, Long businessID);
 
     @Query("SELECT COUNT(s) > 0 " +
             "FROM Supplier s " +
             "INNER JOIN s.products p " +
             "INNER JOIN p.business b " +
-            "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?1")
+            "WHERE s.id = ?1 AND s.deletionDate IS NULL AND b.id = ?2")
     Boolean existsByIdActiveAndBusiness(Long supplierID, Long businessID);
 }
