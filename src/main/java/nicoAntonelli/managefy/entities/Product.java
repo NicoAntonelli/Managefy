@@ -48,7 +48,6 @@ public class Product {
     )
     private Business business;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "supplierID",
