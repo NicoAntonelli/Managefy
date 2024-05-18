@@ -37,14 +37,6 @@ public class SupplierService {
         return supplierRepository.findActivesByBusiness(businessID);
     }
 
-    // Note: this method needs to be called with a supplier with products already-validated
-    public Boolean ExistsSupplier(Supplier supplier, User user) {
-        // Get businessID from first element (
-        Long businessID = supplier.getProducts().iterator().next().getBusiness().getId();
-
-        return ExistsSupplier(supplier.getId(), businessID, user);
-    }
-
     public Boolean ExistsSupplier(Long supplierID, Long businessID, User user) {
         // Validate business, user and role
         businessService.GetOneBusiness(businessID, user);
@@ -80,81 +72,65 @@ public class SupplierService {
     }
 
     public Supplier CreateSupplier(SupplierCU supplierCU, User user) {
-        // Convert DTO into supplier with products
-        Supplier supplier = supplierCU.getSupplier();
-        supplier.loadProducts(supplierCU.getProducts(), supplierCU.getBusinessID());
+        // Validate business, user and role
+        businessService.GetOneBusiness(supplierCU.getBusinessID(), user);
 
         // Validate name
-        if (supplier.getName() == null || supplier.getName().isBlank()) {
+        if (supplierCU.getName() == null || supplierCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateSupplier' - Name field was not supplied");
         }
 
-        // Validate associated products
-        ValidateProductsForSupplier(supplier, user);
+        // Validate associated products' IDs and load each in a collection
+        Set<Product> products = ValidateProductsForSupplier(supplierCU, user);
 
-        // Forced initial state
-        supplier.setId(null);
-        supplier.setDeletionDate(null);
+        // New supplier object with DTO info
+        Supplier supplier = new Supplier(supplierCU.getName(), supplierCU.getDescription(),
+                                         supplierCU.getEmail(), supplierCU.getPhone());
 
-        // Don't save products as nested
-        supplier.setProducts(null);
-
-        // Save supplier first
+        // Save supplier first (without products as nested)
         supplier = supplierRepository.save(supplier);
 
-        // Update each (complete) product and save it
-        Set<Product> products = new HashSet<>();
-        for (Long id : supplierCU.getProducts()) {
-            Product product = productRepository.findById(id).orElseThrow(
-                    () -> new Exceptions.BadRequestException("Error at 'CreateSupplier' - Problem validating product with ID: " + id)
-            );
-
+        // Set new supplier ID for every product
+        for (Product product : products) {
             product.setSupplierByID(supplier.getId());
         }
 
+        // Save products with supplier set
         productRepository.saveAll(products);
 
         return supplier;
     }
 
     public Supplier UpdateSupplier(SupplierCU supplierCU, User user) {
-        // Convert DTO into supplier with products
-        Supplier supplier = supplierCU.getSupplier();
-        supplier.loadProducts(supplierCU.getProducts(), supplierCU.getBusinessID());
+        // Validate business, user and role
+        businessService.GetOneBusiness(supplierCU.getBusinessID(), user);
 
-        // Validate name and logic deletion
-        if (supplier.getName() == null || supplier.getName().isBlank()) {
+        // Validate name
+        if (supplierCU.getName() == null || supplierCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Name field was not supplied");
         }
-        if (supplier.getDeletionDate() != null) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Supplier can't have a deletion date");
-        }
 
-        // Validate associated products
-        ValidateProductsForSupplier(supplier, user);
+        // Validate associated products' IDs and load each in a collection
+        Set<Product> products = ValidateProductsForSupplier(supplierCU, user);
 
         // Validate supplier existence and obtain it loaded from DB
-        Supplier realSupplier = GetOneSupplier(supplier.getId(), supplierCU.getBusinessID(), user);
+        Supplier supplier = GetOneSupplier(supplierCU.getId(), supplierCU.getBusinessID(), user);
 
         // Merge DTO's supplier with the original - Don't mess up relation w/products
-        realSupplier.setName(supplier.getName());
-        realSupplier.setEmail(supplier.getEmail());
-        realSupplier.setPhone(supplier.getPhone());
-        realSupplier.setDescription(supplier.getDescription());
+        supplier.setName(supplierCU.getName());
+        supplier.setEmail(supplierCU.getEmail());
+        supplier.setPhone(supplierCU.getPhone());
+        supplier.setDescription(supplierCU.getDescription());
 
-        // Save supplier first
-        supplier = supplierRepository.save(realSupplier);
+        // Save supplier first (without products as nested)
+        supplier = supplierRepository.save(supplier);
 
-        // Update each (complete) product and save it
-        Set<Product> products = new HashSet<>();
-        for (Long id : supplierCU.getProducts()) {
-            Product product = productRepository.findById(id).orElseThrow(
-                    () -> new Exceptions.BadRequestException("Error at 'UpdateSupplier' - Problem validating product with ID: " + id)
-            );
-
+        // Set existent supplier ID for every product
+        for (Product product : products) {
             product.setSupplierByID(supplier.getId());
         }
 
+        // Save products with supplier set
         productRepository.saveAll(products);
 
         return supplier;
@@ -175,30 +151,24 @@ public class SupplierService {
         return supplierID;
     }
 
-    private void ValidateProductsForSupplier(Supplier supplier, User user) {
+    private Set<Product> ValidateProductsForSupplier(SupplierCU supplierCU, User user) {
         // At least one product
-        Set<Product> products = supplier.getProducts();
-        if (products == null || products.isEmpty()) {
+        Set<Long> productsIDs = supplierCU.getProductsIDs();
+        if (productsIDs == null || productsIDs.isEmpty()) {
             throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - No product was supplied");
         }
 
-        // Products need to exist and each product associated with the same business
-        Long businessID = 0L;
-        for (Product product : products) {
-            // First loop
-            if (businessID == 0L) businessID = product.getBusiness().getId();
+        // Validate and retrieve the products fully-loaded from DB
+        Set<Product> products = new HashSet<>();
+        for (Long id : productsIDs) {
+            // Check product existence & business
+            Product product = productRepository.findByIdActiveAndBusiness(id, supplierCU.getBusinessID()).orElseThrow(
+                    () -> new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Product doesn't exist or it's not associated with the user: " + user.getId())
+            );
 
-            if (!productRepository.existsByIdActiveAndBusiness(product.getId(), user.getId())) {
-                throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Product doesn't exist or it's not associated with the user: " + user.getId());
-            }
-
-            // Check every product's businessID
-            if (!Objects.equals(businessID, product.getBusiness().getId())) {
-                throw new Exceptions.BadRequestException("Error at 'ValidateProductsForSupplier' - Each product needs to be associated with the same business");
-            }
+            products.add(product);
         }
 
-        // Validate business, user and role
-        businessService.GetOneBusiness(businessID, user);
+        return products;
     }
 }
