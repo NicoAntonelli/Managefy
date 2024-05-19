@@ -1,6 +1,7 @@
 package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
+import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserValidation;
 import nicoAntonelli.managefy.entities.dto.Login;
@@ -25,15 +26,18 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final UserValidationRepository userValidationRepository; // Dependency
+    private final BusinessService businessService; // Dependency
     private final EmailService emailService; // Dependency
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        UserValidationRepository userValidationRepository,
+                       BusinessService businessService,
                        EmailService emailService) {
         this.userRepository = userRepository;
         this.userValidationRepository = userValidationRepository;
+        this.businessService = businessService;
         this.emailService = emailService;
         this.passwordEncoder = PasswordEncoder.getInstance();
     }
@@ -185,7 +189,20 @@ public class UserService {
 
     // Only logged-user can delete its own account
     public Long DeleteUser(User user) {
-        userRepository.deleteById(user.getId());
-        return user.getId();
+        // Businesses participation
+        List<Business> associatedBusinesses = businessService.GetBusinesses(user);
+        if (!associatedBusinesses.isEmpty()) {
+            throw new Exceptions.UnauthorizedException("Error at 'DeleteUser' - You have participation in one or more businesses. First leave or delete them.");
+        }
+
+        // Clean validation table also
+        Long userID = user.getId();
+        Optional<UserValidation> optionalValidation = userValidationRepository.findByUser(userID);
+        optionalValidation.ifPresent(userValidationRepository::delete);
+
+        // Delete user (also notifications by delete cascade)
+        userRepository.deleteById(userID);
+
+        return userID;
     }
 }
