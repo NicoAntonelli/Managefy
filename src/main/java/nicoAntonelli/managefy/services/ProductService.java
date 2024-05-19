@@ -213,8 +213,21 @@ public class ProductService {
     }
 
     private void ValidateSimpleAttributesForProduct(ProductCU productCU) {
-        if (productCU.getUnitCost() == null || productCU.getUnitPrice() == null || productCU.getStock() == null) {
+        if (productCU.getCode() == null || productCU.getName() == null || productCU.getDescription() == null ||
+            productCU.getUnitCost() == null || productCU.getUnitPrice() == null || productCU.getStock() == null) {
             throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - One or more of the required fields were not supplied");
+        }
+
+        if (productCU.getCode().isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Code can't be blank");
+        }
+
+        if (productCU.getName().isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Name can't be blank");
+        }
+
+        if (productCU.getDescription().isBlank()) {
+            throw new Exceptions.BadRequestException("Error at 'ValidateSimpleAttributesForProduct' - Description can't be blank");
         }
 
         if (productCU.getUnitCost().compareTo(BigDecimal.ZERO) < 0) {
