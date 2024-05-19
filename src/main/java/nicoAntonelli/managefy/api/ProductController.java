@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.ProductCU;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.ProductService;
@@ -93,12 +94,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public Result<Product> CreateProduct(@RequestBody Product product,
+    public Result<Product> CreateProduct(@RequestBody ProductCU productCU,
                                          @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateProduct");
 
-            product = productService.CreateProduct(product, user);
+            Product product = productService.CreateProduct(productCU, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
@@ -113,12 +114,12 @@ public class ProductController {
     }
 
     @PutMapping
-    public Result<Product> UpdateProduct(@RequestBody Product product,
+    public Result<Product> UpdateProduct(@RequestBody ProductCU productCU,
                                          @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateProduct");
 
-            product = productService.UpdateProduct(product, user);
+            Product product = productService.UpdateProduct(productCU, user);
             return new Result<>(product);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
