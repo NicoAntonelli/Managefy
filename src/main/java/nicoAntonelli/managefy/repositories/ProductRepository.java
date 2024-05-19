@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.repositories;
 
 import nicoAntonelli.managefy.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -35,4 +36,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "INNER JOIN p.business b " +
             "WHERE p.id = ?1 AND p.deletionDate IS NULL AND b.id = ?2")
     Boolean existsByIdActiveAndBusiness(Long productID, Long businessID);
+
+    @Modifying
+    @Query("DELETE FROM Product p " +
+            "WHERE p IN (" +
+            "SELECT sub " +
+            "FROM Product sub " +
+            "INNER JOIN sub.business b " +
+            "WHERE b.id = ?1)")
+    void deleteAllByBusiness(Long businessID);
 }

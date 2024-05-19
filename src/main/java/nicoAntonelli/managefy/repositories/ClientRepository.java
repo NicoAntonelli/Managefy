@@ -14,6 +14,13 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             "FROM Client c " +
             "INNER JOIN c.sales s " +
             "INNER JOIN s.business b " +
+            "WHERE b.id = ?1")
+    List<Client> findByBusiness(Long businessID);
+
+    @Query("SELECT c " +
+            "FROM Client c " +
+            "INNER JOIN c.sales s " +
+            "INNER JOIN s.business b " +
             "WHERE c.deletionDate IS NULL AND b.id = ?1")
     List<Client> findActivesByBusiness(Long businessID);
 
