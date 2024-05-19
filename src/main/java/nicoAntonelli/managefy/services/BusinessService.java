@@ -2,8 +2,10 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
+import nicoAntonelli.managefy.entities.Client;
+import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
-import nicoAntonelli.managefy.repositories.BusinessRepository;
+import nicoAntonelli.managefy.repositories.*;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,28 @@ import java.util.SortedMap;
 @Transactional
 public class BusinessService {
     private final BusinessRepository businessRepository;
+    private final ClientRepository clientRepository; // Dependency
+    private final ProductRepository productRepository; // Dependency
+    private final SaleRepository saleRepository; // Dependency
+    private final SaleLineRepository saleLineRepository; // Dependency
+    private final SupplierRepository supplierRepository; // Dependency
+    private final UserRoleRepository userRoleRepository; // Dependency
 
     @Autowired
-    public BusinessService(BusinessRepository businessRepository) {
+    public BusinessService(BusinessRepository businessRepository,
+                           ClientRepository clientRepository,
+                           ProductRepository productRepository,
+                           SaleRepository saleRepository,
+                           SaleLineRepository saleLineRepository,
+                           SupplierRepository supplierRepository,
+                           UserRoleRepository userRoleRepository) {
         this.businessRepository = businessRepository;
+        this.clientRepository = clientRepository;
+        this.productRepository = productRepository;
+        this.saleRepository = saleRepository;
+        this.saleLineRepository = saleLineRepository;
+        this.supplierRepository = supplierRepository;
+        this.userRoleRepository = userRoleRepository;
     }
 
     public List<Business> GetBusinesses(User user) {
@@ -110,12 +130,28 @@ public class BusinessService {
         return businessRepository.save(business);
     }
 
+    // Warning: deletes everything related also!
     public Long DeleteBusiness(Long businessID, User user) {
         boolean exists = ExistsBusiness(businessID, user, "manager");
         if (!exists) {
             throw new Exceptions.BadRequestException("Error at 'DeleteBusiness' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " isn't the Manager");
         }
 
+        // Get associated clients & suppliers, actives or not
+        List<Client> associatedClients = clientRepository.findByBusiness(businessID);
+        List<Supplier> associatedSuppliers = supplierRepository.findByBusiness(businessID);
+
+        // Physically delete associated: saleLines, sales, products & roles
+        saleLineRepository.deleteAllByBusiness(businessID);
+        saleRepository.deleteAllByBusiness(businessID);
+        productRepository.deleteAllByBusiness(businessID);
+        userRoleRepository.deleteAllByBusiness(businessID);
+
+        // Physically delete associated: clients & suppliers
+        clientRepository.deleteAll(associatedClients);
+        supplierRepository.deleteAll(associatedSuppliers);
+
+        // Finally, physically delete business
         businessRepository.deleteById(businessID);
         return businessID;
     }
