@@ -14,6 +14,13 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
             "FROM Supplier s " +
             "INNER JOIN s.products p " +
             "INNER JOIN p.business b " +
+            "WHERE b.id = ?1")
+    List<Supplier> findByBusiness(Long businessID);
+
+    @Query("SELECT s " +
+            "FROM Supplier s " +
+            "INNER JOIN s.products p " +
+            "INNER JOIN p.business b " +
             "WHERE s.deletionDate IS NULL AND b.id = ?1")
     List<Supplier> findActivesByBusiness(Long businessID);
 

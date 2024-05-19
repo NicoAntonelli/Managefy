@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.repositories;
 
 import nicoAntonelli.managefy.entities.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -49,4 +50,13 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             "WHERE s.id = ?1 AND s.state <> SaleState.Cancelled AND b.id = ?2 " +
             "ORDER BY s.date DESC")
     Boolean existsByIdActiveAndBusiness(Long productID, Long businessID);
+
+    @Modifying
+    @Query("DELETE FROM Sale s " +
+            "WHERE s IN (" +
+            "SELECT sub " +
+            "FROM Sale sub " +
+            "INNER JOIN sub.business b " +
+            "WHERE b.id = ?1)")
+    void deleteAllByBusiness(Long businessID);
 }
