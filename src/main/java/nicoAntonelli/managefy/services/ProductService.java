@@ -1,7 +1,6 @@
 package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
-import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
