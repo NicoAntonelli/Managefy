@@ -155,6 +155,27 @@ public class UserRoleController {
         }
     }
 
+    @PutMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}/transferManager")
+    public Result<UserRole> TransferManagerRole(@PathVariable("otherUserID") Long otherUserID,
+                                                @PathVariable("businessID") Long businessID,
+                                                @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "TransferManagerRole");
+
+            UserRole userRole = userRoleService.TransferManagerRole(otherUserID, businessID, user);
+            return new Result<>(userRole);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @DeleteMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}")
     public Result<UserRoleKey> DeleteUserRole(@PathVariable("otherUserID") Long otherUserID,
                                               @PathVariable("businessID") Long businessID,
@@ -163,6 +184,26 @@ public class UserRoleController {
             User user = authService.validateTokenFromHeaders(headers, "DeleteUserRole");
 
             UserRoleKey userRoleKey = userRoleService.DeleteUserRole(otherUserID, businessID, user);
+            return new Result<>(userRoleKey);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/business/{businessID:[\\d]+}")
+    public Result<UserRoleKey> LeaveUserRole(@PathVariable("businessID") Long businessID,
+                                             @RequestHeader HttpHeaders headers){
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "LeaveUserRole");
+
+            UserRoleKey userRoleKey = userRoleService.LeaveUserRole(businessID, user);
             return new Result<>(userRoleKey);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());

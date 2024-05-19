@@ -131,6 +131,27 @@ public class UserRoleService {
         return userRoleRepository.save(roleToUpdate);
     }
 
+    public UserRole TransferManagerRole(Long otherUserID, long businessID, User user) {
+        // Validate business and current user and other user's roles
+        UserRole otherUserRole = GetOneUserRoleForOther(otherUserID, businessID, user);
+        UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        // Validate authorization for role creation
+        if (otherUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'TransferManagerRole' - The other user is the manager already!");
+        }
+
+        if (!currentUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'TransferManagerRole' - You don't have a manager role to transfer");
+        }
+
+        otherUserRole.setRoleByText("manager");
+        currentUserRole.setRoleByText("admin");
+
+        userRoleRepository.save(currentUserRole);
+        return userRoleRepository.save(otherUserRole);
+    }
+
     public UserRoleKey DeleteUserRole(Long otherUserID, long businessID, User user) {
         // Validate business and current user and other user's roles
         UserRole roleToDelete = GetOneUserRoleForOther(otherUserID, businessID, user);
@@ -151,5 +172,18 @@ public class UserRoleService {
 
         userRoleRepository.deleteById(roleToDelete.getId());
         return roleToDelete.getId();
+    }
+
+    public UserRoleKey LeaveUserRole(long businessID, User user) {
+        // Validate business and current user role
+        UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        // You can leave a business before transfer manager role
+        if (currentUserRole.getIsManager()) {
+            throw new Exceptions.UnauthorizedException("Error at 'LeaveUserRole' - First you need to transfer the manager role to other user!");
+        }
+
+        userRoleRepository.deleteById(currentUserRole.getId());
+        return currentUserRole.getId();
     }
 }
