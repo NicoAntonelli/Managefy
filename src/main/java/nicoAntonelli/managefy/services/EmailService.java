@@ -1,5 +1,6 @@
 package nicoAntonelli.managefy.services;
 
+import nicoAntonelli.managefy.entities.Notification;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -28,11 +29,26 @@ public class EmailService {
         String text = "Hi there, this is an email from Managefy App!\n" +
                 "In order to validate your email you must now enter " +
                 "this number in the app: '" + code + "'.\n" +
-                "If you did not request any email validation, "
-                +"please ignore this message.\n\n\n" +
+                "If you did not request any email validation, " +
+                "please ignore this message.\n\n\n" +
                 "-The Managefy Team\n";
 
         String subject = "Managefy app - User validation code";
+
+        SendEmail(address, subject, text);
+    }
+
+    @Async
+    public void NotificationEmail(String address, Notification notification) {
+        String text = "Hi there, this is an email from Managefy App!\n" +
+                "You received a notification " +
+                "of type: '" + notification.getType().toString() + "' " +
+                "with the message: '" + notification.getDescription() + "'.\n" +
+                "If you don't want to receive more notifications via mail, " +
+                "you can disable 'mail notifications' on the App.\n\n\n" +
+                "-The Managefy Team\n";
+
+        String subject = "Managefy app - Notification (" + notification.getType().toString() + ")";
 
         SendEmail(address, subject, text);
     }
