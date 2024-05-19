@@ -65,12 +65,11 @@ public class Sale {
         this.state = state;
     }
 
-    public Sale(BigDecimal partialPayment, SaleState state) {
+    public Sale(BigDecimal partialPayment, String state) {
         this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
 
-        if (state == null) state = SaleState.PendingPayment;
-        this.state = state;
+        if (!setStateByText(state)) setStateByText("PendingPayment");
     }
 
     public void setBusinessByID(Long businessID) {
