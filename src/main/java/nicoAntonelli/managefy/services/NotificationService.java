@@ -9,7 +9,6 @@ import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,10 +16,12 @@ import java.util.Optional;
 @Transactional
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final EmailService emailService; // Dependency
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, EmailService emailService) {
         this.notificationRepository = notificationRepository;
+        this.emailService = emailService;
     }
 
     public List<Notification> GetNotifications(User user) {
@@ -53,7 +54,15 @@ public class NotificationService {
         Notification notification = new Notification(description, type);
         notification.setUserByID(user.getId());
 
-        return notificationRepository.save(notification);
+        // Save notification
+        notification = notificationRepository.save(notification);
+
+        // Optional - Send notifications by email
+        if (user.getEmailNotifications()) {
+            emailService.NotificationEmail(user.getEmail(), notification);
+        }
+
+        return notification;
     }
 
     public Notification UpdateNotificationState(Long notificationID, String state, User user) {
