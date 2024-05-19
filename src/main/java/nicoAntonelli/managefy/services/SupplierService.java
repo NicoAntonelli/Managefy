@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.entities.dto.SupplierCU;
 import nicoAntonelli.managefy.repositories.ProductRepository;
 import nicoAntonelli.managefy.repositories.SupplierRepository;
@@ -19,14 +20,17 @@ import java.util.*;
 public class SupplierService {
     private final SupplierRepository supplierRepository;
     private final BusinessService businessService; // Dependency
+    private final NotificationService notificationService; // Dependency
     private final ProductRepository productRepository; // Dependency
 
     @Autowired
     public SupplierService(SupplierRepository supplierRepository,
                            BusinessService businessService,
+                           NotificationService notificationService,
                            ProductRepository ProductRepository) {
         this.supplierRepository = supplierRepository;
         this.businessService = businessService;
+        this.notificationService = notificationService;
         this.productRepository = ProductRepository;
     }
 
@@ -57,7 +61,7 @@ public class SupplierService {
     }
 
     // On a new product context
-    public Supplier CreateSupplierForNewProduct(SupplierCU supplierCU) {
+    public Supplier CreateSupplierForNewProduct(SupplierCU supplierCU, User user) {
         // Validate name
         if (supplierCU.getName() == null || supplierCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateSupplierForNewProduct' - Name field was not supplied");
@@ -67,7 +71,13 @@ public class SupplierService {
         Supplier supplier = new Supplier(supplierCU.getName(), supplierCU.getDescription(),
                                          supplierCU.getEmail(), supplierCU.getPhone());
 
-        return supplierRepository.save(supplier);
+        supplier = supplierRepository.save(supplier);
+
+        // Notification for new supplier
+        NotificationC notification = new NotificationC("Your new supplier '" + supplierCU.getName() + "' was created successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return supplier;
     }
 
     public Supplier CreateSupplier(SupplierCU supplierCU, User user) {
@@ -96,6 +106,10 @@ public class SupplierService {
 
         // Save products with supplier set
         productRepository.saveAll(products);
+
+        // Notification for new supplier
+        NotificationC notification = new NotificationC("Your new supplier '" + supplierCU.getName() + "' was created successfully", "low");
+        notificationService.CreateNotification(notification, user);
 
         return supplier;
     }
@@ -132,6 +146,10 @@ public class SupplierService {
         // Save products with supplier set
         productRepository.saveAll(products);
 
+        // Notification for update supplier
+        NotificationC notification = new NotificationC("Your supplier '" + supplierCU.getName() + "' was updated successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
         return supplier;
     }
 
@@ -154,12 +172,20 @@ public class SupplierService {
         }
         productRepository.saveAll(products);
 
+        // Notification for delete supplier
+        NotificationC notification = new NotificationC("Your supplier was deleted successfully, and erased from associated products", "low");
+        notificationService.CreateNotification(notification, user);
+
         return supplierID;
     }
 
     // On a delete product context
-    public void DeleteSupplierAfterDeleteProduct(Long supplierID) {
+    public void DeleteSupplierAfterDeleteProduct(Long supplierID, User user) {
         supplierRepository.deleteById(supplierID);
+
+        // Notification for delete supplier
+        NotificationC notification = new NotificationC("After your product elimination, the supplier without products was also deleted successfully", "low");
+        notificationService.CreateNotification(notification, user);
     }
 
     private Set<Product> ValidateProductsForSupplier(SupplierCU supplierCU, User user) {

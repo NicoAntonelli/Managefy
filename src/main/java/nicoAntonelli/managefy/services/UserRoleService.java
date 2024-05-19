@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserRole;
 import nicoAntonelli.managefy.entities.UserRoleKey;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.repositories.UserRoleRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,17 @@ import java.util.Optional;
 public class UserRoleService {
     private final UserRoleRepository userRoleRepository;
     private final BusinessService businessService; // Dependency
+    private final NotificationService notificationService; // Dependency
     private final UserService userService; // Dependency
 
     @Autowired
     public UserRoleService(UserRoleRepository userRoleRepository,
                            BusinessService businessService,
+                           NotificationService notificationService,
                            UserService userService) {
         this.userRoleRepository = userRoleRepository;
         this.businessService = businessService;
+        this.notificationService = notificationService;
         this.userService = userService;
     }
 
@@ -73,7 +77,7 @@ public class UserRoleService {
     public UserRole CreateUserRole(Long otherUserID, Long businessID, String role, User user) {
         // Validate business and current user and other user's roles
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
-        userService.GetOneUser(otherUserID);
+        User otherUser = userService.GetOneUser(otherUserID);
 
         // Validate role
         if (!List.of("collaborator", "admin", "manager").contains(role)) {
@@ -95,7 +99,17 @@ public class UserRoleService {
             throw new Exceptions.UnauthorizedException("Error at 'CreateUserRole' - Can't create a collaborator role for other user if you don't have an admin or manager role");
         }
 
-        return userRoleRepository.save(roleToCreate);
+        roleToCreate = userRoleRepository.save(roleToCreate);
+
+        // Notification for user role creation - Logged user
+        NotificationC notification = new NotificationC("You granted the role '" + role + "' for the user '" + otherUser.getEmail() + "' successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        // Notification for user role creation - Other user
+        notification = new NotificationC("The user '" + user.getEmail() + "' granted you the role '" + role + "'", "normal");
+        notificationService.CreateNotification(notification, otherUser);
+
+        return roleToCreate;
     }
 
     public void CreateUserRoleForNewBusiness(Long userID, Long businessID) {
@@ -109,6 +123,8 @@ public class UserRoleService {
         // Validate business and current user and other user's roles
         UserRole roleToUpdate = GetOneUserRoleForOther(otherUserID, businessID, user);
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        User otherUser = userService.GetOneUser(otherUserID);
 
         // Validate role
         if (!roleToUpdate.setRoleByText(role)) {
@@ -128,13 +144,25 @@ public class UserRoleService {
             throw new Exceptions.UnauthorizedException("Error at 'UpdateUserRole' - Can't update a collaborator role for other user if you don't have an admin or manager role");
         }
 
-        return userRoleRepository.save(roleToUpdate);
+        roleToUpdate = userRoleRepository.save(roleToUpdate);
+
+        // Notification for user role update - Logged user
+        NotificationC notification = new NotificationC("You granted the role '" + role + "' for the user '" + otherUser.getEmail() + "' successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        // Notification for user role update - Other user
+        notification = new NotificationC("The user '" + user.getEmail() + "' granted you the role '" + role + "'", "normal");
+        notificationService.CreateNotification(notification, otherUser);
+
+        return roleToUpdate;
     }
 
     public UserRole TransferManagerRole(Long otherUserID, long businessID, User user) {
         // Validate business and current user and other user's roles
         UserRole otherUserRole = GetOneUserRoleForOther(otherUserID, businessID, user);
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        User otherUser = userService.GetOneUser(otherUserID);
 
         // Validate authorization for role creation
         if (otherUserRole.getIsManager()) {
@@ -149,13 +177,25 @@ public class UserRoleService {
         currentUserRole.setRoleByText("admin");
 
         userRoleRepository.save(currentUserRole);
-        return userRoleRepository.save(otherUserRole);
+        otherUserRole = userRoleRepository.save(otherUserRole);
+
+        // Notification for user role "manager" transferred - Logged user
+        NotificationC notification = new NotificationC("You transferred the role 'manager' to the user '" + otherUser.getEmail() + "' successfully", "normal");
+        notificationService.CreateNotification(notification, user);
+
+        // Notification for user role "manager" transferred - Other user
+        notification = new NotificationC("The user '" + user.getEmail() + "' transferred to you the role 'manager'", "normal");
+        notificationService.CreateNotification(notification, otherUser);
+
+        return otherUserRole;
     }
 
     public UserRoleKey DeleteUserRole(Long otherUserID, long businessID, User user) {
         // Validate business and current user and other user's roles
         UserRole roleToDelete = GetOneUserRoleForOther(otherUserID, businessID, user);
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
+
+        User otherUser = userService.GetOneUser(otherUserID);
 
         // Validate authorization for role creation
         if (roleToDelete.getIsManager()) {
@@ -171,6 +211,15 @@ public class UserRoleService {
         }
 
         userRoleRepository.deleteById(roleToDelete.getId());
+
+        // Notification for user role deleted - Logged user
+        NotificationC notification = new NotificationC("You deleted the role of the user '" + otherUser.getEmail() + "' successfully", "normal");
+        notificationService.CreateNotification(notification, user);
+
+        // Notification for user role deleted - Other user
+        notification = new NotificationC("The user '" + user.getEmail() + "' has deleted your role!", "priority");
+        notificationService.CreateNotification(notification, otherUser);
+
         return roleToDelete.getId();
     }
 
@@ -184,6 +233,11 @@ public class UserRoleService {
         }
 
         userRoleRepository.deleteById(currentUserRole.getId());
+
+        // Notification for user role leaved
+        NotificationC notification = new NotificationC("You leaved your role successfully", "normal");
+        notificationService.CreateNotification(notification, user);
+
         return currentUserRole.getId();
     }
 }

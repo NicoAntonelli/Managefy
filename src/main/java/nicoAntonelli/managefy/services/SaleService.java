@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.entities.dto.ClientCU;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.entities.dto.SaleC;
 import nicoAntonelli.managefy.entities.dto.SaleLineC;
 import nicoAntonelli.managefy.utils.DateFormatterSingleton;
@@ -23,6 +24,7 @@ public class SaleService {
     private final SaleLineRepository saleLineRepository;
     private final BusinessService businessService; // Dependency
     private final ClientService clientService; // Dependency
+    private final NotificationService notificationService; // Dependency
     private final ProductService productService; // Dependency
     private final DateFormatterSingleton dateFormatterSingleton;
 
@@ -31,11 +33,13 @@ public class SaleService {
                        SaleLineRepository saleLineRepository,
                        BusinessService businessService,
                        ClientService clientService,
+                       NotificationService notificationService,
                        ProductService productService) {
         this.saleRepository = saleRepository;
         this.saleLineRepository = saleLineRepository;
         this.businessService = businessService;
         this.clientService = clientService;
+        this.notificationService = notificationService;
         this.productService = productService;
         this.dateFormatterSingleton = DateFormatterSingleton.getInstance();
     }
@@ -212,6 +216,11 @@ public class SaleService {
 
         // Set saved lines in the sale and return it
         sale.setSaleLines(saleLines);
+
+        // Notification for new sale
+        NotificationC notification = new NotificationC("You made a new sale with date '" + sale.getDate() + "' successfully!", "low");
+        notificationService.CreateNotification(notification, user);
+
         return sale;
     }
 
@@ -219,7 +228,13 @@ public class SaleService {
         Sale sale = GetOneSale(saleID, businessID, user);
         sale.setObservation(observation);
 
-        return saleRepository.save(sale);
+        sale = saleRepository.save(sale);
+
+        // Notification for update sale observation
+        NotificationC notification = new NotificationC("The observation field for your sale was updated to '" + observation + "' successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return sale;
     }
 
     public Sale UpdateSaleState(Long saleID, Long businessID, String state, User user) {
@@ -234,7 +249,13 @@ public class SaleService {
             sale.setPartialPayment(BigDecimal.ZERO);
         }
 
-        return saleRepository.save(sale);
+        sale = saleRepository.save(sale);
+
+        // Notification for update sale state
+        NotificationC notification = new NotificationC("The state field for your sale was updated to '" + state + "' successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return sale;
     }
 
     public Sale UpdateSalePartialPayment(Long saleID, Long businessID, BigDecimal partialPayment, User user) {
@@ -258,7 +279,11 @@ public class SaleService {
             sale.setState(Sale.SaleState.Paid);
         }
 
-        saleRepository.save(sale);
+        sale = saleRepository.save(sale);
+
+        // Notification for update sale state
+        NotificationC notification = new NotificationC("The partial payment field for your sale was updated to $" + partialPayment + " successfully", "low");
+        notificationService.CreateNotification(notification, user);
 
         return sale;
     }
@@ -271,14 +296,26 @@ public class SaleService {
         Sale sale = GetOneSale(saleID, businessID, user);
         sale.setClientByID(clientID);
 
-        return saleRepository.save(sale);
+        sale = saleRepository.save(sale);
+
+        // Notification for set client for sale
+        NotificationC notification = new NotificationC("Your sale was updated with a client successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return sale;
     }
 
     public Sale EraseClientForSale(Long saleID, Long businessID, User user) {
         Sale sale = GetOneSale(saleID, businessID, user);
         sale.setClient(null);
 
-        return saleRepository.save(sale);
+        sale = saleRepository.save(sale);
+
+        // Notification for erase client for sale
+        NotificationC notification = new NotificationC("Your sale was updated with no client field successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return sale;
     }
 
     // Logic deletion (field: sale state)
@@ -303,9 +340,13 @@ public class SaleService {
         if (client != null) {
             List<Sale> salesByClient = saleRepository.findActivesByBusinessAndClient(businessID, client.getId());
             if (salesByClient.size() == 1) {
-                clientService.DeleteClientAfterCancelSale(client.getId());
+                clientService.DeleteClientAfterCancelSale(client.getId(), user);
             }
         }
+
+        // Notification for cancel sale
+        NotificationC notification = new NotificationC("Your sale with date '" + sale.getDate().toString() + "' was cancelled successfully. Update products' stock manually if you still have them!", "normal");
+        notificationService.CreateNotification(notification, user);
 
         return saleID;
     }
@@ -328,7 +369,7 @@ public class SaleService {
         }
 
         // Without ID: create it, then set it updated in sale
-        Client client = clientService.CreateClientForNewSale(clientCU);
+        Client client = clientService.CreateClientForNewSale(clientCU, user);
         saleC.getClient().setId(client.getId());
     }
 }

@@ -5,6 +5,7 @@ import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserValidation;
 import nicoAntonelli.managefy.entities.dto.Login;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.entities.dto.Registration;
 import nicoAntonelli.managefy.entities.dto.Token;
 import nicoAntonelli.managefy.repositories.UserRepository;
@@ -28,17 +29,20 @@ public class UserService {
     private final UserValidationRepository userValidationRepository; // Dependency
     private final BusinessService businessService; // Dependency
     private final EmailService emailService; // Dependency
+    private final NotificationService notificationService; // Dependency
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        UserValidationRepository userValidationRepository,
                        BusinessService businessService,
-                       EmailService emailService) {
+                       EmailService emailService,
+                       NotificationService notificationService) {
         this.userRepository = userRepository;
         this.userValidationRepository = userValidationRepository;
         this.businessService = businessService;
         this.emailService = emailService;
+        this.notificationService = notificationService;
         this.passwordEncoder = PasswordEncoder.getInstance();
     }
 
@@ -141,7 +145,13 @@ public class UserService {
         String password = userRepository.getEncodedPassword(user.getId());
         user.setPassword(password);
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        // Notification for update user
+        NotificationC notification = new NotificationC("Your user account was updated successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return user;
     }
 
     // Only logged-user can generate its own code
@@ -156,6 +166,10 @@ public class UserService {
 
         // Send an email with the code to the user
         emailService.CodeValidationEmail(user.getEmail(), userValidation.getCode());
+
+        // Notification user validation sent
+        NotificationC notification = new NotificationC("We sent you a code via email to verify your user account. Please check your inbox", "priority");
+        notificationService.CreateNotification(notification, user);
 
         return true;
     }
@@ -183,6 +197,10 @@ public class UserService {
         // Update user with validation OK
         user.setValidated(true);
         userRepository.save(user);
+
+        // Notification user validation sent
+        NotificationC notification = new NotificationC("Your user has been correctly verified! You can now start operating with Managefy!", "normal");
+        notificationService.CreateNotification(notification, user);
 
         return true;
     }

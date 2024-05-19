@@ -1,10 +1,8 @@
 package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
-import nicoAntonelli.managefy.entities.Business;
-import nicoAntonelli.managefy.entities.Client;
-import nicoAntonelli.managefy.entities.Supplier;
-import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.*;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.repositories.*;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +23,7 @@ public class BusinessService {
     private final SaleLineRepository saleLineRepository; // Dependency
     private final SupplierRepository supplierRepository; // Dependency
     private final UserRoleRepository userRoleRepository; // Dependency
+    private final NotificationService notificationService; // Dependency
 
     @Autowired
     public BusinessService(BusinessRepository businessRepository,
@@ -33,7 +32,8 @@ public class BusinessService {
                            SaleRepository saleRepository,
                            SaleLineRepository saleLineRepository,
                            SupplierRepository supplierRepository,
-                           UserRoleRepository userRoleRepository) {
+                           UserRoleRepository userRoleRepository,
+                           NotificationService notificationService) {
         this.businessRepository = businessRepository;
         this.clientRepository = clientRepository;
         this.productRepository = productRepository;
@@ -41,6 +41,7 @@ public class BusinessService {
         this.saleLineRepository = saleLineRepository;
         this.supplierRepository = supplierRepository;
         this.userRoleRepository = userRoleRepository;
+        this.notificationService = notificationService;
     }
 
     public List<Business> GetBusinesses(User user) {
@@ -101,7 +102,13 @@ public class BusinessService {
         business.setId(null);
 
         // Note: user role "Manager" creation it's called from controller to prevent circular dependency
-        return businessRepository.save(business);
+        business = businessRepository.save(business);
+
+        // Notification for new business
+        NotificationC notification = new NotificationC("Your new business '" + business.getName() + "' is ready! You can load some products and sales!", "normal");
+        notificationService.CreateNotification(notification, user);
+
+        return business;
     }
 
     public Business UpdateBusiness(Business business, User user) {
@@ -127,7 +134,13 @@ public class BusinessService {
         // Validate business days (Optional: has a default value if not supplied)
         ValidateBusinessDays(business);
 
-        return businessRepository.save(business);
+        business = businessRepository.save(business);
+
+        // Notification for update business
+        NotificationC notification = new NotificationC("Your business '" + business.getName() + "' was correctly updated", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return business;
     }
 
     // Warning: deletes everything related also!
@@ -153,6 +166,11 @@ public class BusinessService {
 
         // Finally, physically delete business
         businessRepository.deleteById(businessID);
+
+        // Notification for deleted business
+        NotificationC notification = new NotificationC("Your business was correctly deleted, with all the associated info (sales, products, clients, suppliers, etc...)", "priority");
+        notificationService.CreateNotification(notification, user);
+
         return businessID;
     }
 

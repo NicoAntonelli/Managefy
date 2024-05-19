@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Product;
 import nicoAntonelli.managefy.entities.Supplier;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.entities.dto.ProductCU;
 import nicoAntonelli.managefy.entities.dto.SupplierCU;
 import nicoAntonelli.managefy.repositories.ProductRepository;
@@ -20,14 +21,17 @@ import java.util.*;
 public class ProductService {
     private final ProductRepository productRepository;
     private final BusinessService businessService; // Dependency
+    private final NotificationService notificationService; // Dependency
     private final SupplierService supplierService; // Dependency
 
     @Autowired
     public ProductService(ProductRepository productRepository,
                           BusinessService businessService,
+                          NotificationService notificationService,
                           SupplierService supplierService) {
         this.productRepository = productRepository;
         this.businessService = businessService;
+        this.notificationService = notificationService;
         this.supplierService = supplierService;
     }
 
@@ -93,7 +97,13 @@ public class ProductService {
             product.setSupplierByID(productCU.getSupplier().getId());
         }
 
-        return productRepository.save(product);
+        product = productRepository.save(product);
+
+        // Notification for new product
+        NotificationC notification = new NotificationC("Your new product '" + productCU.getCode() + " - " + productCU.getName() + "' was created successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return product;
     }
 
     public Product UpdateProduct(ProductCU productCU, User user) {
@@ -130,14 +140,37 @@ public class ProductService {
             product.setSupplierByID(productCU.getSupplier().getId());
         }
 
-        return productRepository.save(product);
+        product = productRepository.save(product);
+
+        // Notification for update product
+        NotificationC notification = new NotificationC("Your product '" + productCU.getCode() + " - " + productCU.getName() + "' was updated successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return product;
     }
 
     public Product UpdateProductStock(Long productID, Long businessID, Integer stock, User user) {
         Product product = GetOneProduct(productID, businessID, user);
-        product.setStock(stock);
 
-        return productRepository.save(product);
+        if (stock <= 0) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateProductStock' - Stock can't be negative");
+        }
+
+        product.setStock(stock);
+        product = productRepository.save(product);
+
+        // Notification for update product stock
+        NotificationC notification = new NotificationC("The stock field for your product was updated to '" + stock + "' successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        // Min stock threshold
+        if (product.getStockMin() != null && product.getStockMin() <= product.getStock()) {
+            // Notification for product min stock threshold reached
+            notification = new NotificationC("Your product '" + product.getCode() + " - " + product.getName() + "' reached the minimum stock threshold of " + product.getStockMin() + ". Make sure to update its stock!", "normal");
+            notificationService.CreateNotification(notification, user);
+        }
+
+        return product;
     }
 
     public Product UpdateOrAddSupplierForProduct(Long productID, Long businessID, Long supplierID, User user) {
@@ -148,14 +181,26 @@ public class ProductService {
         Product product = GetOneProduct(productID, businessID, user);
         product.setSupplierByID(supplierID);
 
-        return productRepository.save(product);
+        product = productRepository.save(product);
+
+        // Notification for set supplier for product
+        NotificationC notification = new NotificationC("Your product was updated with a supplier successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return product;
     }
 
     public Product EraseSupplierForProduct(Long productID, Long businessID, User user) {
         Product product = GetOneProduct(productID, businessID, user);
         product.setSupplier(null);
 
-        return productRepository.save(product);
+        product = productRepository.save(product);
+
+        // Notification for erase supplier for product
+        NotificationC notification = new NotificationC("Your product was updated with no supplier field successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return product;
     }
 
     // For sales
@@ -177,6 +222,14 @@ public class ProductService {
             }
 
             product.setStock(currentStock - amountNeeded);
+
+            // Min stock threshold
+            if (product.getStockMin() != null && product.getStockMin() <= product.getStock()) {
+                // Notification for product min stock threshold reached
+                NotificationC notification = new NotificationC("Your product '" + product.getCode() + " - " + product.getName() + "' reached the minimum stock threshold of " + product.getStockMin() + ". Make sure to update its stock!", "normal");
+                notificationService.CreateNotification(notification, user);
+            }
+
             productsBatch.add(product);
         });
 
@@ -205,9 +258,13 @@ public class ProductService {
         if (supplier != null) {
             List<Product> productsBySupplier = productRepository.findActivesByBusinessAndSupplier(businessID, supplier.getId());
             if (productsBySupplier.size() == 1) {
-                supplierService.DeleteSupplierAfterDeleteProduct(supplier.getId());
+                supplierService.DeleteSupplierAfterDeleteProduct(supplier.getId(), user);
             }
         }
+
+        // Notification for delete product
+        NotificationC notification = new NotificationC("Your product " + product.getCode() + " - " + product.getName() + " was deleted successfully", "low");
+        notificationService.CreateNotification(notification, user);
 
         return productID;
     }
@@ -269,7 +326,7 @@ public class ProductService {
         }
 
         // Without ID: create it, then set it updated in product
-        Supplier supplier = supplierService.CreateSupplierForNewProduct(supplierCU);
+        Supplier supplier = supplierService.CreateSupplierForNewProduct(supplierCU, user);
         productCU.getSupplier().setId(supplier.getId());
     }
 }

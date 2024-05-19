@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.entities.dto.ClientCU;
+import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.repositories.ClientRepository;
 import nicoAntonelli.managefy.repositories.SaleRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
@@ -17,14 +18,17 @@ import java.util.*;
 public class ClientService {
     private final ClientRepository clientRepository;
     private final BusinessService businessService; // Dependency
+    private final NotificationService notificationService; // Dependency
     private final SaleRepository saleRepository; // Dependency
 
     @Autowired
     public ClientService(ClientRepository clientRepository,
                          BusinessService businessService,
+                         NotificationService notificationService,
                          SaleRepository saleRepository) {
         this.clientRepository = clientRepository;
         this.businessService = businessService;
+        this.notificationService = notificationService;
         this.saleRepository = saleRepository;
     }
 
@@ -55,7 +59,7 @@ public class ClientService {
     }
 
     // On a new sale context
-    public Client CreateClientForNewSale(ClientCU clientCU) {
+    public Client CreateClientForNewSale(ClientCU clientCU, User user) {
         // Validate name
         if (clientCU.getName() == null || clientCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateClientForNewSale' - Name field was not supplied");
@@ -65,7 +69,13 @@ public class ClientService {
         Client client = new Client(clientCU.getName(), clientCU.getDescription(),
                                    clientCU.getEmail(), clientCU.getPhone());
 
-        return clientRepository.save(client);
+        client = clientRepository.save(client);
+
+        // Notification for new client
+        NotificationC notification = new NotificationC("Your new client '" + clientCU.getName() + "' was created successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
+        return client;
     }
 
     public Client CreateClient(ClientCU clientCU, User user) {
@@ -94,6 +104,10 @@ public class ClientService {
 
         // Save sales with client set
         saleRepository.saveAll(sales);
+
+        // Notification for new client
+        NotificationC notification = new NotificationC("Your new client '" + clientCU.getName() + "' was created successfully", "low");
+        notificationService.CreateNotification(notification, user);
 
         return client;
     }
@@ -130,6 +144,10 @@ public class ClientService {
         // Save sales with client set
         saleRepository.saveAll(sales);
 
+        // Notification for update client
+        NotificationC notification = new NotificationC("Your client '" + clientCU.getName() + "' was updated successfully", "low");
+        notificationService.CreateNotification(notification, user);
+
         return client;
     }
 
@@ -152,12 +170,20 @@ public class ClientService {
         }
         saleRepository.saveAll(sales);
 
+        // Notification for delete client
+        NotificationC notification = new NotificationC("Your client was deleted successfully, and erased from associated sales", "low");
+        notificationService.CreateNotification(notification, user);
+
         return clientID;
     }
 
     // On a cancel sale context
-    public void DeleteClientAfterCancelSale(Long clientID) {
+    public void DeleteClientAfterCancelSale(Long clientID, User user) {
         clientRepository.deleteById(clientID);
+
+        // Notification for delete client
+        NotificationC notification = new NotificationC("After your sale cancellation, the client without sales was also deleted successfully", "low");
+        notificationService.CreateNotification(notification, user);
     }
 
     private Set<Sale> ValidateSalesForClient(ClientCU clientCU, User user) {
