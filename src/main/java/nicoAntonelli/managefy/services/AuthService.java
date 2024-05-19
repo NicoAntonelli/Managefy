@@ -39,7 +39,7 @@ public class AuthService {
         }
 
         // User needs to have mail verification except for a few methods
-        List<String> whiteList = List.of("GenerateUserValidation", "ValidateUser");
+        List<String> whiteList = List.of("GenerateUserValidation", "ValidateUser", "DeleteUser");
         if (!user.getValidated() && !whiteList.contains(methodName)) {
             throw new Exceptions.UnauthorizedException(methodName + " - The user is not correctly validated yet!");
         }
