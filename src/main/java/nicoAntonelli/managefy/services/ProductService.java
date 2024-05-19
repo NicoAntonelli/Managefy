@@ -86,6 +86,9 @@ public class ProductService {
                 productCU.getUnitCost(), productCU.getUnitPrice(), productCU.getStock(),
                 productCU.getStockMin(), productCU.getSaleMinAmount());
 
+        // Set business
+        product.setBusinessByID(businessID);
+
         // Update product with supplier
         if (productCU.getSupplier() != null) {
             product.setSupplierByID(productCU.getSupplier().getId());
