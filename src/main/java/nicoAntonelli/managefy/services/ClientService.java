@@ -55,16 +55,15 @@ public class ClientService {
     }
 
     // On a new sale context
-    public Client CreateClientForNewSale(Client client) {
+    public Client CreateClientForNewSale(ClientCU clientCU) {
         // Validate name
-        if (client.getName() == null || client.getName().isBlank()) {
+        if (clientCU.getName() == null || clientCU.getName().isBlank()) {
             throw new Exceptions.BadRequestException("Error at 'CreateClientForNewSale' - Name field was not supplied");
         }
 
-        // Forced initial state
-        client.setId(null);
-        client.setDeletionDate(null);
-        client.setSales(null);
+        // New client object with DTO info
+        Client client = new Client(clientCU.getName(), clientCU.getDescription(),
+                                   clientCU.getEmail(), clientCU.getPhone());
 
         return clientRepository.save(client);
     }
@@ -154,6 +153,11 @@ public class ClientService {
         saleRepository.saveAll(sales);
 
         return clientID;
+    }
+
+    // On a cancel sale context
+    public void DeleteClientAfterCancelSale(Long clientID) {
+        clientRepository.deleteById(clientID);
     }
 
     private Set<Sale> ValidateSalesForClient(ClientCU clientCU, User user) {

@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Sale;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.SaleC;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.SaleService;
@@ -116,12 +117,12 @@ public class SaleController {
     }
 
     @PostMapping
-    public Result<Sale> CreateSale(@RequestBody Sale sale,
+    public Result<Sale> CreateSale(@RequestBody SaleC saleC,
                                    @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateSale");
 
-            sale = saleService.CreateSale(sale, user);
+            Sale sale = saleService.CreateSale(saleC, user);
             return new Result<>(sale);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
