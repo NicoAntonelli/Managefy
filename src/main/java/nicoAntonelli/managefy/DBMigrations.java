@@ -150,7 +150,7 @@ public class DBMigrations {
     private static List<Sale> generateSalesWithLines(List<Product> products) {
         // Sale 1 - Soda & Doritos
         long sale1ID = 1L;
-        Sale sale1 = new Sale(sale1ID, BigDecimal.ZERO, null);
+        Sale sale1 = new Sale(sale1ID, BigDecimal.ZERO, null, "Soda & Doritos");
         sale1.setBusinessByID(1L);
         sale1.setClientByID(1L);
 
@@ -168,7 +168,7 @@ public class DBMigrations {
 
         // Sale 2 - Chicken & Eggs with 10% off
         long sale2ID = 2L;
-        Sale sale2 = new Sale(sale2ID, BigDecimal.ZERO, null);
+        Sale sale2 = new Sale(sale2ID, BigDecimal.ZERO, null, "Chicken & Eggs with 10% off");
         sale2.setBusinessByID(1L);
         sale2.setClientByID(1L);
 

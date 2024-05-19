@@ -190,7 +190,7 @@ public class SaleService {
         productService.UpdateProductStockByMany(productsToUpdate, businessID, user);
 
         // New sale object with DTO info
-        Sale sale = new Sale(saleC.getPartialPayment(), saleC.getState());
+        Sale sale = new Sale(saleC.getPartialPayment(), saleC.getState(), saleC.getObservation());
 
         // Set business
         sale.setBusinessByID(businessID);
@@ -213,6 +213,13 @@ public class SaleService {
         // Set saved lines in the sale and return it
         sale.setSaleLines(saleLines);
         return sale;
+    }
+
+    public Sale UpdateSaleObservation(Long saleID, Long businessID, String observation, User user) {
+        Sale sale = GetOneSale(saleID, businessID, user);
+        sale.setObservation(observation);
+
+        return saleRepository.save(sale);
     }
 
     public Sale UpdateSaleState(Long saleID, Long businessID, String state, User user) {

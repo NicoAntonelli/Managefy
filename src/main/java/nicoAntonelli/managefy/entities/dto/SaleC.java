@@ -12,6 +12,7 @@ import java.util.List;
 public class SaleC {
     private String state;
     private BigDecimal partialPayment; // Optional
+    private String observation; // Optional
     private Long businessID;
     private ClientCU client; // Optional
     private List<SaleLineC> saleLines;

@@ -136,6 +136,28 @@ public class SaleController {
         }
     }
 
+    @PutMapping(path = "{saleID}/business/{businessID:[\\d]+}/observation/{observation}")
+    public Result<Sale> UpdateSaleObservation(@PathVariable("saleID") Long saleID,
+                                              @PathVariable("businessID") Long businessID,
+                                              @PathVariable("observation") String observation,
+                                              @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "UpdateSaleObservation");
+
+            Sale sale = saleService.UpdateSaleObservation(saleID, businessID, observation, user);
+            return new Result<>(sale);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 400, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            return new Result<>(null, 401, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            return new Result<>(null, 500, ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "{saleID}/business/{businessID:[\\d]+}/state/{state:[a-zA-Z]+}")
     public Result<Sale> UpdateSaleState(@PathVariable("saleID") Long saleID,
                                         @PathVariable("businessID") Long businessID,

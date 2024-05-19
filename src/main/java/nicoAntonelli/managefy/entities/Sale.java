@@ -30,6 +30,7 @@ public class Sale {
     private BigDecimal partialPayment; // Nullable
     @Column(nullable = false)
     private SaleState state;
+    private String observation; // Nullable
 
     @ManyToOne
     @JoinColumn(
@@ -56,20 +57,22 @@ public class Sale {
         this.id = id;
     }
 
-    public Sale(Long id, BigDecimal partialPayment, SaleState state) {
+    public Sale(Long id, BigDecimal partialPayment, SaleState state, String observation) {
         this.id = id;
         this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
 
         if (state == null) state = SaleState.PendingPayment;
         this.state = state;
+        this.observation = observation;
     }
 
-    public Sale(BigDecimal partialPayment, String state) {
+    public Sale(BigDecimal partialPayment, String state, String observation) {
         this.date = LocalDateTime.now();
         this.partialPayment = partialPayment;
 
         if (!setStateByText(state)) setStateByText("PendingPayment");
+        this.observation = observation;
     }
 
     public void setBusinessByID(Long businessID) {
