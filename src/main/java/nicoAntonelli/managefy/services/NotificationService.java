@@ -57,9 +57,12 @@ public class NotificationService {
         // Save notification
         notification = notificationRepository.save(notification);
 
-        // Optional - Send notifications by email
+        // Optional - Send notifications by email (Ignore exception if fails)
         if (user.getEmailNotifications()) {
-            emailService.NotificationEmail(user.getEmail(), notification);
+            try {
+                emailService.NotificationEmail(user.getEmail(), notification);
+            }
+            catch (Exception _) { }
         }
 
         return notification;
