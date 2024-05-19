@@ -216,6 +216,12 @@ public class ProductService {
                     () -> new Exceptions.BadRequestException("Error at 'UpdateProductStockByMany' - Problem validating product with ID: " + id)
             );
 
+            // Optional - Minimum sale amount validation
+            if (product.getSaleMinAmount() != null && amountNeeded < product.getSaleMinAmount()) {
+                throw new Exceptions.BadRequestException("Error at 'UpdateProductStockByMany' - Product with ID: " + id + " have a minimum sale amount of " + product.getSaleMinAmount() + " units unaccomplished");
+            }
+
+            // Stock validation
             Integer currentStock = product.getStock();
             if (currentStock < amountNeeded) {
                 throw new Exceptions.BadRequestException("Error at 'UpdateProductStockByMany' - Product with ID: " + id + " don't have enough stock!");
