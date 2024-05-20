@@ -131,7 +131,7 @@ public class UserService {
     }
 
     // Only logged-user can update itself
-    public User UpdateUser(User user) {
+    public Token UpdateUser(User user) {
         // Email unique validation
         Optional<User> possibleUser = userRepository.findByEmail(user.getEmail());
         if (possibleUser.isPresent()) {
@@ -151,7 +151,10 @@ public class UserService {
         NotificationC notification = new NotificationC("Your user account was updated successfully", "low");
         notificationService.CreateNotification(notification, user);
 
-        return user;
+        // Generate new JWT Token (with updated user)
+        String JWT = JWTHelper.generateToken(user.toStringSafe());
+
+        return new Token(JWT, user.getId());
     }
 
     // Only logged-user can generate its own code

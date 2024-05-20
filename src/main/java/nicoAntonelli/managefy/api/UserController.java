@@ -107,7 +107,7 @@ public class UserController {
     }
 
     @PutMapping
-    public Result<User> UpdateUser(@RequestBody User user,
+    public Result<Token> UpdateUser(@RequestBody User user,
                                    @RequestHeader HttpHeaders headers) {
         try {
             User loggedUser = authService.validateTokenFromHeaders(headers, "UpdateUser");
@@ -115,8 +115,8 @@ public class UserController {
                 throw new Exceptions.UnauthorizedException("Error at 'UpdateUser' - User: " + user.getId() + " can't update other users");
             }
 
-            user = userService.UpdateUser(user);
-            return new Result<>(user);
+            Token token = userService.UpdateUser(user);
+            return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());
