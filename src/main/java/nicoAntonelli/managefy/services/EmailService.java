@@ -26,9 +26,9 @@ public class EmailService {
 
     @Async
     public void CodeValidationEmail(String address, String code) {
-        String text = "Hi there, this is an email from Managefy App!\n" +
+        String text = "Hi there, this is an email from Managefy App!\n\n" +
                 "In order to validate your email you must now enter " +
-                "this number in the app: '" + code + "'.\n" +
+                "this number in the app: '" + code + "'.\n\n" +
                 "If you did not request any email validation, " +
                 "please ignore this message.\n\n\n" +
                 "-The Managefy Team\n";
@@ -40,10 +40,10 @@ public class EmailService {
 
     @Async
     public void NotificationEmail(String address, Notification notification) {
-        String text = "Hi there, this is an email from Managefy App!\n" +
+        String text = "Hi there, this is an email from Managefy App!\n\n" +
                 "You received a notification " +
                 "of type: '" + notification.getType().toString() + "' " +
-                "with the message: '" + notification.getDescription() + "'.\n" +
+                "with the message: '" + notification.getDescription() + "'.\n\n" +
                 "If you don't want to receive more notifications via mail, " +
                 "you can disable 'mail notifications' on the App.\n\n\n" +
                 "-The Managefy Team\n";
