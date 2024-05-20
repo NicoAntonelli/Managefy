@@ -4,10 +4,7 @@ import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.UserValidation;
-import nicoAntonelli.managefy.entities.dto.Login;
-import nicoAntonelli.managefy.entities.dto.NotificationC;
-import nicoAntonelli.managefy.entities.dto.Registration;
-import nicoAntonelli.managefy.entities.dto.Token;
+import nicoAntonelli.managefy.entities.dto.*;
 import nicoAntonelli.managefy.repositories.UserRepository;
 import nicoAntonelli.managefy.repositories.UserValidationRepository;
 import nicoAntonelli.managefy.utils.Exceptions;
@@ -131,20 +128,43 @@ public class UserService {
     }
 
     // Only logged-user can update itself
-    public Token UpdateUser(User user) {
+    public Token UpdateUser(UserU userU) {
+        // Validate fields
+        String email = userU.getEmail();
+        if (!Validation.email(email)) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateUser' - Email bad formatted: " + email);
+        }
+
+        String password = userU.getPassword();
+        if (!Validation.password(password)) {
+            throw new Exceptions.BadRequestException("Error at 'UpdateUser' - Password bad formatted for the attempted email: " + email);
+        }
+
+        // Disable email notifications if not supplied
+        if (userU.getEmailNotifications() == null) userU.setEmailNotifications(false);
+
         // Email unique validation
-        Optional<User> possibleUser = userRepository.findByEmail(user.getEmail());
+        Optional<User> possibleUser = userRepository.findByEmail(email);
         if (possibleUser.isPresent()) {
             // Only fail validation if it's not the same user
-            if (!Objects.equals(possibleUser.get().getId(), user.getId())) {
-                throw new Exceptions.BadRequestException("Error at 'UpdateUser' - Email '" + user.getEmail() + "' already taken");
+            if (!Objects.equals(possibleUser.get().getId(), userU.getId())) {
+                throw new Exceptions.BadRequestException("Error at 'UpdateUser' - Email '" + email + "' already taken");
             }
         }
 
-        // Retrieve password from DB
-        String password = userRepository.getEncodedPassword(user.getId());
-        user.setPassword(password);
+        // Encode password
+        password = passwordEncoder.encode(password);
 
+        // Obtain loaded user from DB
+        User user = GetOneUser(userU.getId());
+
+        // Merge DTO's user with the original - Don't mess up validation nor relation with other entities
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(userU.getName());
+        user.setEmailNotifications(userU.getEmailNotifications());
+
+        // Save user
         user = userRepository.save(user);
 
         // Notification for update user

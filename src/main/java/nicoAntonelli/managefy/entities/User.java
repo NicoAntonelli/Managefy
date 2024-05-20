@@ -52,7 +52,6 @@ public class User {
         this.id = id;
     }
 
-
     public User(Long id, String email, String password, String name, Boolean validated, Boolean emailNotifications) {
         this.id = id;
         this.email = email;

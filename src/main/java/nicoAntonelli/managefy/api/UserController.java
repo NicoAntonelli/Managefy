@@ -4,6 +4,7 @@ import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.Login;
 import nicoAntonelli.managefy.entities.dto.Registration;
 import nicoAntonelli.managefy.entities.dto.Token;
+import nicoAntonelli.managefy.entities.dto.UserU;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
@@ -107,15 +108,15 @@ public class UserController {
     }
 
     @PutMapping
-    public Result<Token> UpdateUser(@RequestBody User user,
-                                   @RequestHeader HttpHeaders headers) {
+    public Result<Token> UpdateUser(@RequestBody UserU userU,
+                                    @RequestHeader HttpHeaders headers) {
         try {
             User loggedUser = authService.validateTokenFromHeaders(headers, "UpdateUser");
-            if (!Objects.equals(loggedUser.getId(), user.getId())) {
-                throw new Exceptions.UnauthorizedException("Error at 'UpdateUser' - User: " + user.getId() + " can't update other users");
+            if (!Objects.equals(loggedUser.getId(), userU.getId())) {
+                throw new Exceptions.UnauthorizedException("Error at 'UpdateUser' - User: " + loggedUser.getId() + " can't update other users");
             }
 
-            Token token = userService.UpdateUser(user);
+            Token token = userService.UpdateUser(userU);
             return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
