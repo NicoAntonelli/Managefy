@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.services;
 
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
+import nicoAntonelli.managefy.entities.dto.BusinessCU;
 import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.repositories.*;
 import nicoAntonelli.managefy.utils.Exceptions;
@@ -83,23 +84,24 @@ public class BusinessService {
         return business.get();
     }
 
-    public Business CreateBusiness(Business business, User user) {
+    public Business CreateBusiness(BusinessCU businessCU, User user) {
         // Validate simple attributes
-        if (business.getName() == null || business.getDescription() == null || business.getLink() == null) {
+        if (businessCU.getName() == null || businessCU.getDescription() == null || businessCU.getLink() == null) {
             throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - One or more of the required fields were not supplied");
         }
 
         // Link unique validation
-        Optional<Business> possibleBusiness = businessRepository.findByLink(business.getLink(), user.getId());
+        Optional<Business> possibleBusiness = businessRepository.findByLink(businessCU.getLink(), user.getId());
         if (possibleBusiness.isPresent()) {
-            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - Link '" + business.getLink() + "' already taken");
+            throw new Exceptions.BadRequestException("Error at 'CreateBusiness' - Link '" + businessCU.getLink() + "' already taken");
         }
 
         // Validate business days (Optional: has a default value if not supplied)
-        ValidateBusinessDays(business);
+        ValidateBusinessDays(businessCU);
 
-        // Forced initial state
-        business.setId(null);
+        // New client object with DTO info
+        Business business = new Business(businessCU.getName(), businessCU.getDescription(), businessCU.getLink(),
+                                         businessCU.getIsPublic(), businessCU.getBusinessDays());
 
         // Note: user role "Manager" creation it's called from controller to prevent circular dependency
         business = businessRepository.save(business);
@@ -111,28 +113,38 @@ public class BusinessService {
         return business;
     }
 
-    public Business UpdateBusiness(Business business, User user) {
-        boolean exists = ExistsBusiness(business.getId(), user, "admin");
+    public Business UpdateBusiness(BusinessCU businessCU, User user) {
+        boolean exists = ExistsBusiness(businessCU.getId(), user, "admin");
         if (!exists) {
-            throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Business with ID: " + business.getId() + " doesn't exist or the user: " + user.getId() + " isn't an Admin");
+            throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Business with ID: " + businessCU.getId() + " doesn't exist or the user: " + user.getId() + " isn't an Admin");
         }
 
         // Validate simple attributes
-        if (business.getName() == null || business.getDescription() == null || business.getLink() == null) {
+        if (businessCU.getName() == null || businessCU.getDescription() == null || businessCU.getLink() == null) {
             throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - One or more of the required fields were not supplied");
         }
 
+        // Validate business days (Optional: has a default value if not supplied)
+        ValidateBusinessDays(businessCU);
+
         // Link unique validation
-        Optional<Business> possibleBusiness = businessRepository.findByLink(business.getLink(), user.getId());
+        Optional<Business> possibleBusiness = businessRepository.findByLink(businessCU.getLink(), user.getId());
         if (possibleBusiness.isPresent()) {
             // Only fail validation if it's not the same business
-            if (!Objects.equals(possibleBusiness.get().getId(), business.getId())) {
-                throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Link '" + business.getLink() + "' already taken");
+            if (!Objects.equals(possibleBusiness.get().getId(), businessCU.getId())) {
+                throw new Exceptions.BadRequestException("Error at 'UpdateBusiness' - Link '" + businessCU.getLink() + "' already taken");
             }
         }
 
-        // Validate business days (Optional: has a default value if not supplied)
-        ValidateBusinessDays(business);
+        // Validate business existence and obtain it loaded from DB
+        Business business = GetOneBusiness(businessCU.getId(), user);
+
+        // Merge DTO's client with the original - Don't mess up relation with other entities
+        business.setName(businessCU.getName());
+        business.setDescription(businessCU.getDescription());
+        business.setLink(businessCU.getLink());
+        business.setIsPublic(businessCU.getIsPublic());
+        business.setBusinessDays(businessCU.getBusinessDays());
 
         business = businessRepository.save(business);
 
@@ -174,9 +186,9 @@ public class BusinessService {
         return businessID;
     }
 
-    private void ValidateBusinessDays(Business business) {
-        SortedMap<String, Boolean> businessDays = business.getBusinessDays();
-        if (business.getBusinessDays() != null) {
+    private void ValidateBusinessDays(BusinessCU businessCU) {
+        SortedMap<String, Boolean> businessDays = businessCU.getBusinessDays();
+        if (businessCU.getBusinessDays() != null) {
             if (businessDays.size() != 7) {
                 throw new Exceptions.BadRequestException("Error at 'ValidateBusinessDays' - Business days need to have a total of 7 days");
             }

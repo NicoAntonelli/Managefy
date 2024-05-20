@@ -2,6 +2,7 @@ package nicoAntonelli.managefy.api;
 
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
+import nicoAntonelli.managefy.entities.dto.BusinessCU;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.BusinessService;
 import nicoAntonelli.managefy.services.ErrorLogService;
@@ -111,15 +112,15 @@ public class BusinessController {
     }
 
     @PostMapping
-    public Result<Business> CreateBusiness(@RequestBody Business business,
+    public Result<Business> CreateBusiness(@RequestBody BusinessCU businessCU,
                                            @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateBusiness");
 
-            business = businessService.CreateBusiness(business, user);
+            Business business = businessService.CreateBusiness(businessCU, user);
 
             // Set new manager role
-            userRoleService.CreateUserRoleForNewBusiness(business.getId(), user.getId());
+            userRoleService.CreateUserRoleForNewBusiness(user.getId(), business.getId());
 
             return new Result<>(business);
         } catch (Exceptions.BadRequestException ex) {
@@ -135,12 +136,12 @@ public class BusinessController {
     }
 
     @PutMapping
-    public Result<Business> UpdateBusiness(@RequestBody Business business,
+    public Result<Business> UpdateBusiness(@RequestBody BusinessCU businessCU,
                                            @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateBusiness");
 
-            business = businessService.UpdateBusiness(business, user);
+            Business business = businessService.UpdateBusiness(businessCU, user);
             return new Result<>(business);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
