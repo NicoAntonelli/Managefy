@@ -19,6 +19,11 @@ public class PathController {
         this.errorLogService = errorLogService;
     }
 
+    @RequestMapping(path = {"", "/"})
+    public Result<Object> API() {
+        return new Result<>("Welcome to Managefy API!");
+    }
+
     @RequestMapping(path = "**",
                     method = {RequestMethod.GET, RequestMethod.POST,
                               RequestMethod.PUT, RequestMethod.DELETE,
