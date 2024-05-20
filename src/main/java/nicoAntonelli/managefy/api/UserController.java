@@ -149,13 +149,13 @@ public class UserController {
     }
 
     @PutMapping(path = "validate/{code:[\\d]+}")
-    public Result<Boolean> ValidateUser(@PathVariable("code") String code,
-                                        @RequestHeader HttpHeaders headers) {
+    public Result<Token> ValidateUser(@PathVariable("code") String code,
+                                      @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "ValidateUser");
 
-            Boolean response = userService.ValidateUser(code, user);
-            return new Result<>(response);
+            Token token = userService.ValidateUser(code, user);
+            return new Result<>(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             return new Result<>(null, 400, ex.getMessage());

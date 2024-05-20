@@ -175,34 +175,39 @@ public class UserService {
     }
 
     // Only logged-user can validate itself
-    public Boolean ValidateUser(String code, User user) {
+    public Token ValidateUser(String code, User user) {
+        Long userID = user.getId();
         if (user.getValidated()) {
             throw new Exceptions.BadRequestException("Error at 'ValidateUser' - User with ID: " + user.getId() + " has already been validated");
         }
 
-        Optional<UserValidation> optionalValidation = userValidationRepository.findByUser(user.getId());
-        if (optionalValidation.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'ValidateUser' - No validation code was generated for the User ID: " + user.getId());
-        }
+        UserValidation userValidation = userValidationRepository.findByUser(userID).orElseThrow(
+                () -> new Exceptions.BadRequestException("Error at 'ValidateUser' - No validation code was generated for the User ID: " + userID)
+        );
 
         // Code and expiry date validations
-        UserValidation userValidation = optionalValidation.get();
         if (!Objects.equals(userValidation.getCode(), code)) {
-            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code mismatch for the User ID: " + user.getId());
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code mismatch for the User ID: " + userID);
         }
         if (userValidation.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code has expired for the User ID: " + user.getId());
+            throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Validation code has expired for the User ID: " + userID);
         }
+
+        // Get user with all its fields loaded
+        user = GetOneUser(userID);
 
         // Update user with validation OK
         user.setValidated(true);
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         // Notification user validation sent
         NotificationC notification = new NotificationC("Your user has been correctly verified! You can now start operating with Managefy!", "normal");
         notificationService.CreateNotification(notification, user);
 
-        return true;
+        // Generate new JWT Token (with now-validated user)
+        String JWT = JWTHelper.generateToken(user.toStringSafe());
+
+        return new Token(JWT, userID);
     }
 
     // Only logged-user can delete its own account

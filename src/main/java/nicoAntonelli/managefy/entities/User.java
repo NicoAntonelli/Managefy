@@ -89,6 +89,18 @@ public class User {
                 "}";
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", validated=" + validated +
+                ", emailNotifications=" + emailNotifications +
+                '}';
+    }
+
     public static User UserFromJWT(String payload) {
         List<String> filters = List.of("id=", "email=", "name=", "validated=", "emailNotifications=");
         String id = payload.substring(payload.indexOf(filters.get(0)) + filters.get(0).length(), payload.indexOf(filters.get(1)) - 2);

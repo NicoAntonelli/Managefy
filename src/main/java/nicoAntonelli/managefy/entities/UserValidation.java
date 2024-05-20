@@ -39,4 +39,14 @@ public class UserValidation {
         user = new User();
         user.setId(userID);
     }
+
+    @Override
+    public String toString() {
+        return "UserValidation{" +
+                "id=" + id +
+                ", user=" + user.toStringSafe() +
+                ", code='" + code + '\'' +
+                ", expiryDate=" + expiryDate +
+                '}';
+    }
 }
