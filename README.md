@@ -16,6 +16,16 @@ with multiple easy-to-understand graphs... in a single free app.
 > graphical and statistical results in a simple way.
 
 
+## Getting started
+
+1. Clone this repository and open it in your favourite IDE
+2. Reload project to install all the Maven dependencies
+3. Run (or debug) Managefy Application locally
+4. Go to the main endpoint at `localhost:8080/api` (by default, or other custom port) in any browser
+5. Make more requests with `Postman` or the tool you like to the API
+
+> To make API requests, the API base path is `localhost:8080/api/`
+
 ## Technologies used
 
 ### Frontend
@@ -30,15 +40,17 @@ with multiple easy-to-understand graphs... in a single free app.
 
 ### Backend
 
-| Name                            | How it contributes to the project                                   |
-|:--------------------------------|:--------------------------------------------------------------------|
-| :coffee: Java                   | General-purpose object-oriented programming language                |
-| :feather: Maven                 | Automation tool for build and manage Java projects                  |
-| :fallen_leaf: Spring Boot       | Java framework used to create services and applications             |
-| :bookmark_tabs: Spring Data JPA | Extra layer of data-access abstraction. Easy JPA-based repositories |
-| :world_map: Hibernate           | Object-relational mapping (ORM) tool for Java, JPA implementation   |
-| :card_file_box: PostgreSQL      | Open-source relational database management system (RDBMS)           |
-| :hot_pepper: Lombok             | Minimizes boilerplate such as constructors, getters and setters     |
+| Name                               | How it contributes to the project                                    |
+|:-----------------------------------|:---------------------------------------------------------------------|
+| :coffee: Java                      | General-purpose object-oriented programming language                 |
+| :feather: Maven                    | Automation tool for build and manage Java projects                   |
+| :fallen_leaf: Spring Boot          | Java framework used to create services and applications              |
+| :bookmark_tabs: Spring Data JPA    | Extra layer of data-access abstraction. Easy JPA-based repositories  |
+| :world_map: Hibernate              | Object-relational mapping (ORM) tool for Java, JPA implementation    |
+| :card_file_box: PostgreSQL         | Open-source relational database management system (RDBMS)            |
+| :floppy_disk: JSON Web Token (JWT) | Compact and self-contained way for securely transmitting information |
+| :envelope: Java Mail               | Official tool to send and receive email via SMTP                     |
+| :hot_pepper: Lombok                | Minimizes boilerplate such as constructors, getters and setters      |
 
 ## Author
 
