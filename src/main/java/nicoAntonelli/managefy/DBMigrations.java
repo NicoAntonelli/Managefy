@@ -3,9 +3,11 @@ package nicoAntonelli.managefy;
 import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.utils.PasswordEncoder;
 import nicoAntonelli.managefy.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +17,17 @@ import java.util.List;
 @Configuration
 @SuppressWarnings("unused")
 public class DBMigrations {
+    private final Boolean runMigrations;
+
+    @Autowired
+    public DBMigrations(Environment env) {
+        if (env == null) {
+            throw new RuntimeException("Can't access to environment variables from the file 'application.properties'!");
+        }
+
+        runMigrations = Boolean.parseBoolean(env.getProperty("migrations.run"));
+    }
+
     @Bean
     CommandLineRunner runner(BusinessRepository businessRepository,
                              ClientRepository clientRepository,
@@ -27,6 +40,9 @@ public class DBMigrations {
                              UserRepository userRepository,
                              UserRoleRepository userRoleRepository) {
         return args -> {
+            // Don't run migrations clause
+            if (!runMigrations) return;
+
             // Businesses
             List<Business> businesses = generateBusinesses();
             businessRepository.saveAll(businesses);
