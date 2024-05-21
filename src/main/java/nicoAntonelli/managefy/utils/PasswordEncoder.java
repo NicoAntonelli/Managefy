@@ -16,7 +16,7 @@ public final class PasswordEncoder {
 
     private PasswordEncoder() throws NoSuchAlgorithmException {
         // Salt generation
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = new SecureRandom(new byte[8]);
         byte[] salt = new byte[16];
         random.nextBytes(salt);
         this.salt = salt;
