@@ -7,10 +7,12 @@ import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.NotificationService;
 import nicoAntonelli.managefy.utils.Exceptions;
-import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -32,102 +34,102 @@ public class NotificationController {
     }
 
     @GetMapping
-    public Result<List<Notification>> GetNotifications(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<List<Notification>> GetNotifications(@RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "GetNotifications");
 
             List<Notification> notifications = notificationService.GetNotifications(user);
-            return new Result<>(notifications);
+            return ResponseEntity.status(HttpStatus.OK).body(notifications);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @GetMapping(path = "{notificationID:[\\d]+}")
-    public Result<Notification> GetOneNotification(@PathVariable("notificationID") Long notificationID,
-                                                   @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Notification> GetOneNotification(@PathVariable("notificationID") Long notificationID,
+                                                           @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "GetOneNotification");
 
             Notification notification = notificationService.GetOneNotification(notificationID, user);
-            return new Result<>(notification);
+            return ResponseEntity.status(HttpStatus.OK).body(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PostMapping
-    public Result<Notification> CreateNotification(@RequestBody NotificationC notificationC,
-                                                   @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Notification> CreateNotification(@RequestBody NotificationC notificationC,
+                                                           @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CreateNotification");
 
             Notification notification = notificationService.CreateNotification(notificationC, user);
-            return new Result<>(notification);
+            return ResponseEntity.status(HttpStatus.OK).body(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PutMapping(path = "{notificationID:[\\d]+}/state/{state:[a-zA-Z]+}")
-    public Result<Notification> UpdateNotificationState(@PathVariable("notificationID") Long notificationID,
-                                                        @PathVariable("state") String state,
-                                                        @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Notification> UpdateNotificationState(@PathVariable("notificationID") Long notificationID,
+                                                                @PathVariable("state") String state,
+                                                                @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "UpdateNotificationState");
 
             Notification notification = notificationService.UpdateNotificationState(notificationID, state, user);
-            return new Result<>(notification);
+            return ResponseEntity.status(HttpStatus.OK).body(notification);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @DeleteMapping(path = "{notificationID:[\\d]+}")
-    public Result<Long> CloseNotification(@PathVariable("notificationID") Long notificationID,
-                                          @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Long> CloseNotification(@PathVariable("notificationID") Long notificationID,
+                                                  @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "CloseNotification");
 
             notificationID = notificationService.CloseNotification(notificationID, user);
-            return new Result<>(notificationID);
+            return ResponseEntity.status(HttpStatus.OK).body(notificationID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 }

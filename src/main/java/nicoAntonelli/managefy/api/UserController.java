@@ -9,10 +9,12 @@ import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.ErrorLogService;
 import nicoAntonelli.managefy.services.UserService;
 import nicoAntonelli.managefy.utils.Exceptions;
-import nicoAntonelli.managefy.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,81 +37,81 @@ public class UserController {
     }
 
     @GetMapping()
-    public Result<List<User>> GetUsers(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<List<User>> GetUsers(@RequestHeader HttpHeaders headers) {
         try {
             authService.validateTokenFromHeaders(headers, "GetUsers");
 
             List<User> users = userService.GetUsers();
-            return new Result<>(users);
+            return ResponseEntity.status(HttpStatus.OK).body(users);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @GetMapping(path = "{userID:[\\d]+}")
-    public Result<User> GetOneUser(@PathVariable("userID") Long userID,
-                                   @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<User> GetOneUser(@PathVariable("userID") Long userID,
+                                           @RequestHeader HttpHeaders headers) {
         try {
             authService.validateTokenFromHeaders(headers, "GetOneUser");
 
             User user = userService.GetOneUser(userID);
-            return new Result<>(user);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PostMapping(path = "register")
-    public Result<Token> Register(@RequestBody Registration registration) {
+    public ResponseEntity<Token> Register(@RequestBody Registration registration) {
         try {
             Token token = userService.CreateUser(registration);
-            return new Result<>(token);
+            return ResponseEntity.status(HttpStatus.OK).body(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PostMapping(path = "login")
-    public Result<Token> Login(@RequestBody Login login) {
+    public ResponseEntity<Token> Login(@RequestBody Login login) {
         try {
             Token token = userService.Login(login);
-            return new Result<>(token);
+            return ResponseEntity.status(HttpStatus.OK).body(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PutMapping
-    public Result<Token> UpdateUser(@RequestBody UserU userU,
-                                    @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Token> UpdateUser(@RequestBody UserU userU,
+                                            @RequestHeader HttpHeaders headers) {
         try {
             User loggedUser = authService.validateTokenFromHeaders(headers, "UpdateUser");
             if (!Objects.equals(loggedUser.getId(), userU.getId())) {
@@ -117,74 +119,74 @@ public class UserController {
             }
 
             Token token = userService.UpdateUser(userU);
-            return new Result<>(token);
+            return ResponseEntity.status(HttpStatus.OK).body(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PutMapping(path = "generateValidation")
-    public Result<Boolean> GenerateUserValidation(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Boolean> GenerateUserValidation(@RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "GenerateUserValidation");
 
             Boolean response = userService.GenerateUserValidation(user);
-            return new Result<>(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @PutMapping(path = "validate/{code:[\\d]+}")
-    public Result<Token> ValidateUser(@PathVariable("code") String code,
-                                      @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Token> ValidateUser(@PathVariable("code") String code,
+                                              @RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "ValidateUser");
 
             Token token = userService.ValidateUser(code, user);
-            return new Result<>(token);
+            return ResponseEntity.status(HttpStatus.OK).body(token);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 
     @DeleteMapping
-    public Result<Long> DeleteUser(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Long> DeleteUser(@RequestHeader HttpHeaders headers) {
         try {
             User user = authService.validateTokenFromHeaders(headers, "DeleteUser");
 
             Long userID = userService.DeleteUser(user);
-            return new Result<>(userID);
+            return ResponseEntity.status(HttpStatus.OK).body(userID);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 400, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (Exceptions.UnauthorizedException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
-            return new Result<>(null, 401, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
-            return new Result<>(null, 500, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         }
     }
 }
