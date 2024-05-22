@@ -30,13 +30,18 @@ with multiple easy-to-understand graphs... in a single free app.
 
 ### Frontend
 
-| Name                                    | How it contributes to the project              |
-|:----------------------------------------|:-----------------------------------------------|
-| :necktie: TypeScript                    | Programming language that builds on JavaScript |
-| :rocket: Next.js                        | Fullstack framework for React.js               |
-| :framed_picture:	HTML5 / CSS3 / SASS    | The basics for the web!                        |
-| :art: Mantine                           | Really nice component library                  |
-| :package: TurboPack                     | JavaScript very fast bundler                   |
+| Name                            | How it contributes to the project              |
+|:--------------------------------|:-----------------------------------------------|
+| :necktie: TypeScript            | Programming language that builds on JavaScript |
+| :rocket: Next.js                | Fullstack framework for React.js               |
+| :basket: Mantine                | Really cool component library                  |
+| :bone: HTML5 & CSS3             | The basics for the web!                        |
+| :art: Tailwind CSS              | Simple stylization                             |
+| :framed_picture: Tabler Icons   | Icons Mantine-compatible                       |
+| :paintbrush: Prettier           | Nice code formatter                            |
+| :triangular_ruler: ESLint       | Complete linter with strict rules              |
+| :package: TurboPack             | JavaScript very fast bundler                   |
+| :page_with_curl: GitHub Actions | CI/CD automation                               |
 
 ### Backend
 
