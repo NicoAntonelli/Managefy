@@ -220,8 +220,8 @@ public class DBMigrations {
         PasswordEncoder passwordEncoder = PasswordEncoder.getInstance();
         if (passwordEncoder == null) return new ArrayList<>();
 
-        User user1 = new User("johndoe@mail.com", passwordEncoder.encode("Java1234"), "John Doe", true, true);
-        User user2 = new User("janedoe@mail.com", passwordEncoder.encode("Script1234"), "Jane Doe", false, false);
+        User user1 = new User("johndoe@mail.com", passwordEncoder.encode("Java1234#"), "John Doe", true, true);
+        User user2 = new User("janedoe@mail.com", passwordEncoder.encode("Script1234#"), "Jane Doe", false, false);
 
         return List.of(user1, user2);
     }
