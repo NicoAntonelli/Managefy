@@ -20,6 +20,12 @@ public class AuthService {
             token = token.substring(token.indexOf(filter) + filter.length());
         }
 
+        // Remove authorization
+        filter = "Authorization=";
+        if (token.contains(filter)) {
+            token = token.substring(token.indexOf(filter) + filter.length());
+        }
+
         if (!JWTHelper.validateToken(token)) return null;
 
         String userStringify = JWTHelper.getSubjectFromToken(token);
@@ -32,7 +38,12 @@ public class AuthService {
             throw new Exceptions.UnauthorizedException(methodName + " - Invalid access token");
         }
 
+        // Check if the token it's contained directly in headers
         String token = headers.getFirst("Authorization");
+
+        // Check if the token it's inside an http-only cookie
+        if (token == null) token = headers.getFirst("Cookie");
+
         User user = validateToken(token);
         if (user == null) {
             throw new Exceptions.UnauthorizedException(methodName + " - Invalid access token");
