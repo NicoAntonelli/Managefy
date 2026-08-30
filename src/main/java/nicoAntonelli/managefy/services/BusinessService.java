@@ -46,7 +46,9 @@ public class BusinessService {
     }
 
     public List<Business> GetBusinesses(User user) {
-        return businessRepository.findByUser(user.getId());
+        List<Business> businesses = businessRepository.findByUser(user.getId());
+        businesses.forEach(business -> SetCurrentUserRoleForBusiness(user, business));
+        return businesses;
     }
 
     public Boolean ExistsBusiness(Long businessID, User user, String minimumRole) {
@@ -63,7 +65,9 @@ public class BusinessService {
             throw new Exceptions.BadRequestException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " don't have a rol in it");
         }
 
-        return business.get();
+        Business foundBusiness = business.get();
+        SetCurrentUserRoleForBusiness(user, foundBusiness);
+        return foundBusiness;
     }
 
     public Business GetOneBusinessByLink(String link, User user) {
@@ -72,7 +76,9 @@ public class BusinessService {
             throw new Exceptions.BadRequestException("Error at 'GetOneBusinessByLink' - Business with Link: " + link + " doesn't exist or the user: " + user.getId() + " don't have a rol in it");
         }
 
-        return business.get();
+        Business foundBusiness = business.get();
+        SetCurrentUserRoleForBusiness(user, foundBusiness);
+        return foundBusiness;
     }
 
     public Business GetOneBusinessByLinkPublic(String link) {
@@ -184,6 +190,27 @@ public class BusinessService {
         notificationService.CreateNotification(notification, user);
 
         return businessID;
+    }
+
+    private void SetCurrentUserRoleForBusiness(User user, Business business) {
+        if (user == null || business == null) return;
+
+        Optional<UserRole> currentUserRole = userRoleRepository.findById(new UserRoleKey(user.getId(), business.getId()));
+        if (currentUserRole.isEmpty()) {
+            business.setCurrentUserRole(null);
+            return;
+        }
+
+        UserRole role = currentUserRole.get();
+        if (role.getIsManager()) {
+            business.setCurrentUserRole("Manager");
+        } else if (role.getIsAdmin()) {
+            business.setCurrentUserRole("Admin");
+        } else if (role.getIsCollaborator()) {
+            business.setCurrentUserRole("Collaborator");
+        } else {
+            business.setCurrentUserRole(null);
+        }
     }
 
     private void ValidateBusinessDays(BusinessCU businessCU) {

@@ -44,6 +44,9 @@ public class Business {
         put("Sunday", false);
     }};
 
+    @Transient
+    private String currentUserRole; // Nullable, not persisted in DB
+
     @JsonIgnore
     @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL })
     private Set<UserRole> userRoles = new HashSet<>();
