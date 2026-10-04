@@ -135,6 +135,28 @@ public class UserRoleController {
         }
     }
 
+    @PutMapping(path = "business/{businessID:[\\d]+}/createRoleByMail/{role:[a-zA-Z]+}")
+    public ResponseEntity<UserRole> CreateUserRoleByMail(@RequestParam("email") String email,
+                                                         @PathVariable("businessID") Long businessID,
+                                                         @PathVariable("role") String role,
+                                                         @RequestHeader HttpHeaders headers) {
+        try {
+            User user = authService.validateTokenFromHeaders(headers, "CreateUserRoleByMail");
+
+            UserRole userRole = userRoleService.CreateUserRoleByMail(email, businessID, role, user);
+            return ResponseEntity.status(HttpStatus.OK).body(userRole);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
+
     @PutMapping(path = "user/{otherUserID:[\\d]+}/business/{businessID:[\\d]+}/updateRole/{role:[a-zA-Z]+}")
     public ResponseEntity<UserRole> UpdateUserRole(@PathVariable("otherUserID") Long otherUserID,
                                                    @PathVariable("businessID") Long businessID,

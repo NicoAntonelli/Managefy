@@ -74,17 +74,26 @@ public class UserRoleService {
         return userRole.get();
     }
 
+    public UserRole CreateUserRoleByMail(String email, Long businessID, String role, User user) {
+        User otherUser = userService.GetOneUserByEmail(email);
+        return CreateUserRole(otherUser, businessID, role, user);
+    }
+
     public UserRole CreateUserRole(Long otherUserID, Long businessID, String role, User user) {
+        User otherUser = userService.GetOneUser(otherUserID);
+        return CreateUserRole(otherUser, businessID, role, user);
+    }
+
+    private UserRole CreateUserRole(User otherUser, Long businessID, String role, User user) {
         // Validate business and current user and other user's roles
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
-        User otherUser = userService.GetOneUser(otherUserID);
 
         // Validate role
         if (!List.of("collaborator", "admin", "manager").contains(role)) {
             throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - Invalid role: " + role);
         }
 
-        UserRole roleToCreate = new UserRole(otherUserID, businessID, role);
+        UserRole roleToCreate = new UserRole(otherUser.getId(), businessID, role);
 
         // Validate authorization for role creation
         if (roleToCreate.getIsManager()) {
