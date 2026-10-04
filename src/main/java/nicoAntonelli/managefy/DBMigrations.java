@@ -88,8 +88,8 @@ public class DBMigrations {
     }
 
     private static List<Business> generateBusinesses() {
-        Business business1 = new Business("Groceryfy", "Buy everything", "groceryfy/", false);
-        Business business2 = new Business("Dean's Butchery", "The best meat", "deans-butchery/", false);
+        Business business1 = new Business("Intergalactic Shop", "Buy everything", "intergalactic-shop-na120x/", false);
+        Business business2 = new Business("Dean's Butchery", "The best meat", "deans-butchery-a1234z/", false);
 
         return List.of(business1, business2);
     }
