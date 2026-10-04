@@ -44,6 +44,10 @@ public class UserRoleService {
     }
 
     public UserRole GetOneUserRoleForOther(Long otherUserID, Long businessID, User user) {
+        return GetOneUserRoleForOther(otherUserID, businessID, user, false);
+    }
+
+    public UserRole GetOneUserRoleForOther(Long otherUserID, Long businessID, User user, boolean acceptsEmptyRole) {
         // Validate business, logged user and role
         businessService.GetOneBusiness(businessID, user);
 
@@ -54,6 +58,8 @@ public class UserRoleService {
 
         Optional<UserRole> userRole = userRoleRepository.findById(userRoleKey);
         if (userRole.isEmpty()) {
+            if (acceptsEmptyRole) return null;
+
             throw new Exceptions.BadRequestException("Error at 'GetOneUserRoleForOther' - UserRole with ID: " + userRoleKey + " doesn't exist");
         }
 
@@ -85,10 +91,17 @@ public class UserRoleService {
     }
 
     private UserRole CreateUserRole(User otherUser, Long businessID, String role, User user) {
-        // Validate business and current user and other user's roles
+        // Validate business and current user role
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
 
+        // Validate other user role
+        UserRole otherUserRole = GetOneUserRoleForOther(otherUser.getId(), businessID, user, true);
+        if (otherUserRole != null) {
+            throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - User with ID: " + otherUser.getId() + " already has a role for this business!");
+        }
+
         // Validate role
+        role = role.toLowerCase();
         if (!List.of("collaborator", "admin", "manager").contains(role)) {
             throw new Exceptions.BadRequestException("Error at 'CreateUserRole' - Invalid role: " + role);
         }
@@ -129,13 +142,14 @@ public class UserRoleService {
     }
 
     public UserRole UpdateUserRole(Long otherUserID, Long businessID, String role, User user) {
-        // Validate business and current user and other user's roles
+        // Validate business, current user and other user's roles
         UserRole roleToUpdate = GetOneUserRoleForOther(otherUserID, businessID, user);
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
 
         User otherUser = userService.GetOneUser(otherUserID);
 
         // Validate role
+        role = role.toLowerCase();
         if (!roleToUpdate.setRoleByText(role)) {
             throw new Exceptions.BadRequestException("Error at 'UpdateUserRole' - Invalid role: " + role);
         }
@@ -167,7 +181,7 @@ public class UserRoleService {
     }
 
     public UserRole TransferManagerRole(Long otherUserID, long businessID, User user) {
-        // Validate business and current user and other user's roles
+        // Validate business, current user and other user's roles
         UserRole otherUserRole = GetOneUserRoleForOther(otherUserID, businessID, user);
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
 
@@ -200,7 +214,7 @@ public class UserRoleService {
     }
 
     public UserRoleKey DeleteUserRole(Long otherUserID, long businessID, User user) {
-        // Validate business and current user and other user's roles
+        // Validate business, current user and other user's roles
         UserRole roleToDelete = GetOneUserRoleForOther(otherUserID, businessID, user);
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
 
