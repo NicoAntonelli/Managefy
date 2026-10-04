@@ -227,7 +227,7 @@ public class UserRoleService {
         // Validate business and current user role
         UserRole currentUserRole = GetOneUserRoleForLogged(businessID, user);
 
-        // You can leave a business before transfer manager role
+        // You can't leave a business before transfer manager role
         if (currentUserRole.getIsManager()) {
             throw new Exceptions.UnauthorizedException("Error at 'LeaveUserRole' - First you need to transfer the manager role to other user!");
         }
