@@ -3,6 +3,7 @@ package nicoAntonelli.managefy.api;
 import nicoAntonelli.managefy.entities.Business;
 import nicoAntonelli.managefy.entities.User;
 import nicoAntonelli.managefy.entities.dto.BusinessCU;
+import nicoAntonelli.managefy.entities.dto.BusinessResources;
 import nicoAntonelli.managefy.services.AuthService;
 import nicoAntonelli.managefy.services.BusinessService;
 import nicoAntonelli.managefy.services.ErrorLogService;
@@ -101,6 +102,23 @@ public class BusinessController {
         try {
             Business business = businessService.GetOneBusinessByLinkPublic(link);
             return ResponseEntity.status(HttpStatus.OK).body(business);
+        } catch (Exceptions.BadRequestException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (Exceptions.UnauthorizedException ex) {
+            errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (Exception ex) {
+            errorLogService.SetBackendError(ex.getMessage(), Exceptions.InternalServerErrorException.status, ex.getCause());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "{businessID:[\\d]+}/publicResources")
+    public ResponseEntity<BusinessResources> GetOneBusinessWithResourcesPublic(@PathVariable("businessID") Long businessID) {
+        try {
+            BusinessResources businessResources = businessService.GetOneBusinessWithResourcesPublic(businessID);
+            return ResponseEntity.status(HttpStatus.OK).body(businessResources);
         } catch (Exceptions.BadRequestException ex) {
             errorLogService.SetBackendError(ex.getMessage(), ex.getStatus(), ex.getInnerException());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());

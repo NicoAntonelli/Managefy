@@ -3,12 +3,15 @@ package nicoAntonelli.managefy.services;
 import jakarta.transaction.Transactional;
 import nicoAntonelli.managefy.entities.*;
 import nicoAntonelli.managefy.entities.dto.BusinessCU;
+import nicoAntonelli.managefy.entities.dto.BusinessResources;
 import nicoAntonelli.managefy.entities.dto.NotificationC;
 import nicoAntonelli.managefy.repositories.*;
 import nicoAntonelli.managefy.utils.Exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,6 +60,26 @@ public class BusinessService {
             case "manager" -> businessRepository.existsByIdAndUserManager(businessID, user.getId());
             default -> businessRepository.existsByIdAndUser(businessID, user.getId());
         };
+    }
+
+    public BusinessResources GetOneBusinessWithResourcesPublic(Long businessID) {
+        boolean exists = businessRepository.existsByIdPublic(businessID);
+        if (!exists) {
+            throw new Exceptions.BadRequestException("Error at 'GetOneBusinessPublic' - Business with ID: " + businessID + " doesn't exist or the business it's not public");
+        }
+
+        // Default interval: from 3 months to tomorrow
+        LocalDate today = LocalDate.now();
+        LocalDateTime initialDate = today.minusMonths(3).atStartOfDay();
+        LocalDateTime finalDate = today.plusDays(1).atStartOfDay();
+
+        List<Client> clients = clientRepository.findActivesByBusiness(businessID);
+        List<Product> products = productRepository.findActivesByBusiness(businessID);
+        List<Sale> sales = saleRepository.findActivesByIntervalAndBusiness(initialDate, finalDate, businessID);
+        List<Supplier> suppliers = supplierRepository.findActivesByBusiness(businessID);
+        List<UserRole> userRoles = userRoleRepository.findByBusiness(businessID);
+
+        return new BusinessResources(businessID, clients, products, sales, suppliers, userRoles);
     }
 
     public Business GetOneBusiness(Long businessID, User user) {

@@ -62,4 +62,10 @@ public interface BusinessRepository extends JpaRepository<Business, Long> {
             "WHERE b.id = ?1 " +
             "AND u.id = ?2 AND ur.isManager = TRUE")
     Boolean existsByIdAndUserManager(Long businessID, Long userID);
+
+    @Query("SELECT COUNT(b) > 0 " +
+            "FROM Business b " +
+            "WHERE b.id = ?1 " +
+            "AND b.isPublic = TRUE")
+    Boolean existsByIdPublic(Long businessID);
 }
