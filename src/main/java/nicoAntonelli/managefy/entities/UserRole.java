@@ -2,15 +2,21 @@ package nicoAntonelli.managefy.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
+
+import java.util.Objects;
 
 @Entity
 @IdClass(UserRoleKey.class)
 @Table(name = "userRoles")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class UserRole {
     @Id
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "userID",
@@ -21,6 +27,7 @@ public class UserRole {
     private User user;
 
     @Id
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "businessID",
@@ -79,5 +86,22 @@ public class UserRole {
         }
 
         return true;
+    }
+
+    // Identity based on composite key (user + business)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        UserRole other = (UserRole) o;
+        if (getUser() == null || getBusiness() == null || other.getUser() == null || other.getBusiness() == null) return false;
+        return getUser().getId() != null && getBusiness().getId() != null
+                && Objects.equals(getUser().getId(), other.getUser().getId())
+                && Objects.equals(getBusiness().getId(), other.getBusiness().getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

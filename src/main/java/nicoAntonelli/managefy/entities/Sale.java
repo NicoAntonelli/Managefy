@@ -2,17 +2,21 @@ package nicoAntonelli.managefy.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "sales")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class Sale {
     // State enum
     public enum SaleState { Cancelled, PendingPayment, PartialPayment, Paid, PaidAndBilled }
@@ -32,6 +36,7 @@ public class Sale {
     private SaleState state;
     private String observation; // Nullable
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "businessID",
@@ -41,6 +46,7 @@ public class Sale {
     )
     private Business business;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "clientID",
@@ -49,6 +55,7 @@ public class Sale {
     )
     private Client client; // Nullable
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "sale", cascade = { CascadeType.ALL },
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SaleLine> saleLines = new ArrayList<>();
@@ -124,5 +131,19 @@ public class Sale {
         }
 
         this.setTotalPrice(total);
+    }
+
+    // Identity based on ID only
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Sale other = (Sale) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

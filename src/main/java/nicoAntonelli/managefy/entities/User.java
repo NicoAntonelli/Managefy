@@ -3,20 +3,23 @@ package nicoAntonelli.managefy.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users",
        uniqueConstraints = {
                @UniqueConstraint(name = "users_email_unique", columnNames = "email")
        })
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class User {
     @Id
     @SequenceGenerator(name = "users_sequence", sequenceName = "users_sequence")
@@ -109,5 +112,19 @@ public class User {
         String emailNotifications = payload.substring(payload.indexOf(filters.get(4)) + filters.get(4).length(), payload.indexOf("}"));
 
         return new User(Long.parseLong(id), email, null, name, Boolean.parseBoolean(validated), Boolean.parseBoolean(emailNotifications));
+    }
+
+    // Identity based on ID only
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User other = (User) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

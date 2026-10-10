@@ -3,17 +3,21 @@ package nicoAntonelli.managefy.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Table(name = "products")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class Product {
     @Id
     @SequenceGenerator(name = "products_sequence", sequenceName = "products_sequence")
@@ -39,6 +43,7 @@ public class Product {
     private LocalDateTime deletionDate; // Nullable
 
     @JsonIgnore
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "businessID",
@@ -48,6 +53,7 @@ public class Product {
     )
     private Business business;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "supplierID",
@@ -57,6 +63,7 @@ public class Product {
     private Supplier supplier; // Nullable
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "product", cascade = { CascadeType.ALL },
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<SaleLine> saleLines = new HashSet<>();
@@ -99,5 +106,19 @@ public class Product {
     public void setSupplierByID(Long supplierID) {
         supplier = new Supplier();
         supplier.setId(supplierID);
+    }
+
+    // Identity based on ID only
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Product other = (Product) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

@@ -3,14 +3,16 @@ package nicoAntonelli.managefy.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Table(name = "clients")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class Client {
     @Id
     @SequenceGenerator(name = "clients_sequence", sequenceName = "clients_sequence")
@@ -28,6 +30,7 @@ public class Client {
     private LocalDateTime deletionDate; // Nullable
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "client", cascade = { CascadeType.ALL },
             orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Sale> sales = new HashSet<>();
@@ -51,5 +54,19 @@ public class Client {
         this.email = email;
         this.phone = phone;
         this.deletionDate = deletionDate;
+    }
+
+    // Identity based on ID only
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Client other = (Client) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

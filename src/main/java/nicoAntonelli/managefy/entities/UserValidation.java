@@ -2,15 +2,18 @@ package nicoAntonelli.managefy.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.Hibernate;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.Objects;
 
 @Entity
 @Table(name = "userValidations")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class UserValidation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,5 +51,19 @@ public class UserValidation {
                 ", code='" + code + '\'' +
                 ", expiryDate=" + expiryDate +
                 '}';
+    }
+
+    // Identity based on ID only
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        UserValidation other = (UserValidation) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

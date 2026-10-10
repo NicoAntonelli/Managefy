@@ -3,8 +3,11 @@ package nicoAntonelli.managefy.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -15,7 +18,7 @@ import java.util.*;
         uniqueConstraints = {
                 @UniqueConstraint(name = "businesses_link_unique", columnNames = "link")
         })
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class Business {
     @Id
     @SequenceGenerator(name = "businesses_sequence", sequenceName = "businesses_sequence")
@@ -48,15 +51,18 @@ public class Business {
     private String currentUserRole; // Nullable, not persisted in DB
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL })
     private Set<UserRole> userRoles = new HashSet<>();
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL },
                orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Product> products = new HashSet<>();
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "business", cascade = { CascadeType.ALL },
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Sale> sales = new ArrayList<>();
@@ -79,5 +85,19 @@ public class Business {
         this.description = description;
         this.isPublic = isPublic;
         this.link = link;
+    }
+
+    // Identity based on ID only
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Business other = (Business) o;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }

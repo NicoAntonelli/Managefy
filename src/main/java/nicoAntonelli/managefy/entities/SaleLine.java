@@ -3,18 +3,23 @@ package nicoAntonelli.managefy.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @IdClass(SaleLineKey.class)
 @Table(name = "saleLines")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class SaleLine {
     @Id
     @JsonIgnore
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "saleID",
@@ -38,6 +43,7 @@ public class SaleLine {
     @Transient
     private BigDecimal subtotal; // Calculated
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(
             name = "productID",
@@ -95,5 +101,22 @@ public class SaleLine {
         if (price == null) price = getProduct().getUnitPrice();
 
         subtotal = BigDecimal.valueOf(amount).multiply(price).multiply(discountSurcharge);
+    }
+
+    // Identity based on composite key (sale + position)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        SaleLine other = (SaleLine) o;
+        if (getSale() == null || other.getSale() == null) return false;
+        return getSale().getId() != null && getPosition() != null
+                && Objects.equals(getSale().getId(), other.getSale().getId())
+                && Objects.equals(getPosition(), other.getPosition());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }
