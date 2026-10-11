@@ -112,12 +112,9 @@ public class UserService {
             throw new Exceptions.BadRequestException("Error at 'ValidateUser' - Password bad formatted for the attempted email: " + email);
         }
 
-        // Encode password
-        password = passwordEncoder.encode(password);
-
         // Email & password comparison against DB
         User user = GetOneUserByEmail(email);
-        if (!Objects.equals(email, user.getEmail()) || !Objects.equals(password, user.getPassword())) {
+        if (!Objects.equals(email, user.getEmail()) || !passwordEncoder.matches(password, user.getPassword())) {
             throw new Exceptions.UnauthorizedException("Error at 'ValidateUser' - Email or password mismatch, attempted email: " + email);
         }
 
