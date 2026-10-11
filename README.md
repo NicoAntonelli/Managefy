@@ -1,6 +1,8 @@
 # Managefy
 Easy-to-use resource management for your business
 
+![Version](https://img.shields.io/badge/version-1.0-blue)
+
 ![Managefy logo](public/Managefy-logo.jpeg)
 
 ## Project description
@@ -51,6 +53,7 @@ with multiple easy-to-understand graphs... in a single free app.
 | :feather: Maven                    | Automation tool for build and manage Java projects                   |
 | :fallen_leaf: Spring Boot          | Java framework used to create services and applications              |
 | :bookmark_tabs: Spring Data JPA    | Extra layer of data-access abstraction. Easy JPA-based repositories  |
+| :key: Spring Security Crypto       | Hashes passwords with BCrypt and provides encryption utilities       |
 | :world_map: Hibernate              | Object-relational mapping (ORM) tool for Java, JPA implementation    |
 | :card_file_box: PostgreSQL         | Open-source relational database management system (RDBMS)            |
 | :floppy_disk: JSON Web Token (JWT) | Compact and self-contained way for securely transmitting information |
