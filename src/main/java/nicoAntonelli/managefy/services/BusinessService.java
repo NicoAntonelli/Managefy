@@ -85,7 +85,7 @@ public class BusinessService {
     public Business GetOneBusiness(Long businessID, User user) {
         Optional<Business> business = businessRepository.findByIdAndUser(businessID, user.getId());
         if (business.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " don't have a rol in it");
+            throw new Exceptions.BadRequestException("Error at 'GetOneBusiness' - Business with ID: " + businessID + " doesn't exist or the user: " + user.getId() + " don't have a role in it");
         }
 
         Business foundBusiness = business.get();
@@ -96,7 +96,7 @@ public class BusinessService {
     public Business GetOneBusinessByLink(String link, User user) {
         Optional<Business> business = businessRepository.findByLink(link, user.getId());
         if (business.isEmpty()) {
-            throw new Exceptions.BadRequestException("Error at 'GetOneBusinessByLink' - Business with Link: " + link + " doesn't exist or the user: " + user.getId() + " don't have a rol in it");
+            throw new Exceptions.BadRequestException("Error at 'GetOneBusinessByLink' - Business with Link: " + link + " doesn't exist or the user: " + user.getId() + " don't have a role in it");
         }
 
         Business foundBusiness = business.get();
